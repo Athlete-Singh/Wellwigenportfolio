@@ -11,6 +11,8 @@ import Navbar from "./components/common/Navbar";
 import FloatingContact from "./components/common/FloatingContact";
 import AdminLayout from "./features/dashboard/layout/AdminLayout";
 import ErrorBoundary from "./components/ErrorBoundary";
+import LandingPage from "./features/landing/LandingPage";
+import AnimatedBackground from "./components/common/AnimatedBackground";
 
 // Home / Website Pages
 import Hero from './features/home/components/Hero';
@@ -68,11 +70,11 @@ function ProviderProtectedRoute({ children, allowedRole }) {
   const token = localStorage.getItem("providerToken") || localStorage.getItem("vendorToken");
   const infoRaw = localStorage.getItem("providerInfo") || localStorage.getItem("vendorInfo");
   const status = localStorage.getItem("providerStatus") || localStorage.getItem("vendorStatus");
-  
+
   if (!token || !infoRaw) {
     return <Navigate to="/vendor/login" replace />;
   }
-  
+
   let info = {};
   try {
     info = JSON.parse(infoRaw);
@@ -80,9 +82,9 @@ function ProviderProtectedRoute({ children, allowedRole }) {
     console.error("Failed to parse providerInfo:", e);
     return <Navigate to="/vendor/login" replace />;
   }
-  
+
   const type = (info.type || "").toUpperCase(); // e.g. "DOCTOR", "LAB", "PHARMACY", "TRAINER", "NUTRITION", "VENDOR"
-  
+
   // Enforce Approved Status
   if (status !== "approved") {
     return (
@@ -96,8 +98,8 @@ function ProviderProtectedRoute({ children, allowedRole }) {
           <p className="mt-2 text-xs text-slate-400 leading-relaxed">
             Once administrators approve your application, you will receive an email with your credentials to access your secure portal.
           </p>
-          <button 
-            onClick={() => { localStorage.clear(); window.location.href = "/vendor/login"; }} 
+          <button
+            onClick={() => { localStorage.clear(); window.location.href = "/vendor/login"; }}
             className="mt-8 w-full py-3.5 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200"
           >
             Return to Login
@@ -106,7 +108,7 @@ function ProviderProtectedRoute({ children, allowedRole }) {
       </div>
     );
   }
-  
+
   // Enforce Role Alignment & Prevent Wrong Dashboard Access
   if (allowedRole && type !== allowedRole.toUpperCase()) {
     return (
@@ -120,8 +122,8 @@ function ProviderProtectedRoute({ children, allowedRole }) {
           <p className="mt-2 text-xs text-slate-400 leading-relaxed">
             You do not have authorization to view the <span className="font-bold text-rose-600 uppercase">{allowedRole}</span> dashboard.
           </p>
-          <button 
-            onClick={() => { window.location.href = `/${type.toLowerCase()}/dashboard`; }} 
+          <button
+            onClick={() => { window.location.href = `/${type.toLowerCase()}/dashboard`; }}
             className="mt-8 w-full py-3.5 bg-[#009688] text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#00796B] transition-all shadow-xl shadow-emerald-200"
           >
             Go to My Dashboard
@@ -130,7 +132,7 @@ function ProviderProtectedRoute({ children, allowedRole }) {
       </div>
     );
   }
-  
+
   return children;
 }
 
@@ -159,27 +161,35 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-transparent text-black relative">
+      {/* Global Living Energy Field Animated Background */}
+      <AnimatedBackground />
+
       <Toaster position="top-right" reverseOrder={false} />
 
-      {/* ✅ Hide Navbar for Admin, Vendor, and Provider Pages */}
-      {!location.pathname.startsWith("/admin") &&
-       !location.pathname.startsWith("/vendor") &&
-       !location.pathname.startsWith("/provider") && 
-       !location.pathname.startsWith("/lab") && 
-       !location.pathname.startsWith("/pharmacy") && 
-       !location.pathname.startsWith("/trainer") && 
-       !location.pathname.startsWith("/dashboard") && 
-       !location.pathname.startsWith("/login") && <Navbar />}
+      {/* ✅ Hide Navbar for Landing Page, Admin, Vendor, and Provider Pages */}
+      {location.pathname !== "/" &&
+        !location.pathname.startsWith("/admin") &&
+        !location.pathname.startsWith("/vendor") &&
+        !location.pathname.startsWith("/provider") &&
+        !location.pathname.startsWith("/lab") &&
+        !location.pathname.startsWith("/pharmacy") &&
+        !location.pathname.startsWith("/trainer") &&
+        !location.pathname.startsWith("/dashboard") &&
+        !location.pathname.startsWith("/login") && <Navbar />}
 
-        <ErrorBoundary>
+      <ErrorBoundary>
         <Routes location={location} key={location.pathname}>
 
           {/* ================= ADMIN ROUTES ================= */}
           <Route path="/cart" element={<Cart />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          
+          {/* OLD CODE (commented by AI) */}
+          {/* (no /admin/inquiries route previously) */}
+          {/* NEW CODE - Wellwigen restyle / Inquiries feature */}
+          <Route path="/admin/inquiries" element={<AdminDashboard initialTab="Inquiries" />} />
+
           <Route path="/admin/manage" element={<AdminLayout />}>
             <Route path="medical-records" element={<MedicalRecords />} />
             <Route path="prescriptions" element={<Prescriptions />} />
@@ -204,7 +214,7 @@ function App() {
 
 
           {/* ================= VENDOR ROUTES ================= */}
-          
+
           <Route path="/provider/onboarding" element={<OnboardingWizard />} />
           <Route path="/provider/status" element={<ProviderStatus />} />
           <Route path="/vendor/register" element={<OnboardingWizard />} />
@@ -247,9 +257,23 @@ function App() {
             }
           />
 
-          {/* ================= HOME ================= */}
+          {/* ================= NEW SINGLE-PAGE LANDING ================= */}
+          <Route path="/" element={<LandingPage />} />
+
+          {/* ================= REDIRECTS FROM OLD MARKETING ROUTES TO ANCHORS ================= */}
+          <Route path="/personal-training" element={<Navigate to="/#personal-training" replace />} />
+          <Route path="/group-classes" element={<Navigate to="/#group-classes" replace />} />
+          <Route path="/schedule" element={<Navigate to="/#group-classes" replace />} />
+          <Route path="/about" element={<Navigate to="/#home" replace />} />
+          <Route path="/contact" element={<Navigate to="/#home" replace />} />
+          <Route path="/services" element={<Navigate to="/#home" replace />} />
+          <Route path="/pricing" element={<Navigate to="/#personal-training" replace />} />
+          <Route path="/testimonial" element={<Navigate to="/#home" replace />} />
+          <Route path="/contactus" element={<Navigate to="/#home" replace />} />
+
+          {/* ================= LEGACY START: Original Multi-page Homepage =================
           <Route
-            path="/"
+            path="/legacy-home"
             element={
               <PageWrapper>
                 <Helmet>
@@ -257,49 +281,35 @@ function App() {
                   <meta name="description" content="Wellwigen is an AI-powered health and wellness ecosystem. Get 24/7 online doctor consultations, personalized AI meal plans, and certified virtual personal fitness trainers. Sync biometric devices, book home lab tests, and get doorstep medicine delivery." />
                   <meta name="keywords" content="online doctor consultation, 24/7 online doctor, AI meal planner, AI nutrition app, virtual fitness trainer, online personal training, immediate virtual care, telehealth app, home lab tests, prescription medicine delivery online, AI diet coach, medical health ecosystem, digital clinic" />
                   <link rel="canonical" href={window.location.origin + "/"} />
-                  {/* Open Graph / Facebook */}
                   <meta property="og:type" content="website" />
                   <meta property="og:title" content="Wellwigen | 24/7 Online Doctor Consultation, AI Diet Planner & Fitness Coach" />
                   <meta property="og:description" content="Access 24/7 online doctor consultations, personalized AI diet plans, certified fitness training, and fast online medicine delivery." />
                   <meta property="og:url" content="https://wellwigen.com" />
                   <meta property="og:image" content="https://wellwigen.com/og-image.jpg" />
-                  {/* Twitter */}
                   <meta name="twitter:card" content="summary_large_image" />
                   <meta name="twitter:title" content="Wellwigen | 24/7 Online Doctor Consultation, AI Diet Planner & Fitness Coach" />
                   <meta name="twitter:description" content="Access 24/7 online doctor consultations, personalized AI diet plans, certified fitness training, and fast online medicine delivery." />
-                  {/* Schema Markup */}
                   <script type="application/ld+json">
                     {`
-                      {
-                        "@context": "https://schema.org",
-                        "@type": "MedicalBusiness",
-                        "name": "Wellwigen",
-                        "alternateName": "Wellwigen Health & Fitness",
-                        "url": "https://wellwigen.com",
-                        "logo": "https://wellwigen.com/favicon.svg",
-                        "image": "https://wellwigen.com/og-image.jpg",
-                        "description": "Wellwigen is an AI-powered health and wellness platform offering 24/7 online doctor consultations, personalized AI meal plans, and virtual fitness coaching. Access immediate virtual care, certified trainers, home lab tests, and doorstep medicine delivery.",
-                        "telephone": "+919598506627",
-                        "email": "wellwigen@gmail.com",
-                        "address": {
-                          "@type": "PostalAddress",
-                          "streetAddress": "123 Fitness Street, Wellness City",
-                          "addressCountry": "IN"
-                        },
-                        "priceRange": "$$",
-                        "medicalSpecialty": [
-                          "PrimaryCare",
-                          "Dietetics",
-                          "Physiotherapy"
-                        ],
-                        "contactPoint": {
-                          "@type": "ContactPoint",
+                        {
+                          "@context": "https://schema.org",
+                          "@type": "MedicalBusiness",
+                          "name": "Wellwigen",
+                          "alternateName": "Wellwigen Health & Fitness",
+                          "url": "https://wellwigen.com",
+                          "logo": "https://wellwigen.com/favicon.svg",
+                          "image": "https://wellwigen.com/og-image.jpg",
+                          "description": "Wellwigen is an AI-powered health and wellness platform offering 24/7 online doctor consultations, personalized AI meal plans, and virtual fitness coaching.",
                           "telephone": "+919598506627",
-                          "contactType": "customer service",
-                          "email": "wellwigen@gmail.com"
+                          "email": "wellwigen@gmail.com",
+                          "address": {
+                            "@type": "PostalAddress",
+                            "streetAddress": "123 Fitness Street, Wellness City",
+                            "addressCountry": "IN"
+                          },
+                          "priceRange": "$$"
                         }
-                      }
-                    `}
+                      `}
                   </script>
                 </Helmet>
 
@@ -307,9 +317,9 @@ function App() {
                   <Hero />
                   <ResponsiveSection>
                     <FitnessClasses />
-                  <ResponsiveSection>
-                    <VerifiedTrainers />
-                  </ResponsiveSection>
+                    <ResponsiveSection>
+                      <VerifiedTrainers />
+                    </ResponsiveSection>
                   </ResponsiveSection>
                   <Framework />
                   <FruitMarketplace />
@@ -337,83 +347,18 @@ function App() {
               </PageWrapper>
             }
           />
+          ================= LEGACY END: Original Multi-page Homepage ================= */}
 
-          {/* ================= OTHER ROUTES ================= */}
+          {/* ================= LEGACY START: Original Marketing Sub-routes (redirected to single-scroll anchors above) =================
           <Route path="/services" element={
             <PageWrapper>
               <Helmet>
                 <title>Comprehensive Telehealth Services: 24/7 Online Doctor & Fitness | Wellwigen Services</title>
                 <meta name="description" content="Explore Wellwigen's complete digital healthcare ecosystem. Connect with 24/7 online doctor consultations, get a personalized AI meal planner, book home blood sample collections, hire online personal fitness trainers, and order online medicine delivery." />
-                <meta name="keywords" content="telehealth services, 24/7 online doctor, virtual fitness trainer, personalized nutrition advice, home blood collection lab tests, online medicine delivery, immediate virtual care, virtual clinic near me, remote patient monitoring" />
                 <link rel="canonical" href={window.location.origin + "/services"} />
-                <script type="application/ld+json">
-                  {`
-                    {
-                      "@context": "https://schema.org",
-                      "@type": "Service",
-                      "serviceType": "Telehealth and Wellness Services",
-                      "provider": {
-                        "@type": "MedicalBusiness",
-                        "name": "Wellwigen",
-                        "url": "https://wellwigen.com"
-                      },
-                      "hasOfferCatalog": {
-                        "@type": "OfferCatalog",
-                        "name": "Wellwigen Health Services",
-                        "itemListElement": [
-                          {
-                            "@type": "Offer",
-                            "itemOffered": {
-                              "@type": "Service",
-                              "name": "24/7 Online Doctor Consultation",
-                              "description": "Immediate virtual consultations with board-certified physicians."
-                            }
-                          },
-                          {
-                            "@type": "Offer",
-                            "itemOffered": {
-                              "@type": "Service",
-                              "name": "Personalized AI Diet Planner & Nutrition",
-                              "description": "Customized automated meal planning for weight loss and health monitoring."
-                            }
-                          },
-                          {
-                            "@type": "Offer",
-                            "itemOffered": {
-                              "@type": "Service",
-                              "name": "Online Personal Training & Fitness Coach",
-                              "description": "Certified virtual training routines adapted to biometric devices."
-                            }
-                          },
-                          {
-                            "@type": "Offer",
-                            "itemOffered": {
-                              "@type": "Service",
-                              "name": "At-Home Lab Tests & Blood Sample Collection",
-                              "description": "Convenient diagnostic testing in the comfort of your home."
-                            }
-                          },
-                          {
-                            "@type": "Offer",
-                            "itemOffered": {
-                              "@type": "Service",
-                              "name": "Doorstep Prescription Medicine Delivery Online",
-                              "description": "Fast online pharmacy orders delivered directly to your door."
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  `}
-                </script>
               </Helmet>
-              <ResponsiveSection><Dashboard />
-                  </ResponsiveSection>
-                  <ResponsiveSection>
-                    <FitnessClasses />
-                  <ResponsiveSection>
-                    <VerifiedTrainers />
-                  </ResponsiveSection></ResponsiveSection>
+              <ResponsiveSection><Dashboard /></ResponsiveSection>
+              <ResponsiveSection><FitnessClasses /><ResponsiveSection><VerifiedTrainers /></ResponsiveSection></ResponsiveSection>
               <Footer />
             </PageWrapper>
           } />
@@ -421,19 +366,7 @@ function App() {
             <PageWrapper>
               <Helmet>
                 <title>AI Health Engine & Personalized Bio-Tracking | Wellwigen Ecosystem</title>
-                <meta name="description" content="Learn how the Wellwigen AI Health Engine integrates with wearables and biometric sensors to analyze heart rate variability (HRV) and circadian rhythms to provide personalized preventative healthcare interventions." />
-                <meta name="keywords" content="AI health engine, personalized bio-tracking, HRV health monitoring, biometric analysis, preventive healthcare system, circadian rhythm app, wearable health tech, smart health monitoring" />
                 <link rel="canonical" href={window.location.origin + "/ecosystem"} />
-                <script type="application/ld+json">
-                  {`
-                    {
-                      "@context": "https://schema.org",
-                      "@type": "WebPage",
-                      "name": "Wellwigen AI Health Engine",
-                      "description": "Real-time biometric monitoring and smart health intervention systems."
-                    }
-                  `}
-                </script>
               </Helmet>
               <Footer />
             </PageWrapper>
@@ -442,19 +375,7 @@ function App() {
             <PageWrapper>
               <Helmet>
                 <title>Affordable Health Subscriptions & Telemedicine Pricing | Wellwigen Plans</title>
-                <meta name="description" content="View our flexible, flat-rate wellness subscription plans. Gain unlimited access to 24/7 online doctor visits, certified virtual personal fitness trainers, and personalized AI meal plans." />
-                <meta name="keywords" content="telemedicine pricing, health subscription plans, online doctor consultation cost, virtual fitness trainer pricing, personalized meal plan subscription, online medical care plans" />
                 <link rel="canonical" href={window.location.origin + "/pricing"} />
-                <script type="application/ld+json">
-                  {`
-                    {
-                      "@context": "https://schema.org",
-                      "@type": "WebPage",
-                      "name": "Wellwigen Pricing Plans",
-                      "description": "Subscription plans for telemedicine, AI nutrition coaching, and online physical training."
-                    }
-                  `}
-                </script>
               </Helmet>
               <Pricing isSubSection={false} />
               <Footer />
@@ -464,19 +385,7 @@ function App() {
             <PageWrapper>
               <Helmet>
                 <title>Wellwigen Reviews | Patient Success Stories & Client Testimonials</title>
-                <meta name="description" content="See real reviews from patients and clients who transformed their health using Wellwigen. Read success stories about online doctor consultations, personalized AI diet plans, and virtual fitness coaching." />
-                <meta name="keywords" content="Wellwigen reviews, online doctor reviews, AI meal planner reviews, virtual fitness trainer reviews, digital health success stories, patient testimonials" />
                 <link rel="canonical" href={window.location.origin + "/testimonial"} />
-                <script type="application/ld+json">
-                  {`
-                    {
-                      "@context": "https://schema.org",
-                      "@type": "WebPage",
-                      "name": "Wellwigen Patient Success Stories & Reviews",
-                      "description": "Reviews from users who achieved clinical wellness, weight loss, and fitness with Wellwigen."
-                    }
-                  `}
-                </script>
               </Helmet>
               <Testimonials />
               <Footer />
@@ -486,24 +395,13 @@ function App() {
             <PageWrapper>
               <Helmet>
                 <title>Contact Wellwigen | 24/7 Telehealth Support & Partner Care</title>
-                <meta name="description" content="Get in touch with Wellwigen support. Contact our customer care for help with online doctor booking, partner integrations, virtual trainer signups, or health app support." />
-                <meta name="keywords" content="contact telehealth support, telemedicine customer service, book online doctor consultation, partner with Wellwigen, customer support phone" />
                 <link rel="canonical" href={window.location.origin + "/contactus"} />
-                <script type="application/ld+json">
-                  {`
-                    {
-                      "@context": "https://schema.org",
-                      "@type": "ContactPage",
-                      "name": "Contact Wellwigen Support",
-                      "description": "Support information for telemedicine patients and providers on the Wellwigen platform."
-                    }
-                  `}
-                </script>
               </Helmet>
               <ContactUs />
               <Footer />
             </PageWrapper>
           } />
+          ================= LEGACY END: Original Marketing Sub-routes ================= */}
           <Route path="/join-as-trainer" element={
             <PageWrapper>
               <Helmet>
@@ -513,13 +411,13 @@ function App() {
                 <link rel="canonical" href={window.location.origin + "/join-as-trainer"} />
                 <script type="application/ld+json">
                   {`
-                    {
-                      "@context": "https://schema.org",
-                      "@type": "WebPage",
-                      "name": "Join Wellwigen as a Certified Fitness Coach",
-                      "description": "Onboarding page for professional personal trainers to offer remote fitness coaching."
-                    }
-                  `}
+                      {
+                        "@context": "https://schema.org",
+                        "@type": "WebPage",
+                        "name": "Join Wellwigen as a Certified Fitness Coach",
+                        "description": "Onboarding page for professional personal trainers to offer remote fitness coaching."
+                      }
+                    `}
                 </script>
               </Helmet>
               <TrainerForm />
@@ -537,13 +435,13 @@ function App() {
                 <link rel="canonical" href={window.location.origin + "/register"} />
                 <script type="application/ld+json">
                   {`
-                    {
-                      "@context": "https://schema.org",
-                      "@type": "RegisterAction",
-                      "name": "Sign Up for Wellwigen",
-                      "description": "Start your personalized health, telemedicine, and fitness program."
-                    }
-                  `}
+                      {
+                        "@context": "https://schema.org",
+                        "@type": "RegisterAction",
+                        "name": "Sign Up for Wellwigen",
+                        "description": "Start your personalized health, telemedicine, and fitness program."
+                      }
+                    `}
                 </script>
               </Helmet>
               <ResponsiveSection>
@@ -563,13 +461,13 @@ function App() {
                 <link rel="canonical" href={window.location.origin + "/login"} />
                 <script type="application/ld+json">
                   {`
-                    {
-                      "@context": "https://schema.org",
-                      "@type": "WebPage",
-                      "name": "Patient Login - Wellwigen Portal",
-                      "description": "Secure sign-in for patient health tracking and consultations."
-                    }
-                  `}
+                      {
+                        "@context": "https://schema.org",
+                        "@type": "WebPage",
+                        "name": "Patient Login - Wellwigen Portal",
+                        "description": "Secure sign-in for patient health tracking and consultations."
+                      }
+                    `}
                 </script>
               </Helmet>
               <Login />
@@ -577,8 +475,11 @@ function App() {
           } />
 
         </Routes>
-        </ErrorBoundary>
-        <FloatingContact />
+      </ErrorBoundary>
+      {/* OLD CODE (commented by AI) */}
+      {/* {location.pathname !== '/' && <FloatingContact />} */}
+      {/* NEW CODE - Wellwigen restyle / Inquiries feature (hide floating contact in admin) */}
+      {location.pathname !== '/' && !location.pathname.startsWith('/admin') && <FloatingContact />}
     </div>
   );
 }

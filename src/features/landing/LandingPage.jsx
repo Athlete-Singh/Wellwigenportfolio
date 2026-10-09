@@ -1,0 +1,185 @@
+import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
+import PageLoader from './components/PageLoader';
+import Navbar from './components/Navbar';
+import HomeSection from './components/HomeSection';
+import PersonalTrainingSection from './components/PersonalTrainingSection';
+import GroupClassesSection from './components/GroupClassesSection';
+import FinalCTA from './components/FinalCTA';
+import Footer from './components/Footer';
+import LeadModal from './components/LeadModal';
+import LegalModal from './components/LegalModal';
+import FloatingWhatsApp from './components/FloatingWhatsApp';
+
+export default function LandingPage() {
+  const [loading, setLoading] = useState(true);
+  const [leadModalOpen, setLeadModalOpen] = useState(false);
+  const [leadModalData, setLeadModalData] = useState({});
+  const [legalModalOpen, setLegalModalOpen] = useState(false);
+  const [legalModalType, setLegalModalType] = useState('privacy');
+
+  // Initial loader duration (400ms for smooth hydration)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handle direct anchor links from URL on mount
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const id = hash.replace('#', '');
+      const timer = setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleOpenLeadModal = (data = {}) => {
+    setLeadModalData(data);
+    setLeadModalOpen(true);
+  };
+
+  const handleCloseLeadModal = () => {
+    setLeadModalOpen(false);
+  };
+
+  const handleOpenLegalModal = (type) => {
+    setLegalModalType(type);
+    setLegalModalOpen(true);
+  };
+
+  const handleCloseLegalModal = () => {
+    setLegalModalOpen(false);
+  };
+
+  const handleNavigateSection = (sectionId) => {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      window.history.pushState(null, '', `#${sectionId}`);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-transparent text-slate-800 font-sans selection:bg-teal-500 selection:text-white">
+      {/* Dynamic SEO Tags */}
+      <Helmet>
+        <title>Wellwigen | Online Personal Training &amp; Live Group Fitness Classes</title>
+        <meta
+          name="description"
+          content="Get Fit. Get Strong. Stay Consistent. Join Wellwigen for personalized 1-on-1 personal training and live interactive online group fitness classes with certified expert coaches."
+        />
+        <meta
+          name="keywords"
+          content="online personal training, live group fitness classes, online fitness trainer India, HIIT, Tabata, Yoga, Jungle Fit, weight loss coaching, strength training online"
+        />
+        <link rel="canonical" href="https://wellwigen.com/" />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://wellwigen.com/" />
+        <meta property="og:title" content="Wellwigen | Online Personal Training &amp; Group Fitness" />
+        <meta
+          property="og:description"
+          content="Get Fit. Get Strong. Stay Consistent. Personalized online fitness training &amp; live group workouts."
+        />
+        <meta property="og:image" content="https://wellwigen.com/images/hero_workout.jpg" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Wellwigen | Online Personal Training &amp; Group Fitness" />
+        <meta
+          name="twitter:description"
+          content="Personalized 1-on-1 online personal training and live interactive group classes with expert coaches."
+        />
+        <meta name="twitter:image" content="https://wellwigen.com/images/hero_workout.jpg" />
+
+        {/* Structured Data: SportsActivityLocation / HealthClub */}
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "SportsActivityLocation",
+              "name": "Wellwigen Online Fitness",
+              "alternateName": "Wellwigen",
+              "url": "https://wellwigen.com",
+              "logo": "https://wellwigen.com/favicon.svg",
+              "image": "https://wellwigen.com/images/hero_workout.jpg",
+              "description": "Online personal training and live interactive group fitness classes coached by certified master trainers.",
+              "telephone": "+919598506627",
+              "email": "wellwigen@gmail.com",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "123 Fitness Street, Wellness City",
+                "addressCountry": "IN"
+              },
+              "priceRange": "₹₹",
+              "openingHours": "Mo-Su 06:00-22:00"
+            }
+          `}
+        </script>
+      </Helmet>
+
+      {/* Branded Initial Page Loader */}
+      <PageLoader isLoading={loading} />
+
+      {/* Sticky Header with Frosted Glass & Progress Bar */}
+      <Navbar onOpenLeadModal={handleOpenLeadModal} />
+
+      {/* Main Single-Scroll Body */}
+      <main>
+        {/* Section 1: Home (id="home") */}
+        <HomeSection
+          onOpenLeadModal={handleOpenLeadModal}
+          onNavigateSection={handleNavigateSection}
+        />
+
+        {/* Section 2: Personal Training (id="personal-training") */}
+        <PersonalTrainingSection
+          onOpenLeadModal={handleOpenLeadModal}
+        />
+
+        {/* Section 3: Group Classes (id="group-classes") */}
+        <GroupClassesSection
+          onOpenLeadModal={handleOpenLeadModal}
+        />
+
+        {/* Section 4: Final CTA */}
+        <FinalCTA
+          onOpenLeadModal={handleOpenLeadModal}
+          onNavigateSection={handleNavigateSection}
+        />
+      </main>
+
+      {/* Section 5: Footer (Dark Teal) */}
+      <Footer
+        onNavigateSection={handleNavigateSection}
+        onOpenLegalModal={handleOpenLegalModal}
+      />
+
+      {/* Lead Modal */}
+      <LeadModal
+        isOpen={leadModalOpen}
+        onClose={handleCloseLeadModal}
+        initialData={leadModalData}
+      />
+
+      {/* Legal Modal */}
+      <LegalModal
+        isOpen={legalModalOpen}
+        type={legalModalType}
+        onClose={handleCloseLegalModal}
+      />
+
+      {/* Floating Interactive Elements */}
+      <FloatingWhatsApp />
+    </div>
+  );
+}

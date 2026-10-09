@@ -1,0 +1,466 @@
+/* ==========================================================================
+   WELLWIGEN - LIVING ENERGY FIELD (ANIMATED BACKGROUND SYSTEM)
+   High-performance GPU-accelerated layered ambient fitness background.
+   ========================================================================== */
+
+:root {
+  /* Living Energy Field Color Tokens */
+  --ab-color-teal: #2DD4BF;
+  --ab-color-teal-glow: #3AA9A0;
+  --ab-color-teal-electric: #2DE2C8;
+  --ab-color-blue: #4F9BD4;
+  --ab-color-blue-deep: #3B82F6;
+  --ab-color-orange: #F27A3D;
+  --ab-color-orange-deep: #EA5A28;
+  --ab-color-navy-dark: #0B1220;
+  --ab-color-navy-light: #111B2E;
+  --ab-color-mint: #F3FBF9;
+
+  /* Permanent Single Light Living Energy Theme Variables */
+  --ab-blob-opacity: 0.28;
+  --ab-grid-opacity: 0.24;
+  --ab-grid-dot-color: rgba(31, 181, 163, 0.35);
+  --ab-icon-opacity: 0.20;
+  --ab-icon-stroke: rgba(31, 181, 163, 0.65);
+  --ab-spotlight-color: rgba(45, 212, 191, 0.16);
+  --ab-ecg-stroke: #1FB5A3;
+  --ab-radar-stroke: rgba(31, 181, 163, 0.30);
+  --ab-sweep-color: rgba(45, 212, 191, 0.15);
+  --ab-noise-opacity: 0.035;
+}
+
+/* Permanent Light Theme Tokens */
+.ab-theme-light {
+  --ab-blob-opacity: 0.28;
+  --ab-grid-opacity: 0.24;
+  --ab-grid-dot-color: rgba(31, 181, 163, 0.35);
+  --ab-icon-opacity: 0.20;
+  --ab-icon-stroke: rgba(31, 181, 163, 0.65);
+  --ab-spotlight-color: rgba(45, 212, 191, 0.16);
+  --ab-ecg-stroke: #1FB5A3;
+  --ab-radar-stroke: rgba(31, 181, 163, 0.30);
+  --ab-sweep-color: rgba(45, 212, 191, 0.15);
+}
+
+/* ================= ROOT FIXED CONTAINER (PERMANENT LIGHT THEME) ================= */
+.ab-root-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  contain: strict;
+  /* Soft radiant light mint background permanently locked (No dark switching glitch) */
+  background: radial-gradient(circle at 50% 20%, #FAFEFD 0%, #F1FBF8 50%, #E5F6F2 100%) !important;
+}
+
+/* Make body and base app wrapper transparent so the fixed background can be viewed */
+body, #root, .min-h-screen {
+  background-color: transparent !important;
+}
+
+/* Give dark sections a rich translucent navy backdrop so energy mesh shimmers through */
+[data-nav-theme="dark"].bg-\[\#0E1420\],
+[data-nav-theme="dark"].bg-\[\#092B28\] {
+  background-color: rgba(14, 20, 32, 0.94) !important;
+}
+
+/* Screen behind boxes made transparent so background animation is clearly visible */
+[data-nav-theme="light"],
+[data-nav-theme="light"].bg-\[\#F3FBF9\],
+[data-nav-theme="light"].bg-\[\#F8FAFC\],
+[data-nav-theme="light"].bg-white {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Cards & Modals remain completely solid and elevated */
+.conic-glow-content,
+.card-soft,
+[data-nav-theme="light"] .card-soft,
+[data-nav-theme="light"] .bg-white,
+.modal-content,
+[role="dialog"] {
+  background-color: #ffffff !important;
+}
+
+/* Specific white screen for 2nd and 3rd image hero areas (as requested: "sirf esi area mein lagana aur kahi nahi") */
+[data-nav-theme="light"].hero-white-screen,
+.hero-white-screen {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+/* ================= 1. BASE GRADIENT BLOBS ================= */
+.ab-blobs-layer {
+  position: absolute;
+  inset: -15%;
+  width: 130%;
+  height: 130%;
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 120ms ease-out;
+  opacity: var(--ab-blob-opacity);
+  will-change: transform;
+}
+
+.ab-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(95px);
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Blob 1: Vibrant Teal */
+.ab-blob-1 {
+  top: 5%;
+  left: 2%;
+  width: min(650px, 55vw);
+  height: min(650px, 55vw);
+  background: radial-gradient(circle, var(--ab-color-teal) 0%, var(--ab-color-teal-glow) 55%, transparent 75%);
+  animation: abBlobDrift1 28s ease-in-out infinite alternate;
+}
+
+/* Blob 2: Ocean Blue */
+.ab-blob-2 {
+  top: 15%;
+  right: -5%;
+  width: min(720px, 60vw);
+  height: min(720px, 60vw);
+  background: radial-gradient(circle, var(--ab-color-blue) 0%, var(--ab-color-blue-deep) 55%, transparent 75%);
+  animation: abBlobDrift2 34s ease-in-out infinite alternate;
+}
+
+/* Blob 3: Warm Orange Ember Accent */
+.ab-blob-3 {
+  bottom: 12%;
+  left: 28%;
+  width: min(480px, 42vw);
+  height: min(480px, 42vw);
+  background: radial-gradient(circle, var(--ab-color-orange) 0%, var(--ab-color-orange-deep) 45%, transparent 70%);
+  animation: abBlobDrift3 24s ease-in-out infinite alternate;
+}
+
+/* Blob 4: Electric Deep Teal */
+.ab-blob-4 {
+  bottom: -8%;
+  left: -5%;
+  width: min(620px, 50vw);
+  height: min(620px, 50vw);
+  background: radial-gradient(circle, var(--ab-color-teal-electric) 0%, #0F766E 50%, transparent 75%);
+  animation: abBlobDrift4 38s ease-in-out infinite alternate;
+}
+
+@keyframes abBlobDrift1 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(8vw, 10vh, 0) scale(1.12); }
+  100% { transform: translate3d(-5vw, 6vh, 0) scale(0.92); }
+}
+
+@keyframes abBlobDrift2 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-10vw, 8vh, 0) scale(0.9); }
+  100% { transform: translate3d(-4vw, -7vh, 0) scale(1.15); }
+}
+
+@keyframes abBlobDrift3 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(12vw, -9vh, 0) scale(1.18); }
+  100% { transform: translate3d(-8vw, 5vh, 0) scale(0.88); }
+}
+
+@keyframes abBlobDrift4 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-6vw, -12vh, 0) scale(1.1); }
+  100% { transform: translate3d(9vw, -5vh, 0) scale(0.95); }
+}
+
+/* ================= 2. ANIMATED GRID & SHIMMER ================= */
+.ab-grid-layer {
+  position: absolute;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  opacity: var(--ab-grid-opacity);
+  transition: opacity 800ms ease;
+  background-image:
+    radial-gradient(var(--ab-grid-dot-color) 1.2px, transparent 1.2px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+  will-change: transform;
+}
+
+.ab-grid-shimmer {
+  display: none !important;
+}
+
+/* ================= 3. FLOATING FITNESS OUTLINE ICONS ================= */
+.ab-icons-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.ab-icon-node {
+  position: absolute;
+  color: var(--ab-icon-stroke);
+  opacity: var(--ab-icon-opacity);
+  transition: opacity 800ms ease, color 800ms ease;
+  will-change: transform;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ab-icon-node svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Depth Layers */
+.ab-depth-near {
+  transform: scale(1.15);
+  filter: blur(0px);
+}
+
+.ab-depth-mid {
+  transform: scale(0.92);
+  filter: blur(0.4px);
+}
+
+.ab-depth-far {
+  transform: scale(0.70);
+  filter: blur(1.1px);
+}
+
+/* Gentle Float Animations */
+.ab-float-gentle {
+  animation: abFloat1 20s ease-in-out infinite alternate;
+}
+
+.ab-float-reverse {
+  animation: abFloat2 26s ease-in-out infinite alternate;
+}
+
+.ab-float-slow {
+  animation: abFloat3 32s ease-in-out infinite alternate;
+}
+
+@keyframes abFloat1 {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(15px, -24px, 0) rotate(6deg); }
+  100% { transform: translate3d(-12px, 16px, 0) rotate(-4deg); }
+}
+
+@keyframes abFloat2 {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-18px, 20px, 0) rotate(-6deg); }
+  100% { transform: translate3d(14px, -18px, 0) rotate(5deg); }
+}
+
+@keyframes abFloat3 {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(10px, 28px, 0) rotate(4deg); }
+  100% { transform: translate3d(-15px, -14px, 0) rotate(-5deg); }
+}
+
+/* ================= 4. CANVAS PARTICLES ================= */
+.ab-canvas-particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ================= 5. SPECIAL EFFECTS ================= */
+
+/* Mouse Follow Spotlight */
+.ab-mouse-spotlight {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: opacity 600ms ease;
+  will-change: background;
+}
+
+/* Animated ECG / Heartbeat Line */
+.ab-ecg-container {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ab-ecg-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ab-ecg-path {
+  stroke: var(--ab-ecg-stroke);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 2400;
+  stroke-dashoffset: 2400;
+  filter: drop-shadow(0 0 6px rgba(45, 212, 191, 0.65));
+  animation: abEcgCycle 13s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes abEcgCycle {
+  0% {
+    stroke-dashoffset: 2400;
+    opacity: 0;
+  }
+  3% {
+    opacity: 0.85;
+  }
+  24% {
+    stroke-dashoffset: 0;
+    opacity: 0.95;
+  }
+  34% {
+    opacity: 0.95;
+  }
+  42% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 2400;
+  }
+}
+
+/* Diagonal Light Sweep */
+.ab-light-sweep {
+  display: none !important;
+}
+
+@keyframes abSweepCycle {
+  0%, 78% {
+    transform: translate3d(-60%, -60%, 0);
+    opacity: 0;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  90% {
+    transform: translate3d(60%, 60%, 0);
+    opacity: 0.7;
+  }
+  92%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Concentric Radar Rings near Hero */
+.ab-radar-container {
+  display: none !important;
+  position: absolute;
+  top: 18%;
+  right: 14%;
+  width: 220px;
+  height: 220px;
+  pointer-events: none;
+  transform: translate(50%, -50%);
+}
+
+.ab-radar-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--ab-radar-stroke);
+  animation: abRadarExpand 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  opacity: 0;
+}
+
+.ab-radar-ring-1 { animation-delay: 0s; }
+.ab-radar-ring-2 { animation-delay: 2.6s; }
+.ab-radar-ring-3 { animation-delay: 5.2s; }
+
+@keyframes abRadarExpand {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.6;
+  }
+  60% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+/* Film-grain Noise Overlay */
+.ab-noise-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: var(--ab-noise-opacity);
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ================= MOBILE OPTIMIZATION (<768px) ================= */
+@media (max-width: 767px) {
+  .ab-blob {
+    filter: blur(45px); /* Reduced blur for 60fps on mobile */
+  }
+
+  .ab-blob-1, .ab-blob-2 {
+    width: 320px;
+    height: 320px;
+  }
+
+  .ab-blob-3, .ab-blob-4 {
+    width: 260px;
+    height: 260px;
+  }
+
+  .ab-mouse-spotlight {
+    display: none !important;
+  }
+
+  .ab-radar-container {
+    right: 25%;
+    top: 15%;
+    width: 140px;
+    height: 140px;
+  }
+}
+
+/* ================= PREFERS-REDUCED-MOTION ================= */
+@media (prefers-reduced-motion: reduce) {
+  .ab-blob,
+  .ab-grid-shimmer,
+  .ab-icon-node,
+  .ab-ecg-path,
+  .ab-light-sweep,
+  .ab-radar-ring {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .ab-canvas-particles {
+    display: none !important;
+  }
+
+  .ab-blobs-layer {
+    opacity: 0.12;
+  }
+}
