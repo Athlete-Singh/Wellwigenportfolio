@@ -48,6 +48,20 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
     }
   };
 
+  // NEW CODE - mobile fix: smart per-image object positions so heads/faces are never cut off on mobile cards
+  const getChallengeImagePosition = (dayCode) => {
+    switch (dayCode) {
+      case 'TUE': return 'object-[52%_15%] sm:object-center'; // jumping athlete midair
+      case 'THU': return 'object-[50%_18%] sm:object-center'; // Thor heavy deadlifter head & eyes
+      case 'FRI': return 'object-[50%_12%] sm:object-center'; // dual jumping cardio athletes
+      case 'SAT': return 'object-[50%_18%] sm:object-center'; // dumbbell bicep curl athlete
+      case 'WED': return 'object-[50%_25%] sm:object-center'; // jungle fit animal crawl posture
+      case 'MON': return 'object-[50%_18%] sm:object-center'; // battle ropes athlete
+      case 'SUN': return 'object-[55%_15%] sm:object-center'; // yoga mobility pose
+      default: return 'object-[center_20%] sm:object-center';
+    }
+  };
+
   return (
     <section id="group-classes" className="relative overflow-hidden">
 
@@ -145,10 +159,19 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
                 <div className="corner-bracket-tl z-20" />
                 <div className="corner-bracket-br z-20" />
 
+                {/* OLD CODE (commented by AI)
                 <img
                   src="/images/group_class_hero.jpg"
                   alt="Energetic group fitness class doing kettlebell squats guided by expert coach in studio"
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                  loading="lazy"
+                />
+                */}
+                {/* NEW CODE - mobile fix: group class athletes and instructor head & form visibility on mobile */}
+                <img
+                  src="/images/group_class_hero.jpg"
+                  alt="Energetic group fitness class doing kettlebell squats guided by expert coach in studio"
+                  className="w-full h-full object-cover object-[50%_25%] sm:object-center group-hover:scale-105 transition-transform duration-700"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent pointer-events-none" />
@@ -192,7 +215,7 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
             </p>
           </div>
 
-          {/* 7 Cards: Desktop Row / Mobile Carousel */}
+          {/* OLD CODE (commented by AI)
           <div
             ref={carouselRef}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 overflow-x-auto pb-4 pt-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none"
@@ -210,7 +233,6 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
                     }`}
                 >
                   <div>
-                    {/* Thumbnail */}
                     <div className="relative h-32 overflow-hidden bg-slate-900">
                       <img
                         src={item.image}
@@ -220,12 +242,10 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#111B2E] via-transparent to-transparent pointer-events-none" />
 
-                      {/* Day Code Badge */}
                       <div className="absolute top-2 left-2 bg-slate-950/85 backdrop-blur-sm text-[#2DE2C8] border border-[#2DE2C8]/30 text-[10px] font-display font-black px-2 py-0.5 rounded uppercase tracking-wider">
                         {item.dayCode}
                       </div>
 
-                      {/* Today Badge */}
                       {isToday && (
                         <div className="absolute top-2 right-2 bg-[#C6F432] text-slate-950 text-[9px] font-display font-black px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping" />
@@ -234,7 +254,6 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
                       )}
                     </div>
 
-                    {/* Content */}
                     <div className="p-3.5">
                       <div className="font-heading font-extrabold text-sm text-white group-hover:text-[#2DE2C8] transition-colors">
                         {item.name}
@@ -248,7 +267,6 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
                     </div>
                   </div>
 
-                  {/* Metadata */}
                   <div className="px-3.5 pb-3.5 pt-2 border-t border-[#2A3547] flex items-center justify-between text-[11px] text-slate-400">
                     <span className="flex items-center gap-1 font-medium">
                       <Clock size={12} className="text-[#2DE2C8]" />
@@ -259,6 +277,84 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
                     </span>
                   </div>
                 </div>
+              );
+            })}
+          </div>
+          */}
+
+          {/* NEW CODE - mobile fix: taller image (4:3 aspect ratio), smart face-preserving positions, 12px badges, 20px card padding & typography, 44px tap target Join button, no horizontal scroll */}
+          <div
+            ref={carouselRef}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-5 sm:gap-4 pb-4 pt-2 px-0 sm:px-0"
+          >
+            {WEEKLY_CHALLENGES.map((item, idx) => {
+              const isToday = item.dayIndex === currentDayIndex;
+
+              return (
+                <motion.div
+                  key={item.dayCode}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-20px' }}
+                  transition={{ duration: 0.3, delay: idx * 0.04 }}
+                  onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: item.name })}
+                  className={`bg-[#111B2E] rounded-2xl overflow-hidden group cursor-pointer border flex flex-col justify-between transition-all duration-300 w-full min-w-0 shadow-dark-card ${isToday
+                    ? 'ring-2 ring-[#2DE2C8] border-[#2DE2C8] shadow-[0_0_30px_rgba(45,226,200,0.35)] scale-[1.01] sm:scale-102 z-10'
+                    : 'border-[#2A3547] hover:border-teal-400 hover:-translate-y-1'
+                    }`}
+                >
+                  <div>
+                    {/* Thumbnail: Aspect ratio 4/3 on mobile with smart face/body object-position, desktop remains h-32 */}
+                    <div className="relative w-full aspect-[4/3] sm:aspect-auto sm:h-32 lg:h-32 overflow-hidden bg-slate-900 rounded-t-2xl">
+                      <img
+                        src={item.image}
+                        alt={`${item.name} - ${item.type}`}
+                        className={`w-full h-full object-cover ${getChallengeImagePosition(item.dayCode)} group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-500`}
+                        loading="lazy"
+                      />
+                      {/* Soft gradient overlay on bottom ~35% of the photo so faces stay bright while blending into card navy */}
+                      <div className="absolute inset-x-0 bottom-0 h-[40%] sm:h-full bg-gradient-to-t from-[#111B2E] via-[#111B2E]/60 to-transparent pointer-events-none" />
+
+                      {/* Day Code Badge: 12px spacing from top & left */}
+                      <div className="absolute top-3 left-3 sm:top-2 sm:left-2 bg-slate-950/85 backdrop-blur-md text-[#2DE2C8] border border-[#2DE2C8]/40 text-xs sm:text-[10px] font-display font-black px-2.5 py-1 sm:px-2 sm:py-0.5 rounded-lg sm:rounded uppercase tracking-wider shadow-md">
+                        {item.dayCode}
+                      </div>
+
+                      {/* Today Badge: 12px spacing from top & right */}
+                      {isToday && (
+                        <div className="absolute top-3 right-3 sm:top-2 sm:right-2 bg-[#C6F432] text-slate-950 text-xs sm:text-[9px] font-display font-black px-3 py-1 sm:px-2 sm:py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping" />
+                          TODAY
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content: 18-20px padding on mobile, title 20-22px bold, subtitle 15-16px, description 14.5-15px */}
+                    <div className="p-5 sm:p-3.5">
+                      <div className="font-heading font-black text-xl sm:text-sm text-white group-hover:text-[#2DE2C8] transition-colors leading-tight">
+                        {item.name}
+                      </div>
+                      <div className="text-[15px] sm:text-xs font-semibold text-[#2DE2C8] mt-1 sm:mt-0.5">
+                        {item.type}
+                      </div>
+                      <p className="text-[14.5px] sm:text-[11px] text-slate-300 sm:text-slate-400 mt-2.5 sm:mt-2 line-clamp-3 sm:line-clamp-2 leading-[1.6]">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Metadata & Tap Target Button (min 44px height on mobile) */}
+                  <div className="px-5 py-4 sm:px-3.5 sm:pb-3.5 sm:pt-2 border-t border-[#2A3547] flex items-center justify-between text-sm sm:text-[11px] text-slate-300 sm:text-slate-400">
+                    <span className="flex items-center gap-1.5 sm:gap-1 font-medium">
+                      <Clock size={16} className="text-[#2DE2C8] sm:w-3 sm:h-3" />
+                      <span>{item.duration}</span>
+                    </span>
+                    <span className="min-h-[44px] px-5 py-2.5 sm:min-h-0 sm:px-0 sm:py-0 rounded-full sm:rounded-none bg-teal-500/15 sm:bg-transparent border border-teal-500/40 sm:border-transparent text-[#2DE2C8] font-bold text-sm sm:text-[11px] flex items-center justify-center gap-1.5 group-hover:bg-[#2DE2C8] group-hover:text-slate-950 transition-all duration-200 active:scale-95 shadow-sm">
+                      <span>Join</span>
+                      <span className="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+                    </span>
+                  </div>
+                </motion.div>
               );
             })}
           </div>

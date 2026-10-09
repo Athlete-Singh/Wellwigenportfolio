@@ -69,12 +69,21 @@ export default function Navbar({ onOpenLeadModal }) {
 
   return (
     <>
-      {/* Sticky Header */}
+      {/* OLD CODE (commented by AI)
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
             ? 'py-3.5 bg-[#0E1420]/95 backdrop-blur-md shadow-[0_4px_25px_rgba(0,0,0,0.5)] border-b border-slate-800'
             : 'py-5 bg-gradient-to-b from-[#0E1420]/85 via-[#0E1420]/40 to-transparent'
+        }`}
+      >
+      */}
+      {/* NEW CODE - mobile fix: always solid backdrop-blur-md on mobile so scrolled content never clashes, desktop keeps exact scroll-dependent gradient */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? 'py-3.5 bg-[#0E1420]/95 backdrop-blur-md shadow-[0_4px_25px_rgba(0,0,0,0.5)] border-b border-slate-800'
+            : 'py-3.5 sm:py-5 bg-[#0E1420]/95 sm:bg-gradient-to-b sm:from-[#0E1420]/85 sm:via-[#0E1420]/40 sm:to-transparent backdrop-blur-md sm:backdrop-blur-none border-b border-slate-800/60 sm:border-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -95,7 +104,13 @@ export default function Navbar({ onOpenLeadModal }) {
                 <span className="font-heading font-extrabold text-xl tracking-tight text-white leading-tight group-hover:text-teal-400 transition-colors">
                   WELLWIGEN
                 </span>
+                {/* OLD CODE (commented by AI)
                 <span className="text-[8.5px] font-bold tracking-[0.2em] text-[#2DE2C8] uppercase -mt-0.5">
+                  STRONGER BODY. BETTER YOU.
+                </span>
+                */}
+                {/* NEW CODE - mobile fix: single line tagline, compact font size, hidden below 360px to prevent word-wrap */}
+                <span className="hidden min-[360px]:inline-block text-[7.5px] sm:text-[8.5px] font-bold tracking-[0.15em] sm:tracking-[0.2em] text-[#2DE2C8] uppercase -mt-0.5 whitespace-nowrap">
                   STRONGER BODY. BETTER YOU.
                 </span>
               </div>
@@ -139,7 +154,7 @@ export default function Navbar({ onOpenLeadModal }) {
               </button>
             </div>
 
-            {/* Mobile Menu Toggle Button */}
+            {/* OLD CODE (commented by AI)
             <div className="flex md:hidden items-center gap-2">
               <button
                 onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
@@ -150,6 +165,24 @@ export default function Navbar({ onOpenLeadModal }) {
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="w-10 h-10 rounded-xl bg-slate-900/80 border border-slate-700 flex items-center justify-center text-slate-200 hover:text-white transition-colors cursor-pointer"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
+            */}
+
+            {/* NEW CODE - mobile fix: compact single-line pill (whitespace: nowrap, 13px, 40px height) vertically aligned with hamburger */}
+            <div className="flex md:hidden items-center gap-2 shrink-0">
+              <button
+                onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
+                className="btn-power-coral h-10 px-3.5 sm:px-4 text-[13px] font-bold rounded-full whitespace-nowrap flex items-center justify-center shadow-coral-glow cursor-pointer shrink-0"
+              >
+                Join Now
+              </button>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-10 h-10 rounded-xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-center text-slate-200 hover:text-white transition-colors cursor-pointer shrink-0"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}

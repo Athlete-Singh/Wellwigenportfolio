@@ -547,10 +547,19 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
             {/* Banner 1: Your Goals. Your Focus. */}
             <div className="relative rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between p-8 sm:p-10 text-white min-h-[380px] group border border-teal-500/30">
               {/* Background Photo */}
+              {/* OLD CODE (commented by AI)
               <img
                 src="/images/card_goals_focus.jpg"
                 alt="Athletes performing kettlebell workouts during personal training"
                 className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                loading="lazy"
+              />
+              */}
+              {/* NEW CODE - mobile fix: face & kettlebell form visibility on mobile */}
+              <img
+                src="/images/card_goals_focus.jpg"
+                alt="Athletes performing kettlebell workouts during personal training"
+                className="absolute inset-0 w-full h-full object-cover object-[45%_25%] sm:object-center group-hover:scale-105 transition-transform duration-700"
                 loading="lazy"
               />
               {/* Balanced scrim: keeps athletes & gym details clearly visible while guaranteeing word priority */}

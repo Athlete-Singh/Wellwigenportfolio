@@ -113,10 +113,19 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
                 <div className="corner-bracket-tl z-20" />
                 <div className="corner-bracket-br z-20" />
 
+                {/* OLD CODE (commented by AI)
                 <img
                   src="/images/pt_coaching.jpg"
                   alt="Woman doing squats during live online 1-on-1 personal training with laptop coach"
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                */}
+                {/* NEW CODE - mobile fix: focus on athlete form & laptop coach on mobile */}
+                <img
+                  src="/images/pt_coaching.jpg"
+                  alt="Woman doing squats during live online 1-on-1 personal training with laptop coach"
+                  className="w-full h-full object-cover object-[55%_35%] sm:object-center group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent pointer-events-none" />
@@ -154,6 +163,7 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
                   onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: goal.title })}
                   className="card-soft overflow-hidden group cursor-pointer border border-slate-200/90 hover:border-teal-400 flex flex-col relative"
                 >
+                  {/* OLD CODE (commented by AI)
                   <div className="relative h-48 overflow-hidden bg-slate-900">
                     <div className="corner-bracket-tl z-20" />
                     <img
@@ -165,6 +175,23 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
                     <div className="absolute bottom-3 left-3 text-white">
                       <span className="font-display font-extrabold text-lg tracking-wide uppercase">
+                        {goal.title}
+                      </span>
+                    </div>
+                  </div>
+                  */}
+                  {/* NEW CODE - mobile fix: aspect-ratio 16/10 on mobile with face-preserving object-position object-[center_20%] */}
+                  <div className="relative aspect-[16/10] sm:aspect-auto sm:h-48 overflow-hidden bg-slate-900">
+                    <div className="corner-bracket-tl z-20" />
+                    <img
+                      src={goal.image}
+                      alt={goal.title}
+                      className="w-full h-full object-cover object-[center_20%] group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 h-1/2 sm:h-full bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-3.5 left-3.5 sm:bottom-3 sm:left-3 text-white">
+                      <span className="font-display font-extrabold text-lg tracking-wide uppercase drop-shadow-md">
                         {goal.title}
                       </span>
                     </div>

@@ -7,8 +7,13 @@ export default function Footer({ onNavigateSection, onOpenLegalModal }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  /* OLD CODE (commented by AI)
+  // <footer data-nav-theme="dark" className="bg-[#092B28] text-slate-300 pt-20 pb-12 border-t border-teal-800/40 relative overflow-hidden">
+  */
+
+  // NEW CODE - mobile fix: pb-28 on mobile (~110px padding) so floating WhatsApp button never covers footer content
   return (
-    <footer data-nav-theme="dark" className="bg-[#092B28] text-slate-300 pt-20 pb-12 border-t border-teal-800/40 relative overflow-hidden">
+    <footer data-nav-theme="dark" className="bg-[#092B28] text-slate-300 pt-20 pb-28 sm:pb-12 border-t border-teal-800/40 relative overflow-hidden">
       {/* Top Slanted / Wave Divider from Final CTA (#0E1420) to Footer (#092B28) */}
       <div className="absolute top-0 left-0 right-0 overflow-hidden leading-none pointer-events-none -mt-px">
         <svg
@@ -196,6 +201,14 @@ export default function Footer({ onNavigateSection, onOpenLegalModal }) {
           </div>
 
           <div className="flex items-center gap-6">
+            <button
+              onClick={scrollToTop}
+              className="hover:text-teal-200 transition-colors cursor-pointer flex items-center gap-1 text-teal-300/80"
+              aria-label="Back to top"
+            >
+              <span>Top</span>
+              <ArrowUp size={12} />
+            </button>
             <button
               onClick={() => onOpenLegalModal('privacy')}
               className="hover:text-teal-200 transition-colors cursor-pointer"
