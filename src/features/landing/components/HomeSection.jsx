@@ -284,7 +284,11 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
+              {/* OLD CODE (commented by AI)
               <h1 className="font-display font-extrabold text-[2.15rem] xs:text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] tracking-tight text-white leading-[1.08] sm:leading-[0.96]">
+              */}
+              {/* NEW CODE - font correction: font-heading (Outfit/Plus Jakarta Sans) font-black matching image 2 */}
+              <h1 className="font-heading font-black text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] tracking-tight text-white leading-[1.1] sm:leading-[0.98]">
                 <span className="block text-white drop-shadow-md">
                   Transform Your Body
                 </span>

@@ -40,7 +40,10 @@ export default {
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],
                 heading: ['Outfit', 'Plus Jakarta Sans', 'Inter', 'sans-serif'],
-                display: ['Syne', 'Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+                // OLD CODE (commented by AI)
+                // display: ['Syne', 'Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+                // NEW CODE - font correction: use Outfit / Plus Jakarta Sans matching image 2
+                display: ['Outfit', 'Plus Jakarta Sans', 'Inter', 'sans-serif'],
                 athletic: ['Oswald', 'Outfit', 'sans-serif'],
             },
             boxShadow: {
