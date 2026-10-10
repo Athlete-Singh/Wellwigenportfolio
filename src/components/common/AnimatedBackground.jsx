@@ -17,7 +17,7 @@ export const BACKGROUND_CONFIG = {
   blobOpacityDark: 0.22,         // 15-25% opacity on dark sections
   blobOpacityLight: 0.09,        // 8-12% opacity on light sections
   enableMouseSpotlight: true,    // Soft teal radial glow following cursor (desktop only)
-  enableHeartbeatLine: true,     // Animated ECG line drawing horizontally every ~12s
+  enableHeartbeatLine: false,    // Turned off per user request: eliminates periodic ECG heart line
   enableLightSweep: false,        // Turned off: eliminates diagonal glass animation on face/images
   enableRadarRings: false,       // Turned off: eliminates expanding ring outlines near hero area
   enableGridShimmer: false,       // Turned off: eliminates harsh diagonal shimmer lines over images
@@ -239,7 +239,8 @@ export default function AnimatedBackground() {
     };
   }, []);
 
-  // 2. Scroll Parallax & Particle Boost (Locked to 100% Light Theme, zero glitching)
+  // OLD CODE (commented by AI)
+  /*
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY || window.pageYOffset;
@@ -261,6 +262,37 @@ export default function AnimatedBackground() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+  */
+  // NEW CODE - smooth animation/performance: rAF throttled scroll, zero parallax overhead on mobile
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY || window.pageYOffset;
+      const delta = Math.abs(currentScrollY - lastScrollYRef.current);
+      lastScrollYRef.current = currentScrollY;
+      scrollYRef.current = currentScrollY;
+
+      // Light particle energy boost
+      scrollBoostRef.current = Math.min(scrollBoostRef.current + delta * 0.05, 3.0);
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          // Disable parallax calculation entirely on mobile for max FPS
+          if (!isMobile && containerRef.current && BACKGROUND_CONFIG.enableParallax && !reducedMotion) {
+            containerRef.current.style.setProperty('--scroll-y', `${currentScrollY}px`);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isMobile, reducedMotion]);
 
   // 3. Mouse-follow Spotlight with smooth lag (Lerp)
   useEffect(() => {
@@ -458,17 +490,7 @@ export default function AnimatedBackground() {
         <div ref={spotlightRef} className="ab-mouse-spotlight" />
       )}
 
-      {/* 5b. Animated ECG / Heartbeat Line (Every ~12s) */}
-      {BACKGROUND_CONFIG.enableHeartbeatLine && !reducedMotion && (
-        <div className="ab-ecg-container">
-          <svg className="ab-ecg-svg" preserveAspectRatio="none" viewBox="0 0 1200 80">
-            <path
-              className="ab-ecg-path"
-              d="M 0 40 L 480 40 L 500 40 L 515 28 L 530 52 L 550 8 L 575 72 L 595 34 L 610 44 L 625 40 L 1200 40"
-            />
-          </svg>
-        </div>
-      )}
+      {/* 5b. Animated ECG / Heartbeat Line removed per user request */}
 
       {/* 5c. Diagonal Light Sweep (Every ~15s) */}
       {BACKGROUND_CONFIG.enableLightSweep && !reducedMotion && (

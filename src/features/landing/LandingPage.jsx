@@ -41,6 +41,59 @@ export default function LandingPage() {
     }
   }, []);
 
+  // OLD CODE (commented by AI)
+  /* Single shared IntersectionObserver was missing; elements relied on varied animation libraries */
+  // NEW CODE - smooth animation/performance: single shared IntersectionObserver for glitch-free pop animations
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const items = document.querySelectorAll('.reveal-item');
+
+    if (prefersReducedMotion) {
+      items.forEach((item) => item.classList.add('revealed'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            el.classList.add('animating');
+            el.classList.add('revealed');
+            observer.unobserve(el);
+
+            // Clean up will-change after animation duration to free GPU memory
+            const timer = setTimeout(() => {
+              el.classList.remove('animating');
+            }, 650);
+            el._animCleanup = timer;
+          }
+        });
+      },
+      {
+        threshold: 0.12,
+        rootMargin: '0px 0px -8% 0px',
+      }
+    );
+
+    items.forEach((item) => {
+      // If element is already in initial viewport, reveal immediately without scroll wait
+      const rect = item.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.85) {
+        item.classList.add('revealed');
+      } else {
+        observer.observe(item);
+      }
+    });
+
+    return () => {
+      items.forEach((item) => {
+        if (item._animCleanup) clearTimeout(item._animCleanup);
+      });
+      observer.disconnect();
+    };
+  }, [loading]);
+
   const handleOpenLeadModal = (data = {}) => {
     setLeadModalData(data);
     setLeadModalOpen(true);
@@ -141,21 +194,40 @@ export default function LandingPage() {
           onNavigateSection={handleNavigateSection}
         />
 
-        {/* Section 2: Personal Training (id="personal-training") */}
+        {/* OLD CODE (commented by AI)
         <PersonalTrainingSection
           onOpenLeadModal={handleOpenLeadModal}
         />
-
-        {/* Section 3: Group Classes (id="group-classes") */}
         <GroupClassesSection
           onOpenLeadModal={handleOpenLeadModal}
         />
-
-        {/* Section 4: Final CTA */}
         <FinalCTA
           onOpenLeadModal={handleOpenLeadModal}
           onNavigateSection={handleNavigateSection}
         />
+        */}
+        {/* NEW CODE - smooth animation/performance: cv-auto content-visibility skips off-screen paint work */}
+        <div className="cv-auto">
+          {/* Section 2: Personal Training (id="personal-training") */}
+          <PersonalTrainingSection
+            onOpenLeadModal={handleOpenLeadModal}
+          />
+        </div>
+
+        <div className="cv-auto">
+          {/* Section 3: Group Classes (id="group-classes") */}
+          <GroupClassesSection
+            onOpenLeadModal={handleOpenLeadModal}
+          />
+        </div>
+
+        <div className="cv-auto">
+          {/* Section 4: Final CTA */}
+          <FinalCTA
+            onOpenLeadModal={handleOpenLeadModal}
+            onNavigateSection={handleNavigateSection}
+          />
+        </div>
       </main>
 
       {/* Section 5: Footer (Dark Teal) */}

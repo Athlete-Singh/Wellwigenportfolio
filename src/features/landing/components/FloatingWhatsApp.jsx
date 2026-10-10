@@ -34,11 +34,21 @@ export default function FloatingWhatsApp() {
       aria-label="WhatsApp Quick Contact"
       className="fixed right-4 sm:right-6 bottom-[max(1.25rem,env(safe-area-inset-bottom,20px))] sm:bottom-6 z-40"
     >
+      {/* OLD CODE (commented by AI)
       <a
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="group relative flex items-center justify-center w-[52px] h-[52px] sm:w-14 sm:h-14 bg-[#25D366] text-white rounded-full shadow-xl sm:shadow-2xl shadow-emerald-500/30 hover:scale-105 sm:hover:scale-110 active:scale-95 transition-all duration-300"
+        aria-label="Chat on WhatsApp with Wellwigen Coach"
+      >
+      */}
+      {/* NEW CODE - smooth animation/performance: specific transform transition with touch-action */}
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group relative flex items-center justify-center w-[52px] h-[52px] sm:w-14 sm:h-14 bg-[#25D366] text-white rounded-full shadow-xl sm:shadow-2xl shadow-emerald-500/30 hover:scale-105 sm:hover:scale-110 active:scale-95 transition-transform duration-200 [touch-action:manipulation]"
         aria-label="Chat on WhatsApp with Wellwigen Coach"
       >
         {/* Soft pulse rings - subtle on mobile to avoid obscuring card content */}

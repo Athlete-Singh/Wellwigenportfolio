@@ -10,13 +10,25 @@
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="preconnect" href="https://images.pexels.com" />
     
-    <!-- Google Fonts: Outfit, Plus Jakarta Sans, Oswald (Condensed), Inter -->
+    <!-- Google Fonts: Syne (Ultra-luxury), Outfit, Plus Jakarta Sans, Oswald, Inter -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Oswald:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Syne:wght@700;800&family=Oswald:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
     
+    <!-- OLD CODE (commented by AI)
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    -->
+    <!-- NEW CODE - smooth animation/performance: hero image preload & noscript fallback -->
+    <!-- Preload primary hero image with high priority for zero LCP layout stutter -->
+    <link rel="preload" as="image" href="/images/hero_workout.jpg" fetchpriority="high" />
+    
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <noscript>
+      <style>
+        .reveal-item { opacity: 1 !important; transform: none !important; }
+      </style>
+    </noscript>
     
     <!-- Default Fallback Meta Tags -->
     <title>Wellwigen | Online Personal Training &amp; Group Fitness - Stronger Body. Better You.</title>

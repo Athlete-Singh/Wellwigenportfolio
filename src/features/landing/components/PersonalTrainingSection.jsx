@@ -157,12 +157,20 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {PT_GOALS.map((goal) => (
-                <div
-                  key={goal.id}
-                  onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: goal.title })}
-                  className="card-soft overflow-hidden group cursor-pointer border border-slate-200/90 hover:border-teal-400 flex flex-col relative"
-                >
+              {PT_GOALS.map((goal, idx) => (
+              /* OLD CODE (commented by AI)
+              <div
+                key={goal.id}
+                onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: goal.title })}
+                className="card-soft overflow-hidden group cursor-pointer border border-slate-200/90 hover:border-teal-400 flex flex-col relative"
+              >
+              */
+              /* NEW CODE - smooth animation/performance: reveal-item with stagger for pop entrance */
+              <div
+                key={goal.id}
+                onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: goal.title })}
+                className={`reveal-item reveal-stagger-${(idx % 4) + 1} card-soft overflow-hidden group cursor-pointer border border-slate-200/90 hover:border-teal-400 flex flex-col relative [touch-action:manipulation]`}
+              >
                   {/* OLD CODE (commented by AI)
                   <div className="relative h-48 overflow-hidden bg-slate-900">
                     <div className="corner-bracket-tl z-20" />
@@ -188,6 +196,7 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
                       alt={goal.title}
                       className="w-full h-full object-cover object-[center_20%] group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-500"
                       loading="lazy"
+                      decoding="async"
                     />
                     <div className="absolute inset-x-0 bottom-0 h-1/2 sm:h-full bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent pointer-events-none" />
                     <div className="absolute bottom-3.5 left-3.5 sm:bottom-3 sm:left-3 text-white">
@@ -228,11 +237,18 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {PT_BENEFITS.map((benefit, idx) => (
-              <div
-                key={idx}
-                className="bg-white p-7 rounded-3xl border border-slate-200/90 hover:border-teal-400/60 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-teal-50/80 border border-teal-100 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-teal-100/70 transition-all">
+            /* OLD CODE (commented by AI)
+            <div
+              key={idx}
+              className="bg-white p-7 rounded-3xl border border-slate-200/90 hover:border-teal-400/60 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1"
+            >
+            */
+            /* NEW CODE - smooth animation/performance: reveal-item with stagger and GPU transform transition */
+            <div
+              key={idx}
+              className={`reveal-item reveal-stagger-${(idx % 6) + 1} bg-white p-7 rounded-3xl border border-slate-200/90 hover:border-teal-400/60 shadow-sm hover:shadow-xl transition-[transform,border-color,box-shadow] duration-250 flex flex-col justify-between group hover:-translate-y-1`}
+            >
+                <div className="w-12 h-12 rounded-2xl bg-teal-50/80 border border-teal-100 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-teal-100/70 transition-transform duration-200">
                   {getBenefitIcon(benefit.icon)}
                 </div>
                 <div>
@@ -264,10 +280,17 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-5 relative z-10">
                 {PT_STEPS.map((step) => (
-                  <div
-                    key={step.step}
-                    className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl flex flex-col text-center items-center hover:border-teal-400/70 hover:-translate-y-1 transition-all duration-300 group"
-                  >
+                /* OLD CODE (commented by AI)
+                <div
+                  key={step.step}
+                  className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl flex flex-col text-center items-center hover:border-teal-400/70 hover:-translate-y-1 transition-all duration-300 group"
+                >
+                */
+                /* NEW CODE - smooth animation/performance: reveal-item with stagger and GPU hover */
+                <div
+                  key={step.step}
+                  className={`reveal-item reveal-stagger-${((step.step - 1) % 6) + 1} bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl flex flex-col text-center items-center hover:border-teal-400/70 hover:-translate-y-1 transition-[transform,border-color,box-shadow] duration-250 group`}
+                >
                     <div className="w-11 h-11 rounded-full gradient-teal-sky text-white font-display font-black text-sm flex items-center justify-center shadow-md shadow-teal-500/25 mb-3 group-hover:scale-110 transition-transform">
                       {step.step}
                     </div>
@@ -311,11 +334,11 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 items-stretch pt-4">
-              {PT_PLANS.map((plan) => {
+              {PT_PLANS.map((plan, idx) => {
                 if (plan.popular) {
                   // Conic Glow Wrapper for Most Popular
                   return (
-                    <div key={plan.id} className="relative scale-105 z-10 flex flex-col">
+                    <div key={plan.id} className={`reveal-item reveal-stagger-${(idx % 3) + 1} relative scale-105 z-10 flex flex-col`}>
                       {/* Floating Badge (Unclipped above the rotating glow border) */}
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-teal-500 to-[#2DE2C8] text-slate-950 font-display font-black text-xs px-4 py-1.5 rounded-full shadow-lg uppercase tracking-wider whitespace-nowrap">
                         {plan.badge}
@@ -367,7 +390,7 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
                 return (
                   <div
                     key={plan.id}
-                    className="bg-white rounded-3xl p-8 relative flex flex-col justify-between border border-slate-100 shadow-xl text-slate-900 hover:-translate-y-1 transition-transform"
+                    className={`reveal-item reveal-stagger-${(idx % 3) + 1} bg-white rounded-3xl p-8 relative flex flex-col justify-between border border-slate-100 shadow-xl text-slate-900 hover:-translate-y-1 transition-transform`}
                   >
                     <div>
                       <div className="text-xs font-display font-bold uppercase tracking-wider text-slate-500 mb-2">
@@ -430,9 +453,16 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
 
             <div className="grid md:grid-cols-3 gap-6">
               {PT_STORIES.map((story, idx) => (
+                /* OLD CODE (commented by AI)
                 <div
                   key={idx}
                   className="card-soft p-6 border border-slate-200/90 flex flex-col justify-between"
+                >
+                */
+                /* NEW CODE - smooth animation/performance: reveal-item with stagger */
+                <div
+                  key={idx}
+                  className={`reveal-item reveal-stagger-${(idx % 3) + 1} card-soft p-6 border border-slate-200/90 flex flex-col justify-between`}
                 >
                   <div>
                     <div className="w-8 h-8 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mb-4">
@@ -445,7 +475,7 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
 
                   <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
                     <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-teal-500/40 shrink-0">
-                      <img src={story.image} alt={story.name} className="w-full h-full object-cover" />
+                      <img src={story.image} alt={story.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                     </div>
                     <div>
                       <div className="font-heading font-bold text-sm text-slate-900">{story.name}</div>
@@ -459,7 +489,7 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
 
           {/* ================= CLOSING STRIP (POP-OUT CTA BANNER) ================= */}
           {/* Outer wrapper: relative with overflow-visible so trainer's head & shoulders pop out */}
-          <div className="relative mt-20 sm:mt-24 lg:mt-28">
+          <div className="relative mt-20 sm:mt-24 lg:mt-28 reveal-item">
             
             {/* Background card with rounded corners and border-radius clipping */}
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#0E1420] via-[#0B3B3C] to-[#111B2E] border border-teal-500/30 shadow-2xl overflow-hidden pointer-events-none z-0">
@@ -477,12 +507,28 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
               className="hidden sm:block absolute bottom-0 left-[3%] lg:left-[4%] h-[135%] md:h-[140%] lg:h-[150%] w-auto object-contain pointer-events-none select-none z-10"
               style={{
                 bottom: 0,
-                filter: 'drop-shadow(0 0 40px rgba(45, 212, 191, 0.3))',
               }}
             />
 
-            {/* Foreground Content: shifted to the right so it never overlaps his body */}
-            <div className="relative z-20 p-8 sm:p-10 lg:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-6">
+            {/* Foreground Content: shifted to the right so it never overlaps his body on desktop */}
+            <div className="relative z-20 p-6 pt-0 sm:p-10 lg:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-6">
+              
+              {/* Mobile Trainer Photo: Upper side with controlled, subtle pop-out */}
+              <div className="sm:hidden -mt-10 mb-1 flex justify-center pointer-events-none select-none">
+                <img
+                  src={personalTrainingManImg}
+                  alt="Personal trainer holding a protein shaker"
+                  width="530"
+                  height="795"
+                  loading="lazy"
+                  className="h-44 xs:h-48 w-auto object-contain"
+                  style={{
+                    maskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
+                  }}
+                />
+              </div>
+
               <div className="max-w-2xl text-center md:text-left sm:pl-44 md:pl-48 lg:pl-64">
                 <h4 className="font-heading text-2xl sm:text-3xl font-black mb-2 text-white">
                   Ready for Personal Training?

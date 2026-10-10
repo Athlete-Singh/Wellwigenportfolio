@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&family=Syne:wght@700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -70,11 +70,25 @@ html, body {
   display: none !important;
 }
 
+/* OLD CODE (commented by AI)
 /* ================= GLASS (SMOOTH GPU-ACCELERATED) ================= */
+/*
 .glass {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+*/
+/* NEW CODE - smooth animation/performance: tuned blur to 8px max to eliminate scroll lag */
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.14);
   transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
@@ -95,15 +109,21 @@ html, body {
   box-shadow: 0 0 40px rgba(59, 130, 246, 0.25);
 }
 
-/* Soft hover glow */
+/* OLD CODE (commented by AI)
 .glow-hover {
   transition: all 0.4s ease;
+}
+*/
+/* NEW CODE - smooth animation/performance: box-shadow specific transition */
+.glow-hover {
+  transition: box-shadow 250ms ease;
 }
 .glow-hover:hover {
   box-shadow: 0 0 60px rgba(59, 130, 246, 0.5);
 }
 
 /* ================= BUTTON ================= */
+/* OLD CODE (commented by AI)
 .btn-primary {
   background: linear-gradient(90deg, #3b82f6, #2563eb);
   padding: 12px 24px;
@@ -111,24 +131,49 @@ html, body {
   font-weight: 500;
   transition: all 0.3s ease;
 }
+*/
+/* NEW CODE - smooth animation/performance: specific opacity & transform transition */
+.btn-primary {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  touch-action: manipulation;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
 
 .btn-primary:hover {
   opacity: 0.9;
 }
 
 /* Glass button */
+/* OLD CODE (commented by AI)
 .btn-glass {
   @apply glass px-6 py-3 rounded-xl;
   transition: all 0.3s ease;
+}
+*/
+/* NEW CODE - smooth animation/performance: specific background transition */
+.btn-glass {
+  @apply glass px-6 py-3 rounded-xl;
+  touch-action: manipulation;
+  transition: background-color 200ms ease, transform 200ms ease;
 }
 .btn-glass:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
 /* ================= CARD ================= */
+/* OLD CODE (commented by AI)
 .card {
   @apply glass p-6 rounded-2xl;
   transition: all 0.35s ease;
+}
+*/
+/* NEW CODE - smooth animation/performance: box-shadow & transform transition */
+.card {
+  @apply glass p-6 rounded-2xl;
+  transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
 .card:hover {
@@ -206,7 +251,8 @@ html, body {
   background-size: 24px 24px;
 }
 
-/* Card base with soft shadows */
+/* ================= CARD BASE & REVEAL SYSTEM ================= */
+/* OLD CODE (commented by AI)
 .card-soft {
   background: #FFFFFF;
   border-radius: 24px;
@@ -220,12 +266,29 @@ html, body {
   box-shadow: 0 20px 40px -10px rgba(31, 181, 163, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
   border-color: rgba(31, 181, 163, 0.3);
 }
+*/
+/* NEW CODE - smooth animation/performance: GPU translate3d hover, specific transitions without layout recalculation */
+.card-soft {
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.02);
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), border-color 200ms ease, box-shadow 200ms ease;
+}
+
+@media (min-width: 768px) {
+  .card-soft:hover {
+    transform: translate3d(0, -4px, 0);
+    box-shadow: 0 20px 40px -10px rgba(31, 181, 163, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
+    border-color: rgba(31, 181, 163, 0.3);
+  }
+}
 
 /* Glassmorphism accents - smooth & jitter-free */
 .glass-panel {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.7);
   transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
@@ -234,6 +297,7 @@ html, body {
 }
 
 /* Gradient CTA Buttons with shine */
+/* OLD CODE (commented by AI)
 .btn-primary-gradient {
   background: linear-gradient(135deg, #1FB5A3 0%, #3B9BD4 100%);
   color: #FFFFFF;
@@ -279,6 +343,94 @@ html, body {
   background: #F3FBF9;
   border-color: #0F766E;
   color: #0B4E48;
+}
+*/
+/* NEW CODE - smooth animation/performance: specific property transitions, touch-action manipulation */
+.btn-primary-gradient {
+  background: linear-gradient(135deg, #1FB5A3 0%, #3B9BD4 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+  touch-action: manipulation;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+  box-shadow: 0 10px 25px -5px rgba(31, 181, 163, 0.35);
+}
+
+.btn-primary-gradient:hover {
+  transform: translate3d(0, -2px, 0);
+  box-shadow: 0 14px 30px -4px rgba(31, 181, 163, 0.45);
+}
+
+.btn-coral-gradient {
+  background: linear-gradient(135deg, #FF7A59 0%, #FF5A36 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+  touch-action: manipulation;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+  box-shadow: 0 10px 25px -5px rgba(255, 122, 89, 0.4);
+}
+
+.btn-coral-gradient:hover {
+  transform: translate3d(0, -2px, 0);
+  box-shadow: 0 14px 30px -4px rgba(255, 122, 89, 0.5);
+}
+
+.btn-outline-brand {
+  background: #FFFFFF;
+  color: #0F766E;
+  border: 1.5px solid #1FB5A3;
+  font-weight: 600;
+  border-radius: 9999px;
+  touch-action: manipulation;
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+.btn-outline-brand:hover {
+  background: #F3FBF9;
+  border-color: #0F766E;
+  color: #0B4E48;
+}
+
+/* ================= UNIFIED SMOOTH POP ENTRANCE SYSTEM ================= */
+.reveal-item {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0) scale(0.97);
+  transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1), transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 640px) {
+  .reveal-item {
+    transform: translate3d(0, 16px, 0);
+    transition: opacity 400ms cubic-bezier(0.22, 1, 0.36, 1), transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+.reveal-item.revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+}
+
+.reveal-item.animating {
+  will-change: transform, opacity;
+}
+
+/* Stagger delays for card rows (60ms step, max 6 items) */
+.reveal-stagger-1 { transition-delay: 60ms; }
+.reveal-stagger-2 { transition-delay: 120ms; }
+.reveal-stagger-3 { transition-delay: 180ms; }
+.reveal-stagger-4 { transition-delay: 240ms; }
+.reveal-stagger-5 { transition-delay: 300ms; }
+.reveal-stagger-6 { transition-delay: 360ms; }
+
+/* Below-the-fold content visibility optimization */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 700px;
 }
 
 /* Clean, smooth button states (Diagonal screen glitch removed) */
@@ -407,6 +559,7 @@ html, body {
 }
 
 /* Power Orange Gradient Button */
+/* OLD CODE (commented by AI)
 .btn-power-coral {
   background: linear-gradient(135deg, #FF6B35 0%, #FF4500 100%);
   color: #FFFFFF;
@@ -420,6 +573,24 @@ html, body {
 
 .btn-power-coral:hover {
   transform: translateY(-2px);
+  box-shadow: 0 14px 30px -4px rgba(255, 107, 53, 0.6);
+}
+*/
+/* NEW CODE - smooth animation/performance: GPU translate3d hover, touch-action manipulation */
+.btn-power-coral {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF4500 100%);
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+  touch-action: manipulation;
+  box-shadow: 0 10px 25px -4px rgba(255, 107, 53, 0.45);
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+}
+
+.btn-power-coral:hover {
+  transform: translate3d(0, -2px, 0);
   box-shadow: 0 14px 30px -4px rgba(255, 107, 53, 0.6);
 }
 

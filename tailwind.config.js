@@ -40,7 +40,8 @@ export default {
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],
                 heading: ['Outfit', 'Plus Jakarta Sans', 'Inter', 'sans-serif'],
-                display: ['Oswald', 'Outfit', 'sans-serif'],
+                display: ['Syne', 'Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+                athletic: ['Oswald', 'Outfit', 'sans-serif'],
             },
             boxShadow: {
                 'soft-sm': '0 2px 8px rgba(15, 23, 42, 0.04)',

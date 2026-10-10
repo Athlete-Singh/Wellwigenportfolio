@@ -23,12 +23,21 @@ export default function FinalCTA({ onOpenLeadModal, onNavigateSection }) {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         
+        {/* OLD CODE (commented by AI)
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="bg-[#111B2E]/90 backdrop-blur-md rounded-3xl p-10 sm:p-16 border border-[#2A3547] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] relative overflow-hidden"
+          style={{
+            boxShadow: '0 25px 60px -15px rgba(0,0,0,0.8), 0 0 35px rgba(45,226,200,0.15)',
+          }}
+        >
+        */}
+        {/* NEW CODE - smooth animation/performance: reveal-item with GPU pop entrance, clean tinted background without backdrop-filter lag */}
+        <div
+          className="reveal-item bg-[#111B2E] rounded-3xl p-10 sm:p-16 border border-[#2A3547] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] relative overflow-hidden"
           style={{
             boxShadow: '0 25px 60px -15px rgba(0,0,0,0.8), 0 0 35px rgba(45,226,200,0.15)',
           }}
@@ -69,18 +78,27 @@ export default function FinalCTA({ onOpenLeadModal, onNavigateSection }) {
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
 
+              {/* OLD CODE (commented by AI)
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-7 py-4 rounded-full bg-[#25D366] text-white hover:bg-[#20bd5a] text-sm sm:text-base font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all hover:scale-105"
               >
+              */}
+              {/* NEW CODE - smooth animation/performance: specific transform transition with touch-action */}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-7 py-4 rounded-full bg-[#25D366] text-white hover:bg-[#20bd5a] text-sm sm:text-base font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-transform duration-200 hover:scale-105 [touch-action:manipulation]"
+              >
                 <MessageCircle size={18} />
                 <span>Chat on WhatsApp</span>
               </a>
             </div>
           </div>
-        </motion.div>
+        </div>
 
       </div>
     </section>

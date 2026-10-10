@@ -28,49 +28,149 @@ import {
   HOME_TRUST_CHIPS,
   WHY_WELLWIGEN_TILES,
   HOW_IT_WORKS_STEPS,
-  CLASS_TYPES,
   HOME_TESTIMONIALS,
 } from '../data/fitnessData';
 import GymMarqueeTicker from './GymMarqueeTicker';
 
 export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
-  // NEW CODE - Alternating Hero Background Images (preserves all 4 images)
+  // Alternating Hero Background Images (Calibrated face focal points for mobile & desktop)
   const HERO_IMAGES = [
     {
       src: '/images/hero_workout.jpg',
       alt: 'Wellwigen elite athletic power training in gym',
-      position: 'object-[70%_20%] sm:object-[68%_25%] lg:object-[68%_20%]',
+      position: 'object-[68%_16%] lg:object-[68%_20%]',
     },
     {
       src: '/images/hero_sled_push.jpg',
       alt: 'Athletic power sled push training at Wellwigen',
-      position: 'object-[75%_35%] sm:object-[70%_30%] lg:object-[65%_25%]',
+      position: 'object-[56%_38%] lg:object-[65%_25%]',
     },
     {
       src: '/images/hero_home_plank.jpg',
       alt: 'Live online virtual personal training session with coach',
-      position: 'object-[45%_12%] sm:object-[48%_10%] lg:object-[50%_8%]',
+      position: 'object-[74%_34%] lg:object-[68%_28%]',
     },
     {
       src: '/images/hero_bench_athlete.jpg',
       alt: 'Muscular athlete focus training at Wellwigen gym',
-      position: 'object-[80%_30%] sm:object-[75%_25%] lg:object-[70%_20%]',
+      position: 'object-[80%_18%] lg:object-[78%_20%]',
     },
     {
       src: '/images/hero_online_coach.jpg',
       alt: 'Expert online personal fitness coach conducting live consultation',
-      position: 'object-[20%_8%] sm:object-[22%_6%] lg:object-[25%_5%]',
+      position: 'object-[61%_20%] lg:object-[62%_20%]',
+    },
+  ];
+
+  // Dynamic rotating keywords per user specifications
+  const ROTATING_HERO_WORDS = [
+    'Wellwigen',
+    'HIIT',
+    'Personal Training',
+    'Yoga Classes',
+    'Jungle Fit Classes',
+    'Tabata Classes',
+  ];
+
+  // Premium Classes Showcase Section (Light Theme)
+  const PREMIUM_CLASSES = [
+    {
+      id: 'yoga',
+      title: 'Yoga classes',
+      desc: 'Mindful flows, breathwork & deep flexibility with certified yogis.',
+      img: '/images/class_yoga.jpg',
+      position: 'object-center',
+    },
+    {
+      id: 'tabata',
+      title: 'Tabata classes',
+      desc: 'High-intensity interval rounds engineered for maximum calorie burn & stamina.',
+      img: '/images/class_tabata.jpg',
+      position: 'object-center',
+    },
+    {
+      id: 'junglefit',
+      title: 'Jungle fit classes',
+      desc: 'Fun, high-energy functional movements, primal flow & rhythmic conditioning.',
+      img: '/images/class_jungle_fit.jpg',
+      position: 'object-center',
+    },
+    {
+      id: 'hiit',
+      title: 'HIIT',
+      desc: 'Full-throttle interval training to build lean muscle and athletic power.',
+      img: '/images/class_hiit.jpg',
+      position: 'object-center',
     },
   ];
 
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
+  const [typedWord, setTypedWord] = useState('');
+  const [wordIndex, setWordIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isWordComplete, setIsWordComplete] = useState(false);
 
+  // OLD CODE (commented by AI)
+  /*
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentHeroImage((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 3800); // Snappier rotation: 3.8 seconds so visitors see the next image promptly
+    }, 3800);
     return () => clearInterval(timer);
   }, [HERO_IMAGES.length]);
+  */
+  // NEW CODE - smooth animation/performance: pre-caches next slide for instant, glitch-free crossfade
+  useEffect(() => {
+    // Preload next image immediately
+    const nextIdx = (currentHeroImage + 1) % HERO_IMAGES.length;
+    const preloadImg = new Image();
+    preloadImg.src = HERO_IMAGES[nextIdx].src;
+
+    const timer = setInterval(() => {
+      setCurrentHeroImage((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 3800);
+    return () => clearInterval(timer);
+  }, [currentHeroImage, HERO_IMAGES.length]);
+
+  // Typewriter effect: types character-by-character, pops on completion, then deletes
+  useEffect(() => {
+    const targetWord = ROTATING_HERO_WORDS[wordIndex];
+    let timeoutId;
+
+    if (isWordComplete) {
+      // Pause when word is fully typed so user can read and enjoy the pop
+      timeoutId = setTimeout(() => {
+        setIsWordComplete(false);
+        setIsDeleting(true);
+      }, 1700);
+      return () => clearTimeout(timeoutId);
+    }
+
+    if (!isDeleting) {
+      // Typing forward
+      if (typedWord.length < targetWord.length) {
+        timeoutId = setTimeout(() => {
+          setTypedWord(targetWord.slice(0, typedWord.length + 1));
+        }, 90);
+      } else {
+        // Word is fully typed -> trigger pop effect & pause
+        setIsWordComplete(true);
+      }
+    } else {
+      // Backspacing / Deleting
+      if (typedWord.length > 0) {
+        timeoutId = setTimeout(() => {
+          setTypedWord(targetWord.slice(0, typedWord.length - 1));
+        }, 45);
+      } else {
+        // Finished deleting -> move to next word
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % ROTATING_HERO_WORDS.length);
+      }
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [typedWord, isDeleting, isWordComplete, wordIndex]);
   const getTileIcon = (name) => {
     switch (name) {
       case 'Award': return <Award className="w-6 h-6 text-teal-600" />;
@@ -104,24 +204,41 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
         <div className="w-px h-16 bg-teal-500/50" />
       </div>
 
-      {/* ================= FULLSCREEN CINEMATIC HERO (EDGE-TO-EDGE) ================= */}
-      <div data-nav-theme="dark" className="relative min-h-[92vh] lg:min-h-screen flex items-center pt-28 pb-20 lg:pt-36 lg:pb-24 bg-[#0E1420]">
+      {/* ================= HERO SECTION (TOP PICTURE ON MOBILE, EDGE-TO-EDGE ON DESKTOP) ================= */}
+      <div data-nav-theme="dark" className="relative min-h-[92vh] lg:min-h-screen flex flex-col lg:flex-row lg:items-center pt-20 pb-16 lg:pt-36 lg:pb-24 bg-[#0E1420]">
 
-        {/* Whole Screen Background Image */}
-        {/* OLD CODE (commented by AI) */}
-        {/*
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <img
-            src="/images/hero_workout.jpg"
-            alt="Wellwigen elite athletic power training in gym"
-            className="w-full h-full object-cover object-[70%_20%] sm:object-[68%_25%] lg:object-[68%_20%] filter brightness-[0.9] contrast-[1.12]"
-            loading="eager"
-            fetchPriority="high"
-          />
-        */}
+        {/* ----------------- MOBILE ONLY: Dedicated Top Picture Showcase (< lg) ----------------- */}
+        <div className="lg:hidden relative w-full h-[48vh] min-h-[340px] max-h-[460px] overflow-hidden select-none -mt-4">
+          {/* Alternating Images with Calibrated Face Focal Points */}
+          {HERO_IMAGES.map((img, idx) => (
+            <motion.img
+              key={img.src}
+              src={img.src}
+              alt={img.alt}
+              initial={false}
+              animate={{
+                opacity: currentHeroImage === idx ? 1 : 0,
+                scale: currentHeroImage === idx ? 1 : 1.05,
+              }}
+              transition={{
+                opacity: { duration: 0.75, ease: 'easeInOut' },
+                scale: { duration: 3.8, ease: 'easeOut' },
+              }}
+              className={`absolute inset-0 w-full h-full object-cover ${img.position} filter brightness-[0.95] contrast-[1.08]`}
+              loading={idx === 0 ? 'eager' : 'lazy'}
+              fetchPriority={idx === 0 ? 'high' : 'auto'}
+            />
+          ))}
 
-        {/* NEW CODE - Wellwigen alternating hero images (both images crossfade smoothly time to time) */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* Deep seamless gradient fade at bottom to blend into #0E1420 */}
+          <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-[#0E1420] from-20% via-[#0E1420]/80 via-60% to-transparent pointer-events-none" />
+
+          {/* Subtle top fade for the navbar */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#0E1420]/80 to-transparent pointer-events-none" />
+        </div>
+
+        {/* ----------------- DESKTOP ONLY: Edge-to-Edge Background (lg+) ----------------- */}
+        <div className="hidden lg:block absolute inset-0 z-0 overflow-hidden">
           {HERO_IMAGES.map((img, idx) => (
             <motion.img
               key={img.src}
@@ -142,155 +259,111 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
             />
           ))}
 
-          {/* Interactive Slide Switcher Indicator */}
-          <div className="absolute bottom-8 right-8 z-30 hidden sm:flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-teal-500/30">
-            {HERO_IMAGES.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentHeroImage(idx)}
-                aria-label={`Switch to hero photo ${idx + 1}`}
-                className={`transition-all duration-300 rounded-full ${currentHeroImage === idx
-                  ? 'w-6 h-1.5 bg-[#2DE2C8]'
-                  : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/70'
-                  }`}
-              />
-            ))}
-          </div>
-
           {/* Deep Cinematic Multi-layer Gradient Overlays for Razor-Sharp Readability */}
-          {/* Left vignette backdrop */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#0E1420] via-[#0E1420]/90 to-transparent lg:w-[68%]" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0E1420]/80 via-[#0E1420]/50 to-transparent" />
-
-          {/* Top fade for transparent sticky navbar */}
           <div className="absolute top-0 inset-x-0 h-44 bg-gradient-to-b from-[#0E1420]/95 via-[#0E1420]/50 to-transparent pointer-events-none" />
-
-          {/* Bottom fade into Marquee ticker band */}
           <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-[#0E1420] via-[#0E1420]/80 to-transparent pointer-events-none" />
-
-          {/* Blueprint Grid & Noise Texture */}
           <div className="absolute inset-0 bg-blueprint opacity-[0.03] pointer-events-none" />
           <div className="absolute inset-0 bg-noise opacity-25 pointer-events-none" />
-
-          {/* Ambient Teal Atmospheric Glow Orb */}
           <div className="absolute top-1/4 left-1/4 w-[480px] h-[480px] bg-teal-500/15 rounded-full blur-[130px] pointer-events-none" />
         </div>
 
-        {/* Giant Faded Outline Display Watermark behind content */}
-        <div className="absolute top-24 left-6 text-[15vw] font-display font-black text-transparent stroke-text select-none pointer-events-none opacity-20 z-0 leading-none">
+        {/* Giant Faded Outline Display Watermark behind content (Desktop) */}
+        <div className="absolute top-24 left-6 text-[15vw] font-display font-black text-transparent stroke-text select-none pointer-events-none opacity-20 z-0 leading-none hidden lg:block">
           BEAST MODE
         </div>
 
-        {/* Content Container (Left-aligned cinematic layout matching references) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-          <div className="max-w-2xl lg:max-w-3xl space-y-6 sm:space-y-7">
+        {/* Content Container (Left-aligned cinematic layout) */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full -mt-32 xs:-mt-36 sm:-mt-40 lg:mt-0">
+          <div className="max-w-2xl lg:max-w-3xl space-y-4 sm:space-y-6 lg:space-y-7">
 
-            {/* OLD CODE (commented by AI) - Awkward top pill badge removed per user request */}
-            {/*
+            {/* Display Headline with Animated Rotating Words */}
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/80 border border-teal-500/40 text-teal-300 text-xs font-display font-bold uppercase tracking-wider backdrop-blur-md shadow-lg"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#2DE2C8] animate-ping" />
-              <span>ONLINE PERSONAL TRAINING &amp; LIVE GROUP FITNESS</span>
-            </motion.div>
-            */}
-            {/* NEW CODE - Removed awkward pill badge */}
-
-            {/* Massive Athletic Display Headline (Matches reference mockups: BUILD YOUR BODY) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <h1 className="font-display font-black text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] tracking-tight text-white uppercase leading-[0.92]">
-                BUILD YOUR BODY.<br />
-                <span className="gradient-teal-sky-text drop-shadow-[0_0_35px_rgba(45,226,200,0.35)]">
-                  STAY CONSISTENT.
+              <h1 className="font-display font-extrabold text-[2.15rem] xs:text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] tracking-tight text-white leading-[1.08] sm:leading-[0.96]">
+                <span className="block text-white drop-shadow-md">
+                  Transform Your Body
+                </span>
+                <span className="block text-white/95 mt-0.5 sm:mt-1 drop-shadow-md">
+                  With
+                </span>
+                <span className="relative block min-h-[1.35em] mt-0.5 sm:mt-1">
+                  <motion.span
+                    animate={{
+                      scale: isWordComplete ? [1, 1.05, 1] : 1,
+                    }}
+                    transition={{
+                      duration: 0.35,
+                      ease: 'easeOut',
+                    }}
+                    className="inline-block gradient-teal-sky-text drop-shadow-[0_0_35px_rgba(45,226,200,0.35)] leading-tight pb-3"
+                  >
+                    {typedWord}
+                    {/* Blinking Cyan Cursor */}
+                    <span
+                      className="inline-block w-[3px] sm:w-[4px] h-[0.78em] ml-1 bg-[#2DE2C8] align-baseline rounded-sm animate-pulse shadow-[0_0_12px_rgba(45,226,200,0.85)]"
+                      aria-hidden="true"
+                    />
+                  </motion.span>
                 </span>
               </h1>
             </motion.div>
 
-            {/* Subtext */}
+            {/* Concise, Premium Subtext (Positioned cleanly below the picture border) */}
             <motion.p
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-base sm:text-lg lg:text-xl text-slate-300 max-w-xl font-normal leading-relaxed drop-shadow"
+              className="text-sm xs:text-base sm:text-lg lg:text-xl text-slate-300/90 max-w-xl font-normal leading-relaxed drop-shadow pt-3 sm:pt-0"
             >
-              Personalized 1-on-1 personal training &amp; live interactive online group fitness classes. Train from anywhere with certified master coaches. Real results, guaranteed consistency.
+              1-on-1 personal training &amp; live group fitness with certified master coaches.
             </motion.p>
 
-            {/* Action Buttons (Matches reference mockups 1 & 2: Join Now + Secondary) */}
+            {/* Action Buttons: Slim & fitted row on mobile, full-sized on desktop */}
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-1"
+              className="flex flex-row flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3.5 pt-1"
             >
               {/* Primary Power Coral CTA */}
+              {/* OLD CODE (commented by AI)
               <button
                 onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: 'Transformation' })}
-                className="btn-power-coral btn-shine px-8 py-4 rounded-xl text-base font-bold flex items-center justify-center gap-2.5 cursor-pointer shadow-coral-glow hover:scale-[1.02] active:scale-[0.98] transition-all group"
+                className="btn-power-coral btn-shine px-3.5 py-2.5 sm:px-8 sm:py-4 rounded-xl text-xs sm:text-base font-bold flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer shadow-coral-glow hover:scale-[1.02] active:scale-[0.98] transition-all group shrink-0"
+              >
+              */}
+              {/* NEW CODE - smooth animation/performance: specific transform transition with touch-action */}
+              <button
+                onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: 'Transformation' })}
+                className="btn-power-coral btn-shine px-3.5 py-2.5 sm:px-8 sm:py-4 rounded-xl text-xs sm:text-base font-bold flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer shadow-coral-glow hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 group shrink-0"
               >
                 <span>Join Now</span>
-                <ArrowRight size={19} className="group-hover:translate-x-1.5 transition-transform" />
+                <ArrowRight size={14} className="sm:w-[19px] sm:h-[19px] group-hover:translate-x-1.5 transition-transform" />
               </button>
 
               {/* Secondary CTA */}
+              {/* OLD CODE (commented by AI)
               <button
                 onClick={() => onNavigateSection('group-classes')}
-                className="px-7 py-4 rounded-xl bg-slate-900/70 hover:bg-slate-800/80 border border-slate-700/80 text-white font-bold text-base flex items-center justify-center gap-2.5 backdrop-blur-md hover:border-teal-400/50 transition-all cursor-pointer shadow-lg"
+                className="px-3 py-2.5 sm:px-7 sm:py-4 rounded-xl bg-slate-900/70 hover:bg-slate-800/80 border border-slate-700/80 text-white font-bold text-xs sm:text-base flex items-center justify-center gap-1.5 sm:gap-2.5 backdrop-blur-md hover:border-teal-400/50 transition-all cursor-pointer shadow-lg whitespace-nowrap"
+              >
+              */}
+              {/* NEW CODE - smooth animation/performance: specific background and border transitions */}
+              <button
+                onClick={() => onNavigateSection('group-classes')}
+                className="px-3 py-2.5 sm:px-7 sm:py-4 rounded-xl bg-slate-900/70 hover:bg-slate-800/80 border border-slate-700/80 text-white font-bold text-xs sm:text-base flex items-center justify-center gap-1.5 sm:gap-2.5 backdrop-blur-md hover:border-teal-400/50 transition-[background-color,border-color] duration-200 cursor-pointer shadow-lg whitespace-nowrap"
               >
                 <span>Explore Group Classes</span>
-                <ArrowRight size={18} className="text-teal-400" />
+                <ArrowRight size={14} className="sm:w-[18px] sm:h-[18px] text-teal-400 shrink-0" />
               </button>
             </motion.div>
 
-            {/* Member Trust & 5-Star Rating Cluster (Matches reference mockup 2) */}
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex items-center gap-4 pt-1"
-            >
-              {/* Member Avatars */}
-              <div className="flex -space-x-2.5">
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80"
-                  alt="Member"
-                  className="w-10 h-10 rounded-full border-2 border-[#0E1420] object-cover"
-                />
-                <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80"
-                  alt="Member"
-                  className="w-10 h-10 rounded-full border-2 border-[#0E1420] object-cover"
-                />
-                <img
-                  src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&h=100&q=80"
-                  alt="Member"
-                  className="w-10 h-10 rounded-full border-2 border-[#0E1420] object-cover"
-                />
-                <div className="w-10 h-10 rounded-full border-2 border-[#0E1420] bg-teal-600 text-white flex items-center justify-center text-xs font-bold font-display">
-                  +6k
-                </div>
-              </div>
 
-              {/* Star Rating & Text */}
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
-                  ))}
-                  <span className="text-xs font-bold text-white ml-1.5">5.0</span>
-                </div>
-                <span className="text-xs text-slate-400 font-medium">
-                  Trusted by 6,000+ members worldwide
-                </span>
-              </div>
-            </motion.div>
 
             {/* Athletic Category Tag Pills (Matches reference mockup 2) */}
             <motion.div
@@ -310,7 +383,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
                 <button
                   key={idx}
                   onClick={() => onNavigateSection('personal-training')}
-                  className="px-3.5 py-1.5 rounded-lg bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-teal-500/50 text-slate-300 hover:text-white text-xs font-medium backdrop-blur-sm transition-all cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-lg bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-teal-500/50 text-slate-300 hover:text-white text-xs font-medium backdrop-blur-sm transition-colors duration-200 cursor-pointer"
                 >
                   {pill}
                 </button>
@@ -324,6 +397,119 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
       {/* ================= DARK MARQUEE TICKER BAND ================= */}
       <GymMarqueeTicker />
+
+      {/* ================= TRANSFORM WITH OUR PREMIUM CLASSES (VIRTUAL STUDIO - LIGHT THEME) ================= */}
+      <section data-nav-theme="light" className="relative py-20 sm:py-24 bg-gradient-to-b from-[#F3FBF9] via-white to-[#F8FAFC] text-slate-900 overflow-hidden border-y border-slate-200/80">
+        {/* Soft Ambient Light Glows */}
+        <div className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-teal-100/40 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute bottom-10 right-1/4 w-[500px] h-[500px] bg-sky-100/35 rounded-full blur-[130px] pointer-events-none" />
+
+        {/* Faded Watermark Accent (Light) */}
+        <div className="absolute -top-6 right-6 text-[15vw] font-display font-black text-slate-200/35 select-none pointer-events-none z-0">
+          STUDIO
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Section Header (Clean Light Theme) */}
+          <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-700 text-xs font-display font-extrabold uppercase tracking-widest shadow-sm mb-4"
+            >
+              <Sparkles size={13} className="text-teal-600" />
+              <span>VIRTUAL STUDIO</span>
+            </motion.div>
+
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="font-display font-black text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] text-slate-900 tracking-tight leading-[1.12]"
+            >
+              Transform With Our{' '}
+              <span className="text-teal-600 drop-shadow-sm">
+                Premium Classes
+              </span>
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-slate-600 text-sm sm:text-base mt-3 max-w-2xl mx-auto leading-relaxed"
+            >
+              Choose from a variety of expert-led online sessions tailored to your goals. Click on any class to reserve your spot!
+            </motion.p>
+          </div>
+
+          {/* 4 Premium Class Cards Grid (Light Theme & Crisp Natural Photos) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            {PREMIUM_CLASSES.map((item, idx) => (
+              /* OLD CODE (commented by AI)
+              <div
+                key={item.id}
+                onClick={() => onOpenLeadModal({ program: item.title, plan: 'Trial Class' })}
+                className="group relative h-[430px] sm:h-[460px] lg:h-[490px] rounded-[30px] overflow-hidden border border-slate-200/80 hover:border-teal-400 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2.5 cursor-pointer flex flex-col justify-end p-6 sm:p-7 select-none bg-slate-100"
+              >
+              */
+              /* NEW CODE - smooth animation/performance: unified reveal pop animation with stagger, composite-only transform hover */
+              <div
+                key={item.id}
+                onClick={() => onOpenLeadModal({ program: item.title, plan: 'Trial Class' })}
+                className={`reveal-item reveal-stagger-${(idx % 4) + 1} group relative h-[430px] sm:h-[460px] lg:h-[490px] rounded-[30px] overflow-hidden border border-slate-200/80 hover:border-teal-400 shadow-md hover:shadow-xl transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-2 cursor-pointer flex flex-col justify-end p-6 sm:p-7 select-none bg-slate-100 [touch-action:manipulation]`}
+              >
+                {/* Natural, Bright Background Image (Zoom on Hover) */}
+                <img
+                  src={item.img}
+                  alt={item.title}
+                  className={`absolute inset-0 w-full h-full object-cover ${item.position} group-hover:scale-105 transition-transform duration-500 ease-out`}
+                  loading="lazy"
+                  decoding="async"
+                />
+
+                {/* Smooth Bottom Gradient Fade for Crisp Text Contrast */}
+                <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent pointer-events-none" />
+
+                {/* Bottom Content Area */}
+                <div className="relative z-10 space-y-2">
+                  <div className="flex items-end justify-between gap-3">
+                    <div>
+                      <h3 className="font-display font-extrabold text-2xl sm:text-[1.65rem] text-white tracking-tight leading-tight group-hover:text-[#2DE2C8] transition-colors drop-shadow-sm">
+                        {item.title}
+                      </h3>
+                      {/* OLD CODE (commented by AI)
+                      <div className="w-10 h-1 bg-[#2DE2C8] rounded-full mt-2 group-hover:w-16 transition-all duration-300" />
+                      */}
+                      {/* NEW CODE - smooth animation/performance: GPU scaleX transform instead of width layout trigger */}
+                      <div className="w-10 h-1 bg-[#2DE2C8] rounded-full mt-2 origin-left group-hover:scale-x-150 transition-transform duration-300" />
+                    </div>
+
+                    {/* Circular Action Arrow Button */}
+                    {/* OLD CODE (commented by AI)
+                    <div className="w-10 h-10 rounded-full bg-teal-500 text-white flex items-center justify-center group-hover:bg-[#2DE2C8] group-hover:text-slate-950 group-hover:scale-110 transition-all shadow-md shrink-0">
+                    */}
+                    {/* NEW CODE - smooth animation/performance: specific background and transform transitions */}
+                    <div className="w-10 h-10 rounded-full bg-teal-500 text-white flex items-center justify-center group-hover:bg-[#2DE2C8] group-hover:text-slate-950 group-hover:scale-110 transition-[background-color,color,transform] duration-200 shadow-md shrink-0">
+                      <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </div>
+
+                  <p className="text-xs sm:text-[13px] text-slate-200/95 line-clamp-2 leading-relaxed pt-1 drop-shadow-sm">
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
 
       {/* ================= CHOOSE HOW YOU WANT TO TRAIN (DARK ACCENT SECTION) ================= */}
       <div data-nav-theme="dark" className="relative py-28 bg-[#0E1420] text-white overflow-hidden">
@@ -357,7 +543,11 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
           <div className="grid md:grid-cols-2 gap-8 items-stretch">
 
             {/* Card 1: Personal Training (Light Card on Dark Background for High Contrast) */}
+            {/* OLD CODE (commented by AI)
             <div className="bg-white rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-100 hover:-translate-y-1.5 transition-all duration-300">
+            */}
+            {/* NEW CODE - smooth animation/performance: reveal-item with stagger-1, GPU transform hover without layout recalculation */}
+            <div className="reveal-item reveal-stagger-1 bg-white rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-100 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250">
               <div className="absolute top-0 right-0 w-36 h-36 bg-teal-100/60 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
 
               <div>
@@ -404,7 +594,11 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
             </div>
 
             {/* Card 2: Online Group Classes (Light Card on Dark Background) */}
+            {/* OLD CODE (commented by AI)
             <div className="bg-white rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-100 hover:-translate-y-1.5 transition-all duration-300">
+            */}
+            {/* NEW CODE - smooth animation/performance: reveal-item with stagger-2, GPU transform hover */}
+            <div className="reveal-item reveal-stagger-2 bg-white rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-100 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250">
               <div className="absolute top-0 right-0 w-36 h-36 bg-sky-100/60 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
 
               <div>
@@ -485,9 +679,16 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
             {/* 6 Feature Tiles */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {WHY_WELLWIGEN_TILES.map((tile, idx) => (
+                /* OLD CODE (commented by AI)
                 <div
                   key={idx}
                   className="card-soft p-6 border border-slate-200/90 flex flex-col justify-between group hover:border-teal-400"
+                >
+                */
+                /* NEW CODE - smooth animation/performance: reveal-item with stagger for pop entrance */
+                <div
+                  key={idx}
+                  className={`reveal-item reveal-stagger-${(idx % 6) + 1} card-soft p-6 border border-slate-200/90 flex flex-col justify-between group hover:border-teal-400`}
                 >
                   <div className="w-12 h-12 rounded-2xl bg-white shadow-soft-sm border border-slate-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     {getTileIcon(tile.icon)}
@@ -521,10 +722,17 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               <div className="hidden lg:block absolute top-1/2 left-8 right-8 h-1 bg-gradient-to-r from-teal-400 via-sky-400 to-teal-400 rounded-full -translate-y-1/2 z-0" />
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-                {HOW_IT_WORKS_STEPS.map((step) => (
+                {HOW_IT_WORKS_STEPS.map((step, idx) => (
+                  /* OLD CODE (commented by AI)
                   <div
                     key={step.step}
                     className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-soft-sm text-center flex flex-col items-center hover:shadow-md transition-shadow"
+                  >
+                  */
+                  /* NEW CODE - smooth animation/performance: reveal-item with stagger */
+                  <div
+                    key={step.step}
+                    className={`reveal-item reveal-stagger-${(idx % 4) + 1} bg-white p-6 rounded-2xl border border-slate-200/80 shadow-soft-sm text-center flex flex-col items-center hover:shadow-md transition-shadow duration-200`}
                   >
                     <div className="w-12 h-12 rounded-full gradient-teal-sky text-white font-display font-black text-lg flex items-center justify-center shadow-teal-glow mb-4">
                       {step.step}
@@ -541,100 +749,91 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
             </div>
           </div>
 
-          {/* ================= FEATURE BANNERS ================= */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-28">
+          {/* ================= FULL-WIDTH SHOWCASE BANNER: YOUR GOALS. YOUR FOCUS. ================= */}
+          <div className="mb-20 sm:mb-24 reveal-item">
+            <div className="relative rounded-2xl lg:rounded-3xl overflow-hidden bg-gradient-to-br from-[#0A121E] via-[#092229] to-[#0D1C2E] border border-teal-500/35 shadow-[0_20px_50px_-15px_rgba(8,34,41,0.6)] text-white group">
+              
+              {/* Special Effects & Ambient Atmosphere */}
+              <div className="absolute inset-0 bg-blueprint-grid opacity-15 pointer-events-none" />
+              <div className="absolute -top-24 -left-24 w-80 h-80 bg-teal-500/15 rounded-full blur-[90px] pointer-events-none" />
+              <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#2DE2C8]/10 rounded-full blur-[90px] pointer-events-none" />
+              <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-teal-400/50 to-transparent" />
 
-            {/* Banner 1: Your Goals. Your Focus. */}
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between p-8 sm:p-10 text-white min-h-[380px] group border border-teal-500/30">
-              {/* Background Photo */}
-              {/* OLD CODE (commented by AI)
-              <img
-                src="/images/card_goals_focus.jpg"
-                alt="Athletes performing kettlebell workouts during personal training"
-                className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                loading="lazy"
-              />
-              */}
-              {/* NEW CODE - mobile fix: face & kettlebell form visibility on mobile */}
-              <img
-                src="/images/card_goals_focus.jpg"
-                alt="Athletes performing kettlebell workouts during personal training"
-                className="absolute inset-0 w-full h-full object-cover object-[45%_25%] sm:object-center group-hover:scale-105 transition-transform duration-700"
-                loading="lazy"
-              />
-              {/* Balanced scrim: keeps athletes & gym details clearly visible while guaranteeing word priority */}
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/50 to-slate-950/20 pointer-events-none" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/35 pointer-events-none" />
+              <div className="relative z-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-stretch p-4 sm:p-6 lg:p-7">
+                
+                {/* Content Side: Slim, concise & perfectly balanced */}
+                <div className="lg:col-span-7 flex flex-col justify-center order-2 lg:order-1 py-1">
+                  
+                  {/* Headline */}
+                  <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">
+                    Your Goals.{' '}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2DE2C8] via-teal-300 to-emerald-400">
+                      Your Focus.
+                    </span>
+                  </h2>
 
-              <div className="relative z-10 mb-8 max-w-md">
-                <span className="inline-block text-xs font-display font-extrabold uppercase tracking-widest text-[#2DE2C8] bg-slate-950/80 border border-teal-400/60 px-3.5 py-1 rounded-full backdrop-blur-md shadow-lg">
-                  1-ON-1 FOCUS
-                </span>
-                <h3 className="font-heading text-3xl sm:text-4xl font-black mt-3 leading-tight text-white drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)]">
-                  Your Goals.{' '}
-                  <span className="text-[#2DE2C8] drop-shadow-[0_0_20px_rgba(45,226,200,0.45)]">
-                    Your Focus.
-                  </span>
-                </h3>
-                <p className="text-sm sm:text-base text-white/95 font-medium mt-2.5 max-w-sm leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
-                  Get customized training, expert guidance and real progress — all from the comfort of your home.
-                </p>
-              </div>
+                  {/* Short, crisp content */}
+                  <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+                    Customized 1-on-1 personal training, real-time posture correction, and authentic progress — crafted around your body and schedule at home.
+                  </p>
 
-              <div className="relative z-10">
-                <button
-                  onClick={() => onNavigateSection('personal-training')}
-                  className="bg-white text-slate-900 hover:bg-teal-50 font-bold px-6 py-3 rounded-full text-sm inline-flex items-center gap-2 shadow-xl transition-all hover:scale-105 cursor-pointer group/btn"
-                >
-                  <span>Explore Personal Training</span>
-                  <ArrowRight size={16} className="text-teal-600 group-hover/btn:translate-x-1 transition-transform" />
-                </button>
-              </div>
-            </div>
-
-            {/* Banner 2: Live Classes. Real Energy. Better Results. */}
-            <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/90 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-display font-bold uppercase tracking-widest text-sky-700 bg-sky-50 px-3 py-1 rounded-full">
-                    ALL CLASS TYPES
-                  </span>
-                  <button
-                    onClick={() => onNavigateSection('group-classes')}
-                    className="text-xs font-bold text-teal-600 hover:underline inline-flex items-center gap-1"
-                  >
-                    <span>View All Classes</span>
-                    <ArrowRight size={12} />
-                  </button>
-                </div>
-
-                <h3 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
-                  Live Classes. Real Energy. Better Results.
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 mb-6">
-                  Four distinct class disciplines to keep every workout exhilarating and well-rounded.
-                </p>
-
-                {/* 4 Class Chips */}
-                <div className="grid grid-cols-2 gap-3">
-                  {CLASS_TYPES.map((cls) => (
-                    <div
-                      key={cls.id}
-                      className="p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-teal-300 transition-colors"
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-display font-black text-sm text-slate-900">{cls.name}</span>
-                        <span className="text-[10px] font-semibold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded">
-                          {cls.tag}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 line-clamp-2">{cls.desc}</p>
+                  {/* Slim Inner Feature Boxes */}
+                  <div className="grid grid-cols-2 gap-2 sm:gap-2.5 my-3.5">
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/[0.05] border border-white/10 hover:border-teal-400/40 transition-colors">
+                      <Target size={14} className="text-[#2DE2C8] shrink-0" />
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-100 truncate">Custom Workouts</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/[0.05] border border-white/10 hover:border-teal-400/40 transition-colors">
+                      <Activity size={14} className="text-emerald-400 shrink-0" />
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-100 truncate">Live Form Correction</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/[0.05] border border-white/10 hover:border-teal-400/40 transition-colors">
+                      <Zap size={14} className="text-cyan-400 shrink-0" />
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-100 truncate">Nutrition & Habits</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/[0.05] border border-white/10 hover:border-teal-400/40 transition-colors">
+                      <TrendingUp size={14} className="text-[#2DE2C8] shrink-0" />
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-100 truncate">Weekly Progress</span>
+                    </div>
+                  </div>
 
+                  {/* Button */}
+                  <div className="flex items-center gap-3 pt-0.5">
+                    {/* OLD CODE (commented by AI)
+                    <button
+                      onClick={() => onNavigateSection('personal-training')}
+                      className="btn-primary-gradient btn-shine px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold inline-flex items-center gap-2 shadow-teal-glow cursor-pointer transition-all hover:scale-105"
+                    >
+                    */}
+                    {/* NEW CODE - smooth animation/performance: specific transform transition */}
+                    <button
+                      onClick={() => onNavigateSection('personal-training')}
+                      className="btn-primary-gradient btn-shine px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold inline-flex items-center gap-2 shadow-teal-glow cursor-pointer transition-transform duration-200 hover:scale-105"
+                    >
+                      <span>Explore Personal Training</span>
+                      <ArrowRight size={15} />
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* Media Showcase Side: Large, Clean, Big Image fitting the content height */}
+                <div className="lg:col-span-5 order-1 lg:order-2 flex">
+                  <div className="relative rounded-xl lg:rounded-2xl overflow-hidden border border-teal-500/30 shadow-lg w-full h-full min-h-[200px] sm:min-h-[220px]">
+                    <img
+                      src="/images/card_goals_focus.jpg"
+                      alt="Athletes performing kettlebell workouts during personal training"
+                      className="w-full h-full object-cover object-[45%_25%] sm:object-center group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
           </div>
 
           {/* ================= REAL PEOPLE. REAL RESULTS (TESTIMONIALS) ================= */}
@@ -653,10 +852,17 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
             {/* Testimonial Cards */}
             <div className="grid md:grid-cols-3 gap-6">
-              {HOME_TESTIMONIALS.map((t) => (
+              {HOME_TESTIMONIALS.map((t, idx) => (
+                /* OLD CODE (commented by AI)
                 <div
                   key={t.id}
                   className="card-soft p-6 border border-slate-200/80 flex flex-col justify-between hover:border-teal-300 transition-all"
+                >
+                */
+                /* NEW CODE - smooth animation/performance: reveal-item with stagger and specific transition */
+                <div
+                  key={t.id}
+                  className={`reveal-item reveal-stagger-${(idx % 3) + 1} card-soft p-6 border border-slate-200/80 flex flex-col justify-between hover:border-teal-300 transition-[transform,border-color,box-shadow] duration-200`}
                 >
                   <div>
                     {/* Star Rating */}
@@ -673,7 +879,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
                   <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
                     <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-teal-500/30 shrink-0">
-                      <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
+                      <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                     </div>
                     <div>
                       <div className="font-heading font-bold text-sm text-slate-900">{t.name}</div>

@@ -291,14 +291,21 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
               const isToday = item.dayIndex === currentDayIndex;
 
               return (
-                <motion.div
+                /* OLD CODE (commented by AI)
+                <div
                   key={item.dayCode}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-20px' }}
-                  transition={{ duration: 0.3, delay: idx * 0.04 }}
                   onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: item.name })}
                   className={`bg-[#111B2E] rounded-2xl overflow-hidden group cursor-pointer border flex flex-col justify-between transition-all duration-300 w-full min-w-0 shadow-dark-card ${isToday
+                    ? 'ring-2 ring-[#2DE2C8] border-[#2DE2C8] shadow-[0_0_30px_rgba(45,226,200,0.35)] scale-[1.01] sm:scale-102 z-10'
+                    : 'border-[#2A3547] hover:border-teal-400 hover:-translate-y-1'
+                    }`}
+                >
+                */
+                /* NEW CODE - smooth animation/performance: reveal-item with stagger and GPU hover */
+                <div
+                  key={item.dayCode}
+                  onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: item.name })}
+                  className={`reveal-item reveal-stagger-${(idx % 6) + 1} bg-[#111B2E] rounded-2xl overflow-hidden group cursor-pointer border flex flex-col justify-between transition-[transform,border-color,box-shadow] duration-250 w-full min-w-0 shadow-dark-card [touch-action:manipulation] ${isToday
                     ? 'ring-2 ring-[#2DE2C8] border-[#2DE2C8] shadow-[0_0_30px_rgba(45,226,200,0.35)] scale-[1.01] sm:scale-102 z-10'
                     : 'border-[#2A3547] hover:border-teal-400 hover:-translate-y-1'
                     }`}
@@ -349,12 +356,12 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
                       <Clock size={16} className="text-[#2DE2C8] sm:w-3 sm:h-3" />
                       <span>{item.duration}</span>
                     </span>
-                    <span className="min-h-[44px] px-5 py-2.5 sm:min-h-0 sm:px-0 sm:py-0 rounded-full sm:rounded-none bg-teal-500/15 sm:bg-transparent border border-teal-500/40 sm:border-transparent text-[#2DE2C8] font-bold text-sm sm:text-[11px] flex items-center justify-center gap-1.5 group-hover:bg-[#2DE2C8] group-hover:text-slate-950 transition-all duration-200 active:scale-95 shadow-sm">
+                    <span className="min-h-[44px] px-5 py-2.5 sm:min-h-0 sm:px-0 sm:py-0 rounded-full sm:rounded-none bg-teal-500/15 sm:bg-transparent border border-teal-500/40 sm:border-transparent text-[#2DE2C8] font-bold text-sm sm:text-[11px] flex items-center justify-center gap-1.5 group-hover:bg-[#2DE2C8] group-hover:text-slate-950 transition-[background-color,color] duration-200 active:scale-95 shadow-sm">
                       <span>Join</span>
                       <span className="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
                     </span>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -385,11 +392,11 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch pt-4">
-            {GROUP_PLANS.map((plan) => {
+            {GROUP_PLANS.map((plan, idx) => {
               if (plan.primary) {
                 // Monthly Plan with Conic Glow
                 return (
-                  <div key={plan.id} className="relative lg:scale-105 z-10 flex flex-col">
+                  <div key={plan.id} className={`reveal-item reveal-stagger-${(idx % 4) + 1} relative lg:scale-105 z-10 flex flex-col`}>
                     {/* Floating Badge (Unclipped above rotating glow border) */}
                     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-teal-500 to-[#2DE2C8] text-slate-950 font-display font-black text-[10px] px-3.5 py-1 rounded-full shadow-lg uppercase tracking-wider whitespace-nowrap">
                       {plan.highlightBadge}
@@ -440,9 +447,16 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
               }
 
               return (
+                /* OLD CODE (commented by AI)
                 <div
                   key={plan.id}
                   className="card-soft p-6 relative flex flex-col justify-between border border-slate-200/90 bg-white hover:border-teal-300 transition-all hover:-translate-y-1"
+                >
+                */
+                /* NEW CODE - smooth animation/performance: reveal-item with stagger and GPU hover */
+                <div
+                  key={plan.id}
+                  className={`reveal-item reveal-stagger-${(idx % 4) + 1} card-soft p-6 relative flex flex-col justify-between border border-slate-200/90 bg-white hover:border-teal-300 transition-[transform,border-color,box-shadow] duration-250 hover:-translate-y-1`}
                 >
                   {plan.highlightBadge && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 gradient-teal-sky text-white text-[10px] font-display font-black px-3 py-0.5 rounded-full shadow-md tracking-wider">
@@ -503,25 +517,42 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
       {/* ================= DARK TRIAL BAND (JUST RS 99 FOR 1 CLASS) ================= */}
       <div
         data-nav-theme="dark"
-        className="relative mt-24 sm:mt-28 lg:mt-32 bg-gradient-to-r from-[#0E1420] via-[#0B3B3C] to-[#111B2E] text-white border-y border-[#2A3547] overflow-visible"
+        className="relative mt-24 sm:mt-28 lg:mt-32 bg-gradient-to-r from-[#0E1420] via-[#0B3B3C] to-[#111B2E] text-white border-y border-[#2A3547] overflow-visible reveal-item"
       >
         <div className="absolute inset-0 bg-blueprint-grid opacity-25 pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative py-14 sm:py-16 lg:py-18">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pt-2 pb-12 sm:py-16 lg:py-18">
 
-          {/* Pop-Out Transparent Trainer Girl (Slightly reduced so words are 100% clear with zero overlap) */}
+          {/* Desktop Pop-Out Transparent Trainer Girl (Slightly reduced so words are 100% clear with zero overlap) */}
           <img
             src="/images/trial_trainer.png"
             alt="Wellwigen trial coach"
             width="454"
             height="760"
             loading="lazy"
+            decoding="async"
             className="hidden sm:block absolute bottom-0 left-2 sm:left-4 lg:left-6 h-[130%] sm:h-[138%] md:h-[145%] lg:h-[152%] max-h-[305px] w-auto object-contain pointer-events-none select-none z-10"
             style={{
               bottom: 0,
-              filter: 'drop-shadow(0 0 35px rgba(45, 212, 191, 0.35)) drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6))',
             }}
           />
+
+          {/* Mobile Trial Coach: Upper side with controlled subtle pop-out */}
+          <div className="sm:hidden -mt-10 mb-2 flex justify-center pointer-events-none select-none relative z-10">
+            <img
+              src="/images/trial_trainer.png"
+              alt="Wellwigen trial coach"
+              width="454"
+              height="760"
+              loading="lazy"
+              decoding="async"
+              className="h-44 xs:h-48 w-auto object-contain"
+              style={{
+                maskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
+              }}
+            />
+          </div>
 
           <div className="relative z-20 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="sm:pl-56 md:pl-64 lg:pl-72 max-w-2xl text-center sm:text-left">
@@ -569,9 +600,16 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
             {WHY_GROUP_CLASSES_TILES.map((tile, idx) => (
+              /* OLD CODE (commented by AI)
               <div
                 key={idx}
                 className="card-soft p-5 border border-slate-200/90 hover:border-teal-300 transition-all flex flex-col justify-between"
+              >
+              */
+              /* NEW CODE - smooth animation/performance: reveal-item with stagger and GPU hover */
+              <div
+                key={idx}
+                className={`reveal-item reveal-stagger-${(idx % 5) + 1} card-soft p-5 border border-slate-200/90 hover:border-teal-300 transition-[transform,border-color,box-shadow] duration-250 flex flex-col justify-between`}
               >
                 <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-100/60 flex items-center justify-center mb-4">
                   {getWhyTileIcon(tile.icon)}

@@ -7,7 +7,8 @@ export default function Navbar({ onOpenLeadModal }) {
   const [activeSection, setActiveSection] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Track scroll position for frosted-glass effect
+  // OLD CODE (commented by AI)
+  /*
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 30);
@@ -15,6 +16,23 @@ export default function Navbar({ onOpenLeadModal }) {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  */
+  // NEW CODE - smooth animation/performance: throttle state updates on scroll to prevent layout churn
+  useEffect(() => {
+    let lastScrolled = window.scrollY > 30;
+    setIsScrolled(lastScrolled);
+
+    const handleScroll = () => {
+      const nowScrolled = window.scrollY > 30;
+      if (nowScrolled !== lastScrolled) {
+        lastScrolled = nowScrolled;
+        setIsScrolled(nowScrolled);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -78,9 +96,19 @@ export default function Navbar({ onOpenLeadModal }) {
         }`}
       >
       */}
-      {/* NEW CODE - mobile fix: always solid backdrop-blur-md on mobile so scrolled content never clashes, desktop keeps exact scroll-dependent gradient */}
+      {/* OLD CODE (commented by AI)
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? 'py-3.5 bg-[#0E1420]/95 backdrop-blur-md shadow-[0_4px_25px_rgba(0,0,0,0.5)] border-b border-slate-800'
+            : 'py-3.5 sm:py-5 bg-[#0E1420]/95 sm:bg-gradient-to-b sm:from-[#0E1420]/85 sm:via-[#0E1420]/40 sm:to-transparent backdrop-blur-md sm:backdrop-blur-none border-b border-slate-800/60 sm:border-transparent'
+        }`}
+      >
+      */}
+      {/* NEW CODE - smooth animation/performance: GPU translateZ(0) layer promotion, specific background/padding/shadow transition */}
+      <header
+        style={{ transform: 'translateZ(0)' }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-[padding,background-color,border-color,box-shadow] duration-250 ${
           isScrolled
             ? 'py-3.5 bg-[#0E1420]/95 backdrop-blur-md shadow-[0_4px_25px_rgba(0,0,0,0.5)] border-b border-slate-800'
             : 'py-3.5 sm:py-5 bg-[#0E1420]/95 sm:bg-gradient-to-b sm:from-[#0E1420]/85 sm:via-[#0E1420]/40 sm:to-transparent backdrop-blur-md sm:backdrop-blur-none border-b border-slate-800/60 sm:border-transparent'
