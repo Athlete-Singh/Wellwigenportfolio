@@ -827,11 +827,11 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
             {/* Card 2: Online Group Classes (Background Image Card with Face-Clear Window) */}
             <div className="reveal-item reveal-stagger-2 rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-700/60 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250 min-h-[580px] bg-slate-900">
-              {/* Background Image positioned for optimal face clarity */}
+              {/* Background Image positioned for optimal face clarity (mobile: shifted toward girl's face, desktop: untouched) */}
               <img
                 src="/images/home_group_classes.jpg"
-                alt="Online group fitness class performing synchronized workout"
-                className="absolute inset-0 w-full h-full object-cover object-[50%_25%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
+                alt="Online group fitness class performing synchronized dumbbell workout"
+                className="absolute inset-0 w-full h-full object-cover object-[62%_20%] sm:object-[50%_25%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
                 loading="lazy"
                 decoding="async"
               />
