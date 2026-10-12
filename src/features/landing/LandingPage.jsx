@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import PageLoader from './components/PageLoader';
 import Navbar from './components/Navbar';
 import HomeSection from './components/HomeSection';
 import PersonalTrainingSection from './components/PersonalTrainingSection';
@@ -12,19 +11,10 @@ import LegalModal from './components/LegalModal';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
 
 export default function LandingPage() {
-  const [loading, setLoading] = useState(true);
   const [leadModalOpen, setLeadModalOpen] = useState(false);
   const [leadModalData, setLeadModalData] = useState({});
   const [legalModalOpen, setLegalModalOpen] = useState(false);
   const [legalModalType, setLegalModalType] = useState('privacy');
-
-  // Initial loader duration (400ms for smooth hydration)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 450);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Handle direct anchor links from URL on mount
   useEffect(() => {
@@ -92,7 +82,7 @@ export default function LandingPage() {
       });
       observer.disconnect();
     };
-  }, [loading]);
+  }, []);
 
   const handleOpenLeadModal = (data = {}) => {
     setLeadModalData(data);
@@ -179,9 +169,6 @@ export default function LandingPage() {
           `}
         </script>
       </Helmet>
-
-      {/* Branded Initial Page Loader */}
-      <PageLoader isLoading={loading} />
 
       {/* Sticky Header with Frosted Glass & Progress Bar */}
       <Navbar onOpenLeadModal={handleOpenLeadModal} />
