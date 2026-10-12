@@ -769,11 +769,11 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
             {/* Card 1: Personal Training (Background Image Card with Face-Clear Window) */}
             <div className="reveal-item reveal-stagger-1 rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-700/60 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250 min-h-[580px] bg-slate-900">
-              {/* Background Image positioned for optimal face clarity (shifted left, head fully preserved) */}
+              {/* Background Image positioned at 65% crop for optimal composition */}
               <img
                 src="/images/home_personal_training.jpg"
                 alt="Personal trainer coaching athlete with barbell in fitness studio"
-                className="absolute inset-0 w-full h-full object-cover object-[58%_15%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
+                className="absolute inset-0 w-full h-full object-cover object-[65%_15%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
                 loading="lazy"
                 decoding="async"
               />
