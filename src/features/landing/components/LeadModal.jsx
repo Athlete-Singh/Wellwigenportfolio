@@ -427,7 +427,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex-1 btn-coral-gradient btn-shine py-3.5 px-6 rounded-full text-white font-bold text-sm flex items-center justify-center gap-2 shadow-coral-glow cursor-pointer disabled:opacity-50"
+                      className="flex-1 btn-coral-gradient btn-shine py-2.5 sm:py-3 px-6 rounded-full text-white font-bold text-sm flex items-center justify-center gap-2 shadow-coral-glow cursor-pointer disabled:opacity-50"
                     >
                       {loading ? (
                         <>
@@ -446,7 +446,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                       href={whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="py-3.5 px-5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors"
+                      className="py-2.5 sm:py-3 px-5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors"
                     >
                       <MessageCircle size={16} className="text-emerald-600" />
                       <span>Chat on WhatsApp</span>

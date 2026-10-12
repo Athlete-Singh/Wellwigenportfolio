@@ -116,7 +116,7 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
               <div className="flex flex-col sm:flex-row gap-3.5 pt-2">
                 <button
                   onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
-                  className="btn-power-coral btn-shine px-8 py-4 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow group"
+                  className="btn-power-coral btn-shine px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow group"
                 >
                   <span>Join Group Classes</span>
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -126,7 +126,7 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
                     const el = document.getElementById('weekly-schedule-anchor');
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="btn-outline-brand px-7 py-4 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow"
+                  className="btn-outline-brand px-7 py-2.5 sm:py-3 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow"
                 >
                   <span>View Schedule</span>
                   <ChevronRight size={18} />
@@ -589,7 +589,7 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
             <div className="flex flex-col items-center sm:items-end gap-2 shrink-0 relative z-30">
               <button
                 onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
-                className="btn-power-coral btn-shine px-8 py-4 rounded-full text-sm font-bold inline-flex items-center gap-2 shadow-coral-glow cursor-pointer"
+                className="btn-power-coral btn-shine px-8 py-2.5 sm:py-3 rounded-full text-sm font-bold inline-flex items-center gap-2 shadow-coral-glow cursor-pointer"
               >
                 <span>Try 1 Class for ₹99</span>
                 <ArrowRight size={16} />

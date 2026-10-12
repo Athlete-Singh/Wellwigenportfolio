@@ -90,14 +90,14 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
               <div className="flex flex-col sm:flex-row gap-3.5 pt-2">
                 <button
                   onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: 'Transformation' })}
-                  className="btn-power-coral btn-shine px-8 py-4 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow group"
+                  className="btn-power-coral btn-shine px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow group"
                 >
                   <span>Start Personal Training</span>
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: 'Consultation' })}
-                  className="btn-outline-brand px-7 py-4 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow"
+                  className="btn-outline-brand px-7 py-2.5 sm:py-3 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow"
                 >
                   <Calendar size={18} />
                   <span>Book a Consultation</span>
@@ -390,7 +390,7 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
 
                           <button
                             onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: plan.name })}
-                            className="w-full btn-power-coral btn-shine py-3.5 rounded-full text-white text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow"
+                            className="w-full btn-power-coral btn-shine py-2.5 sm:py-3 rounded-full text-white text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow"
                           >
                             <span>{plan.cta}</span>
                             <ArrowRight size={16} />
@@ -436,7 +436,7 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
 
                     <button
                       onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: plan.name })}
-                      className="w-full btn-primary-gradient btn-shine py-3.5 rounded-full text-white text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow"
+                      className="w-full btn-primary-gradient btn-shine py-2.5 sm:py-3 rounded-full text-white text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow"
                     >
                       <span>{plan.cta}</span>
                       <ArrowRight size={16} />
@@ -556,7 +556,7 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
               <div className="shrink-0 relative z-30">
                 <button
                   onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: 'Transformation' })}
-                  className="btn-power-coral btn-shine px-8 py-4 rounded-full text-sm sm:text-base font-bold inline-flex items-center gap-2 shadow-coral-glow shrink-0 cursor-pointer"
+                  className="btn-power-coral btn-shine px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-bold inline-flex items-center gap-2 shadow-coral-glow shrink-0 cursor-pointer"
                 >
                   <span>Start Personal Training</span>
                   <ArrowRight size={18} />

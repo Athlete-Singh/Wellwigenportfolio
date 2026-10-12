@@ -64,7 +64,7 @@ export default function FinalCTA({ onOpenLeadModal, onNavigateSection }) {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
               <button
                 onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: 'Transformation' })}
-                className="w-full sm:w-auto btn-power-coral btn-shine px-8 py-4 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow group"
+                className="w-full sm:w-auto btn-power-coral btn-shine px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow group"
               >
                 <span>Start Personal Training</span>
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -72,7 +72,7 @@ export default function FinalCTA({ onOpenLeadModal, onNavigateSection }) {
 
               <button
                 onClick={() => onNavigateSection('group-classes')}
-                className="w-full sm:w-auto btn-primary-gradient btn-shine px-8 py-4 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group"
+                className="w-full sm:w-auto btn-primary-gradient btn-shine px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group"
               >
                 <span>Join Group Classes</span>
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -91,7 +91,7 @@ export default function FinalCTA({ onOpenLeadModal, onNavigateSection }) {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-7 py-4 rounded-full bg-[#25D366] text-white hover:bg-[#20bd5a] text-sm sm:text-base font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-transform duration-200 hover:scale-105 [touch-action:manipulation]"
+                className="w-full sm:w-auto px-7 py-2.5 sm:py-3 rounded-full bg-[#25D366] text-white hover:bg-[#20bd5a] text-sm sm:text-base font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-transform duration-200 hover:scale-105 [touch-action:manipulation]"
               >
                 <MessageCircle size={18} />
                 <span>Chat on WhatsApp</span>

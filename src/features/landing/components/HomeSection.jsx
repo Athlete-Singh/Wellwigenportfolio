@@ -565,7 +565,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               {/* NEW CODE - smooth animation/performance: specific transform transition with touch-action */}
               <button
                 onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: 'Transformation' })}
-                className="btn-power-coral btn-shine px-3.5 py-2.5 sm:px-8 sm:py-4 rounded-xl text-xs sm:text-base font-bold flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer shadow-coral-glow hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 group shrink-0"
+                className="btn-power-coral btn-shine px-3.5 py-2.5 sm:px-8 sm:py-3 rounded-xl text-xs sm:text-base font-bold flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer shadow-coral-glow hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 group shrink-0"
               >
                 <span>Join Now</span>
                 <ArrowRight size={14} className="sm:w-[19px] sm:h-[19px] group-hover:translate-x-1.5 transition-transform" />
@@ -581,7 +581,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               {/* NEW CODE - smooth animation/performance: specific background and border transitions */}
               <button
                 onClick={() => onNavigateSection('group-classes')}
-                className="px-3 py-2.5 sm:px-7 sm:py-4 rounded-xl bg-slate-900/70 hover:bg-slate-800/80 border border-slate-700/80 text-white font-bold text-xs sm:text-base flex items-center justify-center gap-1.5 sm:gap-2.5 backdrop-blur-md hover:border-teal-400/50 transition-[background-color,border-color] duration-200 cursor-pointer shadow-lg whitespace-nowrap"
+                className="px-3 py-2.5 sm:px-7 sm:py-3 rounded-xl bg-slate-900/70 hover:bg-slate-800/80 border border-slate-700/80 text-white font-bold text-xs sm:text-base flex items-center justify-center gap-1.5 sm:gap-2.5 backdrop-blur-md hover:border-teal-400/50 transition-[background-color,border-color] duration-200 cursor-pointer shadow-lg whitespace-nowrap"
               >
                 <span>Explore Group Classes</span>
                 <ArrowRight size={14} className="sm:w-[18px] sm:h-[18px] text-teal-400 shrink-0" />
@@ -820,7 +820,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
                 <button
                   onClick={() => onNavigateSection('personal-training')}
-                  className="w-full btn-primary-gradient px-6 py-4 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group/btn"
+                  className="w-full btn-primary-gradient px-6 py-2.5 sm:py-3 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group/btn"
                 >
                   <span>Explore Personal Training</span>
                   <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
@@ -881,7 +881,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
                 <button
                   onClick={() => onNavigateSection('group-classes')}
-                  className="w-full btn-primary-gradient px-6 py-4 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group/btn"
+                  className="w-full btn-primary-gradient px-6 py-2.5 sm:py-3 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group/btn"
                 >
                   <span>Explore Group Classes</span>
                   <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
