@@ -635,7 +635,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
+
           {/* Section Header (Clean Light Theme) */}
           <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-16">
             <motion.div
@@ -769,11 +769,11 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
             {/* Card 1: Personal Training (Background Image Card with Face-Clear Window) */}
             <div className="reveal-item reveal-stagger-1 rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-700/60 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250 min-h-[580px] bg-slate-900">
-              {/* Background Image positioned for optimal face clarity (mobile: 56% 15%, desktop: 70% 15%) */}
+              {/* Background Image positioned for optimal face clarity (mobile: 60% 15%, desktop: 70% 15%) */}
               <img
                 src="/images/home_personal_training.jpg"
                 alt="Personal trainer coaching athlete with barbell in fitness studio"
-                className="absolute inset-0 w-full h-full object-cover object-[56%_15%] sm:object-[70%_15%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
+                className="absolute inset-0 w-full h-full object-cover object-[60%_15%] sm:object-[70%_15%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
                 loading="lazy"
                 decoding="async"
               />
@@ -827,11 +827,11 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
             {/* Card 2: Online Group Classes (Background Image Card with Face-Clear Window) */}
             <div className="reveal-item reveal-stagger-2 rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-700/60 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250 min-h-[580px] bg-slate-900">
-              {/* Background Image positioned for optimal face clarity (mobile: shifted toward girl's face, desktop: untouched) */}
+              {/* Background Image positioned upward with top headroom preserved so no head is cut */}
               <img
                 src="/images/home_group_classes.jpg"
                 alt="Online group fitness class performing synchronized dumbbell workout"
-                className="absolute inset-0 w-full h-full object-cover object-[62%_20%] sm:object-[50%_25%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
+                className="absolute inset-0 w-full h-full object-cover object-[72%_top] sm:object-[80%_top] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
                 loading="lazy"
                 decoding="async"
               />
@@ -991,7 +991,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
           {/* ================= FULL-WIDTH SHOWCASE BANNER: YOUR GOALS. YOUR FOCUS. ================= */}
           <div className="mb-20 sm:mb-24 reveal-item">
             <div className="relative rounded-2xl lg:rounded-3xl overflow-hidden bg-gradient-to-br from-[#0A121E] via-[#092229] to-[#0D1C2E] border border-teal-500/35 shadow-[0_20px_50px_-15px_rgba(8,34,41,0.6)] text-white group">
-              
+
               {/* Special Effects & Ambient Atmosphere */}
               <div className="absolute inset-0 bg-blueprint-grid opacity-15 pointer-events-none" />
               <div className="absolute -top-24 -left-24 w-80 h-80 bg-teal-500/15 rounded-full blur-[90px] pointer-events-none" />
@@ -999,10 +999,10 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-teal-400/50 to-transparent" />
 
               <div className="relative z-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-stretch p-4 sm:p-6 lg:p-7">
-                
+
                 {/* Content Side: Slim, concise & perfectly balanced */}
                 <div className="lg:col-span-7 flex flex-col justify-center order-2 lg:order-1 py-1">
-                  
+
                   {/* Headline */}
                   <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">
                     Your Goals.{' '}
