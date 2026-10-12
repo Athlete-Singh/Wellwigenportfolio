@@ -831,7 +831,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               <img
                 src="/images/home_group_classes.jpg"
                 alt="Online group fitness class performing synchronized dumbbell workout"
-                className="absolute inset-0 w-full h-full object-cover object-[72%_top] sm:object-[80%_top] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
+                className="absolute inset-0 w-full h-full object-cover object-[78%_top] sm:object-[80%_top] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
                 loading="lazy"
                 decoding="async"
               />

@@ -1,4 +1,12 @@
+// OLD CODE (commented by AI)
+/*
 import React from 'react';
+import { Phone, Mail, MapPin, Instagram, Twitter, Facebook, Linkedin, ArrowUp } from 'lucide-react';
+import { CONTACT_INFO } from '../data/fitnessData';
+*/
+// NEW CODE - Trainer Portal feature: add Link from react-router-dom
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Instagram, Twitter, Facebook, Linkedin, ArrowUp } from 'lucide-react';
 import { CONTACT_INFO } from '../data/fitnessData';
 
@@ -102,6 +110,7 @@ export default function Footer({ onNavigateSection, onOpenLegalModal }) {
             <h5 className="font-heading font-bold text-white text-sm uppercase tracking-wider mb-4">
               Quick Links
             </h5>
+            {/* OLD CODE (commented by AI)
             <ul className="space-y-2.5 text-xs sm:text-sm text-teal-100/80">
               <li>
                 <button
@@ -126,6 +135,50 @@ export default function Footer({ onNavigateSection, onOpenLegalModal }) {
                 >
                   Group Classes
                 </button>
+              </li>
+            </ul>
+            */}
+            {/* NEW CODE - Trainer Portal feature: add Become a Trainer and Trainer Login */}
+            <ul className="space-y-2.5 text-xs sm:text-sm text-teal-100/80">
+              <li>
+                <button
+                  onClick={() => onNavigateSection('home')}
+                  className="hover:text-teal-300 transition-colors cursor-pointer"
+                >
+                  Home
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigateSection('personal-training')}
+                  className="hover:text-teal-300 transition-colors cursor-pointer"
+                >
+                  Personal Training
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigateSection('group-classes')}
+                  className="hover:text-teal-300 transition-colors cursor-pointer"
+                >
+                  Group Classes
+                </button>
+              </li>
+              <li className="pt-1.5 border-t border-teal-800/40">
+                <Link
+                  to="/trainer"
+                  className="text-teal-300 hover:text-white transition-colors flex items-center gap-1 font-semibold"
+                >
+                  <span>Become a Trainer</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/trainer/login"
+                  className="text-teal-300/80 hover:text-white transition-colors flex items-center gap-1"
+                >
+                  <span>Trainer Login</span>
+                </Link>
               </li>
             </ul>
           </div>

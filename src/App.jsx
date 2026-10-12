@@ -110,6 +110,21 @@ const VendorLogin = React.lazy(() => import("./features/provider/legacy/Login"))
 const AddProduct = React.lazy(() => import("./features/provider/legacy/AddProduct"));
 // import MyStore from "./vendor/MyStore";
 
+// Trainer Portal Imports (Light Theme, Modern Wellwigen Coaching)
+import TrainerLayout from "./features/trainer/layout/TrainerLayout";
+import TrainerProtectedRoute from "./features/trainer/components/TrainerProtectedRoute";
+const TrainerIntro = React.lazy(() => import("./features/trainer/pages/TrainerIntro"));
+const TrainerLogin = React.lazy(() => import("./features/trainer/pages/TrainerLogin"));
+const TrainerRegister = React.lazy(() => import("./features/trainer/pages/TrainerRegister"));
+const TrainerOnboarding = React.lazy(() => import("./features/trainer/pages/TrainerOnboarding"));
+const TrainerPortalDashboard = React.lazy(() => import("./features/trainer/pages/TrainerDashboard"));
+const TrainerClasses = React.lazy(() => import("./features/trainer/pages/TrainerClasses"));
+const TrainerClients = React.lazy(() => import("./features/trainer/pages/TrainerClients"));
+const TrainerAvailability = React.lazy(() => import("./features/trainer/pages/TrainerAvailability"));
+const TrainerProfile = React.lazy(() => import("./features/trainer/pages/TrainerProfile"));
+const TrainerSettings = React.lazy(() => import("./features/trainer/pages/TrainerSettings"));
+const TrainerNotFound = React.lazy(() => import("./features/trainer/pages/TrainerNotFound"));
+
 // Route guard to prevent wrong dashboard access and enforce approved status
 function ProviderProtectedRoute({ children, allowedRole }) {
   const token = localStorage.getItem("providerToken") || localStorage.getItem("vendorToken");
@@ -322,8 +337,23 @@ function App() {
           <Route path="/vendor/dashboard" element={<ProviderProtectedRoute allowedRole="VENDOR"><UnifiedDashboard /></ProviderProtectedRoute>} />
           <Route path="/lab/dashboard" element={<ProviderProtectedRoute allowedRole="LAB"><UnifiedDashboard /></ProviderProtectedRoute>} />
           <Route path="/nutrition/dashboard" element={<ProviderProtectedRoute allowedRole="NUTRITION"><UnifiedDashboard /></ProviderProtectedRoute>} />
-          <Route path="/pharmacy/dashboard" element={<ProviderProtectedRoute allowedRole="PHARMACY"><PharmacyDashboard /></ProviderProtectedRoute>} />
+          {/* OLD CODE (commented by AI)
           <Route path="/trainer/dashboard" element={<ProviderProtectedRoute allowedRole="TRAINER"><TrainerDashboard /></ProviderProtectedRoute>} />
+          */}
+          {/* NEW CODE - Wellwigen Trainer Portal (Public intro, auth, 6-step onboarding, and full dashboard suite) */}
+          <Route path="/trainer" element={<TrainerIntro />} />
+          <Route path="/trainer/login" element={<TrainerLogin />} />
+          <Route path="/trainer/register" element={<TrainerRegister />} />
+          <Route path="/trainer/onboarding" element={<TrainerProtectedRoute><TrainerOnboarding /></TrainerProtectedRoute>} />
+
+          {/* Protected Trainer Portal with Light Theme Sidebar & Header Layout */}
+          <Route path="/trainer/dashboard" element={<TrainerProtectedRoute><TrainerLayout><TrainerPortalDashboard /></TrainerLayout></TrainerProtectedRoute>} />
+          <Route path="/trainer/classes" element={<TrainerProtectedRoute><TrainerLayout><TrainerClasses /></TrainerLayout></TrainerProtectedRoute>} />
+          <Route path="/trainer/clients" element={<TrainerProtectedRoute><TrainerLayout><TrainerClients /></TrainerLayout></TrainerProtectedRoute>} />
+          <Route path="/trainer/availability" element={<TrainerProtectedRoute><TrainerLayout><TrainerAvailability /></TrainerLayout></TrainerProtectedRoute>} />
+          <Route path="/trainer/profile" element={<TrainerProtectedRoute><TrainerLayout><TrainerProfile /></TrainerLayout></TrainerProtectedRoute>} />
+          <Route path="/trainer/settings" element={<TrainerProtectedRoute><TrainerLayout><TrainerSettings /></TrainerLayout></TrainerProtectedRoute>} />
+          <Route path="/trainer/*" element={<TrainerNotFound />} />
           <Route path="/dashboard" element={<UserDashboard />} />
 
           {/* ================= TERMS ================= */}

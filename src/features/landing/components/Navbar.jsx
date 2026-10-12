@@ -1,6 +1,14 @@
+// OLD CODE (commented by AI)
+/*
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ArrowRight, Sparkles } from 'lucide-react';
+*/
+// NEW CODE - Trainer Portal feature: add Link and UserCheck icon
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, ArrowRight, Sparkles, UserCheck } from 'lucide-react';
 
 export default function Navbar({ onOpenLeadModal }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -172,7 +180,25 @@ export default function Navbar({ onOpenLeadModal }) {
             </nav>
 
             {/* Desktop CTA Button */}
+            {/* OLD CODE (commented by AI)
             <div className="hidden md:flex items-center gap-3">
+              <button
+                onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
+                className="btn-power-coral px-6 py-2.5 rounded-xl text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-coral-glow cursor-pointer group"
+              >
+                <span>Join Now</span>
+                <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+            */}
+            {/* NEW CODE - Trainer Portal feature: add outline/teal Trainer button alongside Join Now */}
+            <div className="hidden md:flex items-center gap-3">
+              <Link
+                to="/trainer"
+                className="px-5 py-2.5 rounded-xl border border-teal-400/50 hover:border-teal-300 text-teal-300 hover:text-white hover:bg-teal-500/10 text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-xs transition-all duration-200 cursor-pointer"
+              >
+                <span>Trainer</span>
+              </Link>
               <button
                 onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
                 className="btn-power-coral px-6 py-2.5 rounded-xl text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-coral-glow cursor-pointer group"
@@ -261,6 +287,7 @@ export default function Navbar({ onOpenLeadModal }) {
                 </div>
 
                 {/* Navigation Links */}
+                {/* OLD CODE (commented by AI)
                 <div className="py-6 flex flex-col gap-2">
                   {navLinks.map((link) => {
                     const isActive = activeSection === link.id;
@@ -279,6 +306,36 @@ export default function Navbar({ onOpenLeadModal }) {
                       </button>
                     );
                   })}
+                </div>
+                */}
+                {/* NEW CODE - Trainer Portal feature: add Trainer Portal link in mobile drawer */}
+                <div className="py-6 flex flex-col gap-2">
+                  {navLinks.map((link) => {
+                    const isActive = activeSection === link.id;
+                    return (
+                      <button
+                        key={link.id}
+                        onClick={() => scrollTo(link.id)}
+                        className={`w-full text-left px-4 py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-between ${
+                          isActive
+                            ? 'bg-teal-50 text-teal-800 font-bold border border-teal-100'
+                            : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span>{link.label}</span>
+                        {isActive && <span className="w-2 h-2 rounded-full bg-teal-500" />}
+                      </button>
+                    );
+                  })}
+
+                  <Link
+                    to="/trainer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-teal-700 bg-teal-50/80 border border-teal-200/80 flex items-center justify-between transition-all mt-1"
+                  >
+                    <span>Trainer Portal</span>
+                    <ArrowRight size={14} className="text-teal-600" />
+                  </Link>
                 </div>
               </div>
 
