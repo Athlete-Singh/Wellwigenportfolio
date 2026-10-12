@@ -25,3 +25,5 @@ dist-ssr
 
 # Local backups
 legacy-backup/
+public/images-original-backup/
+src/assets-original-backup/

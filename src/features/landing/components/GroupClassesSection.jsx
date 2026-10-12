@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import {
   Video,
@@ -87,12 +88,12 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="lg:col-span-7 space-y-6"
+              className="lg:col-span-6 space-y-6"
             >
               {/* OLD CODE (commented by AI) - Awkward pill badge removed per user request */}
               {/*
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-100/70 border border-teal-200 text-teal-800 text-xs font-display font-extrabold uppercase tracking-wider shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse" />
                 <span>LIVE ONLINE GROUP FITNESS</span>
               </div>
               */}
@@ -153,37 +154,20 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-5 relative"
+              className="lg:col-span-6 relative"
             >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-900 aspect-[16/10] bg-slate-900 group">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-900 aspect-[4/3] bg-slate-900 group">
                 <div className="corner-bracket-tl z-20" />
                 <div className="corner-bracket-br z-20" />
 
-                {/* OLD CODE (commented by AI)
                 <img
-                  src="/images/group_class_hero.jpg"
-                  alt="Energetic group fitness class doing kettlebell squats guided by expert coach in studio"
+                  src="/images/group_running_hero.jpg"
+                  alt="Energetic group running outdoors together smiling and staying motivated"
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                   loading="lazy"
-                />
-                */}
-                {/* NEW CODE - mobile fix: group class athletes and instructor head & form visibility on mobile */}
-                <img
-                  src="/images/group_class_hero.jpg"
-                  alt="Energetic group fitness class doing kettlebell squats guided by expert coach in studio"
-                  className="w-full h-full object-cover object-[50%_25%] sm:object-center group-hover:scale-105 transition-transform duration-700"
-                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent pointer-events-none" />
-
-                {/* OLD CODE (commented by AI) - Awkward floating badge on image removed per user request */}
-                {/*
-                <div className="absolute top-4 right-4 bg-slate-950/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-md border border-slate-700 flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-                  <span className="text-[10px] font-display font-bold text-white uppercase tracking-wider">Live Online</span>
-                </div>
-                */}
-                {/* NEW CODE - Removed awkward floating badge overlay */}
               </div>
             </motion.div>
 
@@ -524,8 +508,25 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pt-2 pb-12 sm:py-16 lg:py-18">
 
           {/* Desktop Pop-Out Transparent Trainer Girl (Slightly reduced so words are 100% clear with zero overlap) */}
+          {/* OLD CODE (commented by AI)
           <img
             src="/images/trial_trainer.png"
+            alt="Wellwigen trial coach"
+            width="454"
+            height="760"
+            loading="lazy"
+            decoding="async"
+            className="hidden sm:block absolute bottom-0 left-2 sm:left-4 lg:left-6 h-[130%] sm:h-[138%] md:h-[145%] lg:h-[152%] max-h-[305px] w-auto object-contain pointer-events-none select-none z-10"
+            style={{
+              bottom: 0,
+            }}
+          />
+          */}
+          {/* NEW CODE - performance optimization: WebP image (72KB vs 797KB) */}
+          <img
+            src="/images/trial_trainer.webp"
+            srcSet="/images/trial_trainer-480w.webp 480w, /images/trial_trainer-768w.webp 768w, /images/trial_trainer.webp 1024w"
+            sizes="(max-width: 768px) 450px, 600px"
             alt="Wellwigen trial coach"
             width="454"
             height="760"
@@ -539,8 +540,26 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
 
           {/* Mobile Trial Coach: Upper side with controlled subtle pop-out */}
           <div className="sm:hidden -mt-10 mb-2 flex justify-center pointer-events-none select-none relative z-10">
+            {/* OLD CODE (commented by AI)
             <img
               src="/images/trial_trainer.png"
+              alt="Wellwigen trial coach"
+              width="454"
+              height="760"
+              loading="lazy"
+              decoding="async"
+              className="h-44 xs:h-48 w-auto object-contain"
+              style={{
+                maskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
+              }}
+            />
+            */}
+            {/* NEW CODE - performance optimization: WebP image (72KB vs 797KB) */}
+            <img
+              src="/images/trial_trainer.webp"
+              srcSet="/images/trial_trainer-480w.webp 480w, /images/trial_trainer.webp 768w"
+              sizes="300px"
               alt="Wellwigen trial coach"
               width="454"
               height="760"

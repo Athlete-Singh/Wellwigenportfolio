@@ -1,4 +1,7 @@
+/* OLD CODE (commented by AI)
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&family=Syne:wght@700;800&display=swap');
+*/
+/* NEW CODE - performance optimization: Google fonts already loaded via HTML <link> with preconnect, eliminating render-blocking CSS chain */
 
 @tailwind base;
 @tailwind components;
@@ -33,7 +36,11 @@ html {
 body {
   margin: 0;
   padding: 0;
+  /* OLD CODE (commented by AI)
   background-color: #F3FBF9;
+  */
+  /* NEW CODE - performance optimization: default dark canvas prevents white/mint flash during initial paint */
+  background-color: #0E1420;
   color: #334155;
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;

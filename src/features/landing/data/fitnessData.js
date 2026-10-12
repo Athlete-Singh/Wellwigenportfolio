@@ -139,7 +139,10 @@ export const HOME_TESTIMONIALS = [
     result: "Lost 9 kg in 12 weeks",
     rating: 5,
     quote: "Wellwigen completely changed my mindset. The coaches are attentive and correct my form through video, making me feel like I have a trainer right beside me.",
-    avatar: "/images/goal_fat_loss.jpg",
+    // OLD CODE (commented by AI)
+    // avatar: "/images/goal_fat_loss.jpg",
+    // NEW CODE - performance optimization: WebP format
+    avatar: "/images/goal_fat_loss.webp",
   },
   {
     id: 2,
@@ -148,7 +151,10 @@ export const HOME_TESTIMONIALS = [
     result: "Built muscle & stamina",
     rating: 5,
     quote: "The group energy is unmatched! Even after long work hours, logging into class at 7 PM feels like the best recharge of my day.",
-    avatar: "/images/goal_muscle.jpg",
+    // OLD CODE (commented by AI)
+    // avatar: "/images/goal_muscle.jpg",
+    // NEW CODE - performance optimization: WebP format
+    avatar: "/images/goal_muscle.webp",
   },
   {
     id: 3,
@@ -157,7 +163,10 @@ export const HOME_TESTIMONIALS = [
     result: "Zero back pain & flexible",
     rating: 5,
     quote: "I was skeptical about online classes, but the community and coaches proved me wrong. Consistent, fun, and extremely effective.",
-    avatar: "/images/goal_mobility.jpg",
+    // OLD CODE (commented by AI)
+    // avatar: "/images/goal_mobility.jpg",
+    // NEW CODE - performance optimization: WebP format
+    avatar: "/images/goal_mobility.webp",
   },
 ];
 
@@ -201,28 +210,40 @@ export const PT_GOALS = [
     id: "fat-loss",
     title: "Fat Loss",
     subtitle: "Build sustainable habits and improve body composition.",
-    image: "/images/goal_fat_loss.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/goal_fat_loss.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/goal_fat_loss.webp",
     accent: "teal",
   },
   {
     id: "muscle-strength",
     title: "Muscle & Strength",
     subtitle: "Structured strength training for progressive results.",
-    image: "/images/goal_muscle.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/goal_muscle.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/goal_muscle.webp",
     accent: "sky",
   },
   {
     id: "general-fitness",
     title: "General Fitness",
     subtitle: "Improve stamina, daily energy, and overall health.",
-    image: "/images/goal_general.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/goal_general.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/goal_general.webp",
     accent: "amber",
   },
   {
     id: "mobility-flexibility",
     title: "Mobility & Flexibility",
     subtitle: "Better movement, flexibility, joint health, and posture.",
-    image: "/images/goal_mobility.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/goal_mobility.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/goal_mobility.webp",
     accent: "emerald",
   },
 ];
@@ -239,6 +260,22 @@ export const PT_STEPS = [
 
 // PT Pricing Plans
 export const PT_PLANS = [
+  {
+    id: "pt-trial",
+    name: "Trial Class",
+    price: "₹299",
+    period: "/session",
+    sessions: "1 Trial Session",
+    features: [
+      "1 live 1-on-1 coaching session",
+      "Fitness & posture assessment",
+      "Form correction & technique guidance",
+      "Personalized workout advice",
+      "Direct coach consultation",
+    ],
+    popular: false,
+    cta: "Get Started",
+  },
   {
     id: "pt-starter",
     name: "Starter",
@@ -299,19 +336,28 @@ export const PT_STORIES = [
     name: "Rohit S.",
     result: "Lost 12 kg in 3 months",
     quote: "Personalized plan and constant support made all the difference.",
-    image: "/images/goal_muscle.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/goal_muscle.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/goal_muscle.webp",
   },
   {
     name: "Anjali M.",
     result: "Built strength & confidence",
     quote: "Best decision I made for my health and overall fitness.",
-    image: "/images/goal_fat_loss.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/goal_fat_loss.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/goal_fat_loss.webp",
   },
   {
     name: "Vikash T.",
     result: "Improved endurance",
     quote: "Now I feel stronger, fitter, and more energetic every single day.",
-    image: "/images/goal_general.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/goal_general.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/goal_general.webp",
   },
 ];
 
@@ -323,7 +369,10 @@ export const WEEKLY_CHALLENGES = [
     name: "Monster Monday",
     type: "Full Body HIIT",
     duration: "60 min",
-    image: "/images/challenge_mon.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/challenge_mon.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/challenge_mon.webp",
     desc: "Kickstart your week with high-intensity intervals that burn fat and build stamina.",
     color: "from-rose-500 to-red-600",
   },
@@ -333,7 +382,10 @@ export const WEEKLY_CHALLENGES = [
     name: "Tabata Tuesday",
     type: "Tabata Intervals",
     duration: "60 min",
-    image: "/images/challenge_tue.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/challenge_tue.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/challenge_tue.webp",
     desc: "20 seconds of intense work, 10 seconds of rest. Short, ferocious, and super effective.",
     color: "from-amber-500 to-orange-500",
   },
@@ -343,7 +395,10 @@ export const WEEKLY_CHALLENGES = [
     name: "Wild Wednesday",
     type: "Jungle Fit / Functional",
     duration: "60 min",
-    image: "/images/challenge_wed.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/challenge_wed.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/challenge_wed.webp",
     desc: "Primal movement, core stability, and agility conditioning for total body control.",
     color: "from-emerald-500 to-teal-600",
   },
@@ -353,7 +408,10 @@ export const WEEKLY_CHALLENGES = [
     name: "Thor Thursday",
     type: "Strength & Power",
     duration: "60 min",
-    image: "/images/challenge_thu.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/challenge_thu.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/challenge_thu.webp",
     desc: "Targeted resistance and power training to build dense muscle and athletic force.",
     color: "from-sky-500 to-blue-600",
   },
@@ -363,7 +421,10 @@ export const WEEKLY_CHALLENGES = [
     name: "Fit Friday",
     type: "Full Body Fitness",
     duration: "60 min",
-    image: "/images/challenge_fri.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/challenge_fri.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/challenge_fri.webp",
     desc: "A fun, high-spirited full body sweat session to finish the workweek strong.",
     color: "from-teal-500 to-cyan-600",
   },
@@ -373,7 +434,10 @@ export const WEEKLY_CHALLENGES = [
     name: "Strong Saturday",
     type: "Strength & Conditioning",
     duration: "60 min",
-    image: "/images/challenge_sat.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/challenge_sat.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/challenge_sat.webp",
     desc: "Heavy volume endurance and conditioning to challenge your physical threshold.",
     color: "from-indigo-500 to-purple-600",
   },
@@ -383,7 +447,10 @@ export const WEEKLY_CHALLENGES = [
     name: "Recovery Sunday",
     type: "Mobility & Stretching",
     duration: "60 min",
-    image: "/images/challenge_sun.jpg",
+    // OLD CODE (commented by AI)
+    // image: "/images/challenge_sun.jpg",
+    // NEW CODE - performance optimization: WebP format
+    image: "/images/challenge_sun.webp",
     desc: "Deep somatic stretching, breathing, and joint mobility to prepare you for the next week.",
     color: "from-teal-600 to-emerald-700",
   },

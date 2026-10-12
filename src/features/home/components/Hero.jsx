@@ -152,7 +152,11 @@ export default function Hero() {
               transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
               className="absolute right-0 top-10 w-[400px] h-[480px] rounded-[40px] overflow-hidden shadow-2xl border-8 border-white z-20"
             >
+              {/* OLD CODE (commented by AI)
               <img src="/images/virtual_fitness_hero.jpg" alt="Yoga" className="w-full h-full object-cover" />
+              */}
+              {/* NEW CODE - performance optimization: WebP image */}
+              <img src="/images/virtual_fitness_hero.webp" alt="Yoga" className="w-full h-full object-cover" loading="lazy" decoding="async" />
               <div className="absolute inset-0 bg-gradient-to-t from-teal-900/40 to-transparent"></div>
             </motion.div>
 

@@ -1,65 +1,56 @@
 import React from 'react';
-import { MessageCircle } from 'lucide-react';
-import { getWhatsAppUrl } from '../data/fitnessData';
+import { Phone } from 'lucide-react';
+import { CONTACT_INFO, getWhatsAppUrl } from '../data/fitnessData';
 
 export default function FloatingWhatsApp() {
   const whatsappUrl = getWhatsAppUrl("Hi Wellwigen! I'm interested in starting fitness coaching.");
+  const callUrl = `tel:+${CONTACT_INFO.phoneRaw}`;
 
-  /* OLD CODE (commented by AI)
-  return (
-    <aside aria-label="WhatsApp Quick Contact" className="fixed bottom-6 right-6 z-40">
-      <a
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group relative flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-2xl shadow-emerald-500/40 hover:scale-110 active:scale-95 transition-all duration-300"
-        aria-label="Chat on WhatsApp with Wellwigen Coach"
-      >
-        <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-30 animate-ping pointer-events-none" />
-        <span className="absolute -inset-2 rounded-full bg-[#25D366] opacity-20 pointer-events-none" />
-
-        <MessageCircle size={28} className="relative z-10" />
-
-        <span className="absolute right-16 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md">
-          Chat with us on WhatsApp
-        </span>
-      </a>
-    </aside>
-  );
-  */
-
-  // NEW CODE - mobile fix: 52px compact diameter on mobile, env(safe-area-inset-bottom) positioning, gentle pulse
   return (
     <aside
-      aria-label="WhatsApp Quick Contact"
-      className="fixed right-4 sm:right-6 bottom-[max(1.25rem,env(safe-area-inset-bottom,20px))] sm:bottom-6 z-40"
+      aria-label="Quick Contact Options"
+      className="fixed right-4 sm:right-6 bottom-[max(1.25rem,env(safe-area-inset-bottom,20px))] sm:bottom-6 z-40 flex flex-col items-center gap-3 pointer-events-none"
     >
-      {/* OLD CODE (commented by AI)
+      {/* Phone Calling Button */}
       <a
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group relative flex items-center justify-center w-[52px] h-[52px] sm:w-14 sm:h-14 bg-[#25D366] text-white rounded-full shadow-xl sm:shadow-2xl shadow-emerald-500/30 hover:scale-105 sm:hover:scale-110 active:scale-95 transition-all duration-300"
-        aria-label="Chat on WhatsApp with Wellwigen Coach"
+        href={callUrl}
+        className="pointer-events-auto group relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 bg-gradient-to-tr from-teal-600 via-teal-500 to-emerald-500 text-white rounded-full shadow-lg shadow-teal-500/30 hover:scale-110 active:scale-95 transition-all duration-200 [touch-action:manipulation] border border-white/20"
+        aria-label={`Call Wellwigen: ${CONTACT_INFO.phone}`}
       >
-      */}
-      {/* NEW CODE - smooth animation/performance: specific transform transition with touch-action */}
-      <a
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group relative flex items-center justify-center w-[52px] h-[52px] sm:w-14 sm:h-14 bg-[#25D366] text-white rounded-full shadow-xl sm:shadow-2xl shadow-emerald-500/30 hover:scale-105 sm:hover:scale-110 active:scale-95 transition-transform duration-200 [touch-action:manipulation]"
-        aria-label="Chat on WhatsApp with Wellwigen Coach"
-      >
-        {/* Soft pulse rings - subtle on mobile to avoid obscuring card content */}
-        <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-15 sm:opacity-30 animate-ping pointer-events-none" />
-        <span className="absolute -inset-1.5 rounded-full bg-[#25D366] opacity-10 sm:opacity-20 pointer-events-none" />
-
-        <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 relative z-10" />
+        <Phone className="w-5 h-5 text-white relative z-10 transition-transform group-hover:rotate-12 duration-200" />
 
         {/* Tooltip on hover (desktop only) */}
-        <span className="hidden sm:inline-block absolute right-16 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md">
-          Chat with us on WhatsApp
+        <span className="hidden sm:inline-block absolute right-16 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md border border-white/10">
+          Call: {CONTACT_INFO.phone}
+        </span>
+      </a>
+
+      {/* WhatsApp Button (Real WhatsApp app design) */}
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="pointer-events-auto group relative flex items-center justify-center w-[52px] h-[52px] sm:w-14 sm:h-14 bg-[#25D366] text-white rounded-full shadow-xl sm:shadow-2xl shadow-emerald-500/40 hover:scale-110 active:scale-95 transition-all duration-200 [touch-action:manipulation]"
+        aria-label="Chat on WhatsApp with Wellwigen Coach"
+      >
+        {/* Soft pulse rings */}
+        <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-25 sm:opacity-30 animate-ping pointer-events-none" />
+        <span className="absolute -inset-1.5 rounded-full bg-[#25D366] opacity-15 sm:opacity-20 pointer-events-none" />
+
+        {/* Official WhatsApp Logo Icon */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          className="w-7 h-7 sm:w-8 sm:h-8 text-white relative z-10 drop-shadow-sm"
+          aria-hidden="true"
+        >
+          <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" />
+        </svg>
+
+        {/* Tooltip on hover (desktop only) */}
+        <span className="hidden sm:inline-block absolute right-16 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md border border-white/10">
+          Chat on WhatsApp
         </span>
       </a>
     </aside>

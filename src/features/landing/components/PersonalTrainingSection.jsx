@@ -1,4 +1,5 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import {
   FileText,
@@ -21,7 +22,10 @@ import {
   PT_PLANS,
   PT_STORIES,
 } from '../data/fitnessData';
-import personalTrainingManImg from '../../../assets/personal-training-man.png';
+// OLD CODE (commented by AI)
+// import personalTrainingManImg from '../../../assets/personal-training-man.png';
+// NEW CODE - performance optimization: WebP image (33KB vs 354KB)
+import personalTrainingManImg from '../../../assets/personal-training-man.webp';
 
 export default function PersonalTrainingSection({ onOpenLeadModal }) {
   const getBenefitIcon = (name) => {
@@ -117,16 +121,27 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
                 <img
                   src="/images/pt_coaching.jpg"
                   alt="Woman doing squats during live online 1-on-1 personal training with laptop coach"
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover object-[55%_35%] sm:object-center group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                 />
                 */}
-                {/* NEW CODE - mobile fix: focus on athlete form & laptop coach on mobile */}
+                {/* OLD CODE (commented by AI)
                 <img
-                  src="/images/pt_coaching.jpg"
-                  alt="Woman doing squats during live online 1-on-1 personal training with laptop coach"
-                  className="w-full h-full object-cover object-[55%_35%] sm:object-center group-hover:scale-105 transition-transform duration-500"
+                  src="/images/pt_personal_trainer_coaching.jpg"
+                  alt="Personal trainer coaching athlete during dumbbell shoulder press workout"
+                  className="w-full h-full object-cover object-[50%_25%] sm:object-center group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
+                />
+                */}
+                {/* NEW CODE - performance optimization: WebP image with responsive srcSet */}
+                <img
+                  src="/images/pt_personal_trainer_coaching.webp"
+                  srcSet="/images/pt_personal_trainer_coaching-480w.webp 480w, /images/pt_personal_trainer_coaching.webp 1024w"
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  alt="Personal trainer coaching athlete during dumbbell shoulder press workout"
+                  className="w-full h-full object-cover object-[50%_25%] sm:object-center group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent pointer-events-none" />
                 
@@ -333,29 +348,29 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
               </h3>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 items-stretch pt-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch pt-4">
               {PT_PLANS.map((plan, idx) => {
                 if (plan.popular) {
                   // Conic Glow Wrapper for Most Popular
                   return (
-                    <div key={plan.id} className={`reveal-item reveal-stagger-${(idx % 3) + 1} relative scale-105 z-10 flex flex-col`}>
+                    <div key={plan.id} className={`reveal-item reveal-stagger-${(idx % 4) + 1} relative lg:scale-105 z-10 flex flex-col`}>
                       {/* Floating Badge (Unclipped above the rotating glow border) */}
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-teal-500 to-[#2DE2C8] text-slate-950 font-display font-black text-xs px-4 py-1.5 rounded-full shadow-lg uppercase tracking-wider whitespace-nowrap">
                         {plan.badge}
                       </div>
 
                       <div className="conic-glow-wrapper shadow-2xl flex-1 flex flex-col h-full">
-                        <div className="conic-glow-content p-8 sm:p-9 text-slate-900 flex flex-col justify-between h-full relative">
+                        <div className="conic-glow-content p-6 sm:p-8 text-slate-900 flex flex-col justify-between h-full relative">
                           <div>
                             <div className="text-xs font-display font-bold uppercase tracking-wider text-slate-500 mb-2 pt-2">
                               {plan.sessions}
                             </div>
-                            <h4 className="font-heading text-2xl font-black text-slate-900 mb-4">
+                            <h4 className="font-heading text-xl sm:text-2xl font-black text-slate-900 mb-4">
                               {plan.name}
                             </h4>
 
                             <div className="flex items-baseline gap-1 mb-6">
-                              <span className="font-display text-4xl font-black text-slate-900">
+                              <span className="font-display text-3xl sm:text-4xl font-black text-slate-900">
                                 {plan.price}
                               </span>
                               <span className="text-sm font-medium text-slate-500">{plan.period}</span>
@@ -390,18 +405,18 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
                 return (
                   <div
                     key={plan.id}
-                    className={`reveal-item reveal-stagger-${(idx % 3) + 1} bg-white rounded-3xl p-8 relative flex flex-col justify-between border border-slate-100 shadow-xl text-slate-900 hover:-translate-y-1 transition-transform`}
+                    className={`reveal-item reveal-stagger-${(idx % 4) + 1} bg-white rounded-3xl p-6 sm:p-8 relative flex flex-col justify-between border border-slate-100 shadow-xl text-slate-900 hover:-translate-y-1 transition-transform`}
                   >
                     <div>
                       <div className="text-xs font-display font-bold uppercase tracking-wider text-slate-500 mb-2">
                         {plan.sessions}
                       </div>
-                      <h4 className="font-heading text-2xl font-black text-slate-900 mb-4">
+                      <h4 className="font-heading text-xl sm:text-2xl font-black text-slate-900 mb-4">
                         {plan.name}
                       </h4>
 
                       <div className="flex items-baseline gap-1 mb-6">
-                        <span className="font-display text-4xl font-black text-slate-900">
+                        <span className="font-display text-3xl sm:text-4xl font-black text-slate-900">
                           {plan.price}
                         </span>
                         <span className="text-sm font-medium text-slate-500">{plan.period}</span>

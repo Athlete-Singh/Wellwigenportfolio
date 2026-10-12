@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 
 // NEW CODE - Wellwigen alternating hero images
 import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Award,
@@ -34,6 +35,8 @@ import GymMarqueeTicker from './GymMarqueeTicker';
 
 export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
   // Alternating Hero Background Images (Calibrated face focal points for mobile & desktop)
+  // OLD CODE (commented by AI)
+  /*
   const HERO_IMAGES = [
     {
       src: '/images/hero_workout.jpg',
@@ -61,8 +64,44 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
       position: 'object-[61%_20%] lg:object-[62%_20%]',
     },
   ];
+  */
+  // NEW CODE - performance optimization: WebP images with responsive srcset
+  const HERO_IMAGES = [
+    {
+      src: '/images/hero_workout.webp',
+      srcSet: '/images/hero_workout-480w.webp 480w, /images/hero_workout-768w.webp 768w, /images/hero_workout.webp 1024w',
+      alt: 'Wellwigen elite athletic power training in gym',
+      position: 'object-[68%_16%] lg:object-[68%_20%]',
+    },
+    {
+      src: '/images/hero_sled_push.webp',
+      srcSet: '/images/hero_sled_push-480w.webp 480w, /images/hero_sled_push-768w.webp 768w, /images/hero_sled_push.webp 1024w',
+      alt: 'Athletic power sled push training at Wellwigen',
+      position: 'object-[56%_38%] lg:object-[65%_25%]',
+    },
+    {
+      src: '/images/hero_home_plank.webp',
+      srcSet: '/images/hero_home_plank-480w.webp 480w, /images/hero_home_plank-768w.webp 768w, /images/hero_home_plank.webp 1024w',
+      alt: 'Live online virtual personal training session with coach',
+      position: 'object-[74%_34%] lg:object-[68%_28%]',
+    },
+    {
+      src: '/images/hero_bench_athlete.webp',
+      srcSet: '/images/hero_bench_athlete-480w.webp 480w, /images/hero_bench_athlete-768w.webp 768w, /images/hero_bench_athlete.webp 1024w',
+      alt: 'Muscular athlete focus training at Wellwigen gym',
+      position: 'object-[80%_18%] lg:object-[78%_20%]',
+    },
+    {
+      src: '/images/hero_online_coach.webp',
+      srcSet: '/images/hero_online_coach-480w.webp 480w, /images/hero_online_coach-768w.webp 768w, /images/hero_online_coach.webp 1024w',
+      alt: 'Expert online personal fitness coach conducting live consultation',
+      position: 'object-[61%_20%] lg:object-[62%_20%]',
+    },
+  ];
 
   // Dynamic rotating keywords per user specifications
+  // OLD CODE (commented by AI)
+  /*
   const ROTATING_HERO_WORDS = [
     'Wellwigen',
     'HIIT',
@@ -71,8 +110,30 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
     'Jungle Fit Classes',
     'Tabata Classes',
   ];
+  */
+  // NEW CODE - removed HIIT per user request
+  // OLD CODE (commented by AI)
+  /*
+  const ROTATING_HERO_WORDS = [
+    'Wellwigen',
+    'Personal Training',
+    'Yoga Classes',
+    'Jungle Fit Classes',
+    'Tabata Classes',
+  ];
+  */
+  // NEW CODE - updated Jungle Fit Classes to Jungle Fit Class per user request
+  const ROTATING_HERO_WORDS = [
+    'Wellwigen',
+    'Personal Training',
+    'Yoga Classes',
+    'Jungle Fit Class',
+    'Tabata Classes',
+  ];
 
   // Premium Classes Showcase Section (Light Theme)
+  // OLD CODE (commented by AI)
+  /*
   const PREMIUM_CLASSES = [
     {
       id: 'yoga',
@@ -103,12 +164,53 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
       position: 'object-center',
     },
   ];
+  */
+  // NEW CODE - performance optimization: WebP images with 480w responsive srcSet
+  const PREMIUM_CLASSES = [
+    {
+      id: 'yoga',
+      title: 'Yoga classes',
+      desc: 'Mindful flows, breathwork & deep flexibility with certified yogis.',
+      img: '/images/class_yoga.webp',
+      srcSet: '/images/class_yoga-480w.webp 480w, /images/class_yoga.webp 1024w',
+      position: 'object-center',
+    },
+    {
+      id: 'tabata',
+      title: 'Tabata classes',
+      desc: 'High-intensity interval rounds engineered for maximum calorie burn & stamina.',
+      img: '/images/class_tabata.webp',
+      srcSet: '/images/class_tabata-480w.webp 480w, /images/class_tabata.webp 1024w',
+      position: 'object-center',
+    },
+    {
+      id: 'junglefit',
+      title: 'Jungle fit classes',
+      desc: 'Fun, high-energy functional movements, primal flow & rhythmic conditioning.',
+      img: '/images/class_jungle_fit.webp',
+      srcSet: '/images/class_jungle_fit-480w.webp 480w, /images/class_jungle_fit.webp 1024w',
+      position: 'object-center',
+    },
+    {
+      id: 'hiit',
+      title: 'HIIT',
+      desc: 'Full-throttle interval training to build lean muscle and athletic power.',
+      img: '/images/class_hiit.webp',
+      srcSet: '/images/class_hiit-480w.webp 480w, /images/class_hiit.webp 1024w',
+      position: 'object-center',
+    },
+  ];
 
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
+  // OLD CODE (commented by AI)
+  /*
   const [typedWord, setTypedWord] = useState('');
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isWordComplete, setIsWordComplete] = useState(false);
+  */
+  // NEW CODE - restored original rotating word index
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
   // OLD CODE (commented by AI)
   /*
@@ -132,6 +234,8 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
     return () => clearInterval(timer);
   }, [currentHeroImage, HERO_IMAGES.length]);
 
+  // OLD CODE (commented by AI)
+  /*
   // Typewriter effect: types character-by-character, pops on completion, then deletes
   useEffect(() => {
     const targetWord = ROTATING_HERO_WORDS[wordIndex];
@@ -171,6 +275,14 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
     return () => clearTimeout(timeoutId);
   }, [typedWord, isDeleting, isWordComplete, wordIndex]);
+  */
+  // NEW CODE - restored original vertical sliding rotation (enter from bottom, exit to top)
+  useEffect(() => {
+    const wordTimer = setInterval(() => {
+      setCurrentWordIndex((prev) => (prev + 1) % ROTATING_HERO_WORDS.length);
+    }, 2600);
+    return () => clearInterval(wordTimer);
+  }, [ROTATING_HERO_WORDS.length]);
   const getTileIcon = (name) => {
     switch (name) {
       case 'Award': return <Award className="w-6 h-6 text-teal-600" />;
@@ -183,6 +295,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const getChipIcon = (name) => {
     switch (name) {
       case 'Award': return <Award size={15} className="text-teal-600" />;
@@ -204,12 +317,16 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
         <div className="w-px h-16 bg-teal-500/50" />
       </div>
 
-      {/* ================= HERO SECTION (TOP PICTURE ON MOBILE, EDGE-TO-EDGE ON DESKTOP) ================= */}
+      {/* OLD CODE (commented by AI)
       <div data-nav-theme="dark" className="relative min-h-[92vh] lg:min-h-screen flex flex-col lg:flex-row lg:items-center pt-20 pb-16 lg:pt-36 lg:pb-24 bg-[#0E1420]">
+      */}
+      {/* NEW CODE - shifted slightly down matching user screenshot */}
+      <div data-nav-theme="dark" className="relative min-h-[92vh] lg:min-h-screen flex flex-col lg:flex-row lg:items-center pt-24 pb-16 lg:pt-40 lg:pb-24 bg-[#0E1420]">
 
         {/* ----------------- MOBILE ONLY: Dedicated Top Picture Showcase (< lg) ----------------- */}
         <div className="lg:hidden relative w-full h-[48vh] min-h-[340px] max-h-[460px] overflow-hidden select-none -mt-4">
           {/* Alternating Images with Calibrated Face Focal Points */}
+          {/* OLD CODE (commented by AI)
           {HERO_IMAGES.map((img, idx) => (
             <motion.img
               key={img.src}
@@ -229,6 +346,35 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               fetchPriority={idx === 0 ? 'high' : 'auto'}
             />
           ))}
+          */}
+          {/* NEW CODE - performance optimization: render only current and next slide, responsive srcset */}
+          {HERO_IMAGES.map((img, idx) => {
+            const isSlideActive = currentHeroImage === idx;
+            const isNextSlide = (currentHeroImage + 1) % HERO_IMAGES.length === idx;
+            if (!isSlideActive && !isNextSlide) return null;
+            return (
+              <motion.img
+                key={img.src}
+                src={img.src}
+                srcSet={img.srcSet}
+                sizes="100vw"
+                alt={img.alt}
+                initial={false}
+                animate={{
+                  opacity: isSlideActive ? 1 : 0,
+                  scale: isSlideActive ? 1 : 1.05,
+                }}
+                transition={{
+                  opacity: { duration: 0.75, ease: 'easeInOut' },
+                  scale: { duration: 3.8, ease: 'easeOut' },
+                }}
+                className={`absolute inset-0 w-full h-full object-cover ${img.position} filter brightness-[0.95] contrast-[1.08]`}
+                loading={idx === 0 ? 'eager' : 'lazy'}
+                fetchPriority={idx === 0 ? 'high' : 'auto'}
+                decoding={idx === 0 ? 'sync' : 'async'}
+              />
+            );
+          })}
 
           {/* Deep seamless gradient fade at bottom to blend into #0E1420 */}
           <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-[#0E1420] from-20% via-[#0E1420]/80 via-60% to-transparent pointer-events-none" />
@@ -239,6 +385,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
         {/* ----------------- DESKTOP ONLY: Edge-to-Edge Background (lg+) ----------------- */}
         <div className="hidden lg:block absolute inset-0 z-0 overflow-hidden">
+          {/* OLD CODE (commented by AI)
           {HERO_IMAGES.map((img, idx) => (
             <motion.img
               key={img.src}
@@ -258,6 +405,35 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               fetchPriority={idx === 0 ? 'high' : 'auto'}
             />
           ))}
+          */}
+          {/* NEW CODE - performance optimization: render only current and next slide, responsive srcset */}
+          {HERO_IMAGES.map((img, idx) => {
+            const isSlideActive = currentHeroImage === idx;
+            const isNextSlide = (currentHeroImage + 1) % HERO_IMAGES.length === idx;
+            if (!isSlideActive && !isNextSlide) return null;
+            return (
+              <motion.img
+                key={img.src}
+                src={img.src}
+                srcSet={img.srcSet}
+                sizes="100vw"
+                alt={img.alt}
+                initial={false}
+                animate={{
+                  opacity: isSlideActive ? 1 : 0,
+                  scale: isSlideActive ? 1 : 1.04,
+                }}
+                transition={{
+                  opacity: { duration: 0.75, ease: 'easeInOut' },
+                  scale: { duration: 3.8, ease: 'easeOut' },
+                }}
+                className={`absolute inset-0 w-full h-full object-cover ${img.position} filter brightness-[0.88] contrast-[1.12]`}
+                loading={idx === 0 ? 'eager' : 'lazy'}
+                fetchPriority={idx === 0 ? 'high' : 'auto'}
+                decoding={idx === 0 ? 'sync' : 'async'}
+              />
+            );
+          })}
 
           {/* Deep Cinematic Multi-layer Gradient Overlays for Razor-Sharp Readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#0E1420] via-[#0E1420]/90 to-transparent lg:w-[68%]" />
@@ -274,9 +450,22 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
           BEAST MODE
         </div>
 
-        {/* Content Container (Left-aligned cinematic layout) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full -mt-32 xs:-mt-36 sm:-mt-40 lg:mt-0">
+        {/* OLD CODE (commented by AI)
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full -mt-40 xs:-mt-44 sm:-mt-48 lg:mt-0">
+        */}
+        {/* OLD CODE (commented by AI)
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full -mt-36 xs:-mt-40 sm:-mt-44 lg:mt-0">
+        */}
+        {/* OLD CODE (commented by AI)
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full -mt-24 xs:-mt-28 sm:-mt-32 lg:mt-6">
+        */}
+        {/* OLD CODE (commented by AI)
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full -mt-32 xs:-mt-36 sm:-mt-40 lg:mt-8">
           <div className="max-w-2xl lg:max-w-3xl space-y-4 sm:space-y-6 lg:space-y-7">
+        */}
+        {/* NEW CODE - shifted slightly further down on desktop (lg:mt-16), wide container (lg:max-w-4xl xl:max-w-5xl) so words never clip */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full -mt-32 xs:-mt-36 sm:-mt-40 lg:mt-16">
+          <div className="max-w-2xl lg:max-w-4xl xl:max-w-5xl space-y-4 sm:space-y-6 lg:space-y-7">
 
             {/* Display Headline with Animated Rotating Words */}
             <motion.div
@@ -285,34 +474,66 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               transition={{ duration: 0.6, delay: 0.1 }}
             >
               {/* OLD CODE (commented by AI)
-              <h1 className="font-display font-extrabold text-[2.15rem] xs:text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] tracking-tight text-white leading-[1.08] sm:leading-[0.96]">
-              */}
-              {/* NEW CODE - font correction: font-heading (Outfit/Plus Jakarta Sans) font-black matching image 2 */}
-              <h1 className="font-heading font-black text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] tracking-tight text-white leading-[1.1] sm:leading-[0.98]">
+              <h1 className="font-heading font-black text-[1.75rem] xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.75rem] tracking-tight text-white leading-[1.1] sm:leading-[0.98]">
                 <span className="block text-white drop-shadow-md">
-                  Transform Your Body
+                  Transform
                 </span>
-                <span className="block text-white/95 mt-0.5 sm:mt-1 drop-shadow-md">
-                  With
+                <span className="block text-white drop-shadow-md mt-0.5 sm:mt-1">
+                  Your Body
                 </span>
-                <span className="relative block min-h-[1.35em] mt-0.5 sm:mt-1">
-                  <motion.span
-                    animate={{
-                      scale: isWordComplete ? [1, 1.05, 1] : 1,
-                    }}
-                    transition={{
-                      duration: 0.35,
-                      ease: 'easeOut',
-                    }}
-                    className="inline-block gradient-teal-sky-text drop-shadow-[0_0_35px_rgba(45,226,200,0.35)] leading-tight pb-3"
-                  >
-                    {typedWord}
-                    {/* Blinking Cyan Cursor */}
-                    <span
-                      className="inline-block w-[3px] sm:w-[4px] h-[0.78em] ml-1 bg-[#2DE2C8] align-baseline rounded-sm animate-pulse shadow-[0_0_12px_rgba(45,226,200,0.85)]"
-                      aria-hidden="true"
-                    />
-                  </motion.span>
+                <span className="flex items-baseline flex-nowrap gap-x-2 sm:gap-x-3.5 mt-0.5 sm:mt-1 whitespace-nowrap overflow-visible">
+                  <span className="text-white/95 drop-shadow-md shrink-0">
+                    With
+                  </span>
+                  <span className="relative inline-block h-[1.35em] overflow-hidden align-baseline whitespace-nowrap">
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={ROTATING_HERO_WORDS[currentWordIndex]}
+                        initial={{ opacity: 0, y: 36, scale: 0.94 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -36, scale: 0.94 }}
+                        transition={{
+                          duration: 0.42,
+                          ease: [0.16, 1, 0.3, 1],
+                        }}
+                        className="inline-block gradient-teal-sky-text drop-shadow-[0_0_35px_rgba(45,226,200,0.35)] leading-tight pb-3 whitespace-nowrap"
+                      >
+                        {ROTATING_HERO_WORDS[currentWordIndex]}
+                      </motion.span>
+                    </AnimatePresence>
+                  </span>
+                </span>
+              </h1>
+              */}
+              {/* NEW CODE - generous width, trailing padding to prevent clipping of long words like "Training", clean alignment */}
+              <h1 className="font-heading font-black text-[1.75rem] xs:text-3xl sm:text-5xl md:text-6xl lg:text-[4.35rem] xl:text-[4.75rem] tracking-tight text-white leading-[1.1] sm:leading-[0.98]">
+                <span className="block text-white drop-shadow-md">
+                  Transform
+                </span>
+                <span className="block text-white drop-shadow-md mt-0.5 sm:mt-1">
+                  Your Body
+                </span>
+                <span className="flex items-baseline flex-nowrap gap-x-2 sm:gap-x-3.5 mt-0.5 sm:mt-1 whitespace-nowrap overflow-visible">
+                  <span className="text-white/95 drop-shadow-md shrink-0">
+                    With
+                  </span>
+                  <span className="relative inline-block h-[1.35em] overflow-hidden align-baseline whitespace-nowrap pr-4 sm:pr-8">
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={ROTATING_HERO_WORDS[currentWordIndex]}
+                        initial={{ opacity: 0, y: 36, scale: 0.94 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -36, scale: 0.94 }}
+                        transition={{
+                          duration: 0.42,
+                          ease: [0.16, 1, 0.3, 1],
+                        }}
+                        className="inline-block gradient-teal-sky-text drop-shadow-[0_0_35px_rgba(45,226,200,0.35)] leading-tight pb-3 pr-4 whitespace-nowrap"
+                      >
+                        {ROTATING_HERO_WORDS[currentWordIndex]}
+                      </motion.span>
+                    </AnimatePresence>
+                  </span>
                 </span>
               </h1>
             </motion.div>
@@ -546,106 +767,126 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
           <div className="grid md:grid-cols-2 gap-8 items-stretch">
 
-            {/* Card 1: Personal Training (Light Card on Dark Background for High Contrast) */}
-            {/* OLD CODE (commented by AI)
-            <div className="bg-white rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-100 hover:-translate-y-1.5 transition-all duration-300">
-            */}
-            {/* NEW CODE - smooth animation/performance: reveal-item with stagger-1, GPU transform hover without layout recalculation */}
-            <div className="reveal-item reveal-stagger-1 bg-white rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-100 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250">
-              <div className="absolute top-0 right-0 w-36 h-36 bg-teal-100/60 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
+            {/* Card 1: Personal Training (Background Image Card with Face-Clear Window) */}
+            <div className="reveal-item reveal-stagger-1 rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-700/60 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250 min-h-[580px] bg-slate-900">
+              {/* Background Image positioned for optimal face clarity */}
+              <img
+                src="/images/home_personal_training.jpg"
+                alt="Personal trainer coaching athlete with barbell in fitness studio"
+                className="absolute inset-0 w-full h-full object-cover object-[50%_15%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
+                loading="lazy"
+                decoding="async"
+              />
 
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-display font-extrabold uppercase tracking-wider text-teal-800 bg-teal-50 border border-teal-200/60 px-3 py-1 rounded-full">
-                    1-on-1 FOCUSED
-                  </span>
-                  <div className="w-11 h-11 rounded-2xl gradient-teal-sky text-white flex items-center justify-center shadow-md">
-                    <Target size={22} />
+              {/* Multi-stop Gradient: sheer at top so faces stay 100% clear, deep dark at bottom for font priority */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-slate-950/20 pointer-events-none" />
+
+              {/* Card Content on Top */}
+              <div className="relative z-10 flex flex-col justify-between h-full">
+                <div>
+                  {/* Top Badge & Icon with window below so faces are clear */}
+                  <div className="flex items-center justify-between mb-28 sm:mb-32">
+                    <span className="text-xs font-display font-extrabold uppercase tracking-wider text-teal-300 bg-slate-950/70 border border-teal-500/40 px-3.5 py-1.5 rounded-full backdrop-blur-md shadow-lg">
+                      1-on-1 FOCUSED
+                    </span>
+                    <div className="w-11 h-11 rounded-2xl bg-teal-500/90 backdrop-blur-md text-slate-950 flex items-center justify-center shadow-lg border border-teal-300/40">
+                      <Target size={22} className="stroke-[2.5]" />
+                    </div>
                   </div>
+
+                  <h3 className="font-heading text-2xl sm:text-3xl font-black text-white mb-2 drop-shadow-md">
+                    Personal Training
+                  </h3>
+                  <p className="text-[#2DE2C8] font-bold text-sm sm:text-base mb-6 drop-shadow-sm">
+                    1-on-1 Coaching Built Around You.
+                  </p>
+
+                  <ul className="space-y-3.5 mb-8">
+                    {[
+                      'Personalized workout plan',
+                      'Goal-based training',
+                      'Expert coach guidance',
+                      'Progress tracking',
+                      'Nutrition guidance',
+                      'Flexible online sessions',
+                    ].map((bullet, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-sm text-slate-100 font-medium drop-shadow-sm">
+                        <CheckCircle2 size={18} className="text-[#2DE2C8] shrink-0 mt-0.5" />
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <h3 className="font-heading text-2xl sm:text-3xl font-black text-slate-900 mb-2">
-                  Personal Training
-                </h3>
-                <p className="text-teal-700 font-bold text-sm mb-6">
-                  1-on-1 Coaching Built Around You.
-                </p>
-
-                <ul className="space-y-3.5 mb-8">
-                  {[
-                    'Personalized workout plan',
-                    'Goal-based training',
-                    'Expert coach guidance',
-                    'Progress tracking',
-                    'Nutrition guidance',
-                    'Flexible online sessions',
-                  ].map((bullet, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-sm text-slate-700">
-                      <CheckCircle2 size={18} className="text-teal-500 shrink-0 mt-0.5" />
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
+                <button
+                  onClick={() => onNavigateSection('personal-training')}
+                  className="w-full btn-primary-gradient px-6 py-4 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group/btn"
+                >
+                  <span>Explore Personal Training</span>
+                  <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                </button>
               </div>
-
-              <button
-                onClick={() => onNavigateSection('personal-training')}
-                className="w-full btn-primary-gradient px-6 py-4 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group/btn"
-              >
-                <span>Explore Personal Training</span>
-                <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-              </button>
             </div>
 
-            {/* Card 2: Online Group Classes (Light Card on Dark Background) */}
-            {/* OLD CODE (commented by AI)
-            <div className="bg-white rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-100 hover:-translate-y-1.5 transition-all duration-300">
-            */}
-            {/* NEW CODE - smooth animation/performance: reveal-item with stagger-2, GPU transform hover */}
-            <div className="reveal-item reveal-stagger-2 bg-white rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-100 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250">
-              <div className="absolute top-0 right-0 w-36 h-36 bg-sky-100/60 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
+            {/* Card 2: Online Group Classes (Background Image Card with Face-Clear Window) */}
+            <div className="reveal-item reveal-stagger-2 rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-700/60 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250 min-h-[580px] bg-slate-900">
+              {/* Background Image positioned for optimal face clarity */}
+              <img
+                src="/images/home_group_classes.jpg"
+                alt="Online group fitness class performing synchronized workout"
+                className="absolute inset-0 w-full h-full object-cover object-[50%_25%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
+                loading="lazy"
+                decoding="async"
+              />
 
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-display font-extrabold uppercase tracking-wider text-sky-800 bg-sky-50 border border-sky-200/60 px-3 py-1 rounded-full">
-                    LIVE COMMUNITY
-                  </span>
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-md">
-                    <Users size={22} />
+              {/* Multi-stop Gradient: sheer at top so faces stay 100% clear, deep dark at bottom for font priority */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-slate-950/20 pointer-events-none" />
+
+              {/* Card Content on Top */}
+              <div className="relative z-10 flex flex-col justify-between h-full">
+                <div>
+                  {/* Top Badge & Icon with window below so faces are clear */}
+                  <div className="flex items-center justify-between mb-28 sm:mb-32">
+                    <span className="text-xs font-display font-extrabold uppercase tracking-wider text-sky-300 bg-slate-950/70 border border-sky-500/40 px-3.5 py-1.5 rounded-full backdrop-blur-md shadow-lg">
+                      LIVE COMMUNITY
+                    </span>
+                    <div className="w-11 h-11 rounded-2xl bg-sky-500/90 backdrop-blur-md text-slate-950 flex items-center justify-center shadow-lg border border-sky-300/40">
+                      <Users size={22} className="stroke-[2.5]" />
+                    </div>
                   </div>
+
+                  <h3 className="font-heading text-2xl sm:text-3xl font-black text-white mb-2 drop-shadow-md">
+                    Online Group Classes
+                  </h3>
+                  <p className="text-sky-400 font-bold text-sm sm:text-base mb-6 drop-shadow-sm">
+                    Live Workouts. Real Coaches. Real Community.
+                  </p>
+
+                  <ul className="space-y-3.5 mb-8">
+                    {[
+                      'Live instructor-led workouts',
+                      'Multiple class types',
+                      'Weekly schedule',
+                      'Beginner friendly',
+                      'Community motivation',
+                      'Train from home',
+                    ].map((bullet, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-sm text-slate-100 font-medium drop-shadow-sm">
+                        <CheckCircle2 size={18} className="text-sky-400 shrink-0 mt-0.5" />
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <h3 className="font-heading text-2xl sm:text-3xl font-black text-slate-900 mb-2">
-                  Online Group Classes
-                </h3>
-                <p className="text-sky-700 font-bold text-sm mb-6">
-                  Live Workouts. Real Coaches. Real Community.
-                </p>
-
-                <ul className="space-y-3.5 mb-8">
-                  {[
-                    'Live instructor-led workouts',
-                    'Multiple class types',
-                    'Weekly schedule',
-                    'Beginner friendly',
-                    'Community motivation',
-                    'Train from home',
-                  ].map((bullet, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-sm text-slate-700">
-                      <CheckCircle2 size={18} className="text-sky-500 shrink-0 mt-0.5" />
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
+                <button
+                  onClick={() => onNavigateSection('group-classes')}
+                  className="w-full btn-primary-gradient px-6 py-4 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group/btn"
+                >
+                  <span>Explore Group Classes</span>
+                  <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                </button>
               </div>
-
-              <button
-                onClick={() => onNavigateSection('group-classes')}
-                className="w-full btn-primary-gradient px-6 py-4 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-teal-glow group/btn"
-              >
-                <span>Explore Group Classes</span>
-                <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-              </button>
             </div>
 
           </div>
@@ -824,8 +1065,20 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
                 {/* Media Showcase Side: Large, Clean, Big Image fitting the content height */}
                 <div className="lg:col-span-5 order-1 lg:order-2 flex">
                   <div className="relative rounded-xl lg:rounded-2xl overflow-hidden border border-teal-500/30 shadow-lg w-full h-full min-h-[200px] sm:min-h-[220px]">
+                    {/* OLD CODE (commented by AI)
                     <img
                       src="/images/card_goals_focus.jpg"
+                      alt="Athletes performing kettlebell workouts during personal training"
+                      className="w-full h-full object-cover object-[45%_25%] sm:object-center group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    */}
+                    {/* NEW CODE - performance optimization: WebP image with responsive srcSet */}
+                    <img
+                      src="/images/card_goals_focus.webp"
+                      srcSet="/images/card_goals_focus-480w.webp 480w, /images/card_goals_focus.webp 1024w"
+                      sizes="(max-width: 640px) 100vw, 500px"
                       alt="Athletes performing kettlebell workouts during personal training"
                       className="w-full h-full object-cover object-[45%_25%] sm:object-center group-hover:scale-105 transition-transform duration-700"
                       loading="lazy"

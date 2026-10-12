@@ -328,7 +328,10 @@ export default function AnimatedBackground() {
 
   // 4. Glowing Embers / Sparks Canvas Particles
   useEffect(() => {
-    if (reducedMotion) return;
+    // OLD CODE (commented by AI)
+    // if (reducedMotion) return;
+    // NEW CODE - performance optimization: disable canvas particle loop on mobile devices
+    if (isMobile || reducedMotion) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -462,6 +465,7 @@ export default function AnimatedBackground() {
       )}
 
       {/* 3. Floating Fitness Outline Icons with Depth Parallax */}
+      {/* OLD CODE (commented by AI)
       <div className="ab-icons-layer">
         {activeIcons.map((icon) => (
           <div
@@ -480,8 +484,31 @@ export default function AnimatedBackground() {
         ))}
       </div>
 
-      {/* 4. Canvas Particles (Rising Embers / Sparks) */}
       {!reducedMotion && <canvas ref={canvasRef} className="ab-canvas-particles" />}
+      */}
+      {/* NEW CODE - performance optimization: skip floating vector nodes & canvas particles on mobile (<768px) */}
+      {!isMobile && (
+        <div className="ab-icons-layer">
+          {activeIcons.map((icon) => (
+            <div
+              key={icon.id}
+              className={`ab-icon-node ab-depth-${icon.depth} ${icon.floatClass}`}
+              style={{
+                top: icon.top,
+                left: icon.left,
+                right: icon.right,
+                width: `${icon.size}px`,
+                height: `${icon.size}px`,
+              }}
+            >
+              <FitnessIconSvg type={icon.type} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 4. Canvas Particles (Rising Embers / Sparks) - desktop only */}
+      {!isMobile && !reducedMotion && <canvas ref={canvasRef} className="ab-canvas-particles" />}
 
       {/* 5. Special Effects */}
 

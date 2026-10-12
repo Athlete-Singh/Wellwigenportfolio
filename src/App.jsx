@@ -4,16 +4,24 @@ import "./styles/index.css";
 import { Helmet } from 'react-helmet-async';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import { onMessage } from 'firebase/messaging';
-import { messaging } from './config/firebase.js';
+// OLD CODE (commented by AI)
+// import { onMessage } from 'firebase/messaging';
+// import { messaging } from './config/firebase.js';
 
-import Navbar from "./components/common/Navbar";
-import FloatingContact from "./components/common/FloatingContact";
-import AdminLayout from "./features/dashboard/layout/AdminLayout";
+// OLD CODE (commented by AI)
+// import Navbar from "./components/common/Navbar";
+// import FloatingContact from "./components/common/FloatingContact";
+// import AdminLayout from "./features/dashboard/layout/AdminLayout";
+// NEW CODE - performance optimization: lazy load components not needed on landing page
+const Navbar = React.lazy(() => import("./components/common/Navbar"));
+const FloatingContact = React.lazy(() => import("./components/common/FloatingContact"));
+const AdminLayout = React.lazy(() => import("./features/dashboard/layout/AdminLayout"));
 import ErrorBoundary from "./components/ErrorBoundary";
 import LandingPage from "./features/landing/LandingPage";
 import AnimatedBackground from "./components/common/AnimatedBackground";
 
+// OLD CODE (commented by AI)
+/*
 // Home / Website Pages
 import Hero from './features/home/components/Hero';
 import Framework from './features/home/components/Framework';
@@ -21,7 +29,6 @@ import FruitMarketplace from "./features/home/components/FruitMarketplace";
 import HealthPrograms from "./features/home/components/HealthPrograms";
 import FitnessClasses from "./features/home/components/FitnessClasses";
 import VerifiedTrainers from "./features/home/components/VerifiedTrainers";
-// Pricing is now imported from features
 import Dashboard from "./features/dashboard/components/Dashboard";
 import Diet from "./features/dashboard/components/Diet";
 import Testimonials from './components/Testimonials';
@@ -37,7 +44,6 @@ import TrainerForm from './components/TrainerForm';
 // Admin Pages
 import UserDashboard from "./features/dashboard/pages/UserDashboard";
 import AdminCategories from "./features/admin/pages/AdminCategories";
-// ProductCatalog is now integrated into UserDashboard as 'Vendor Products'
 import MedicalRecords from "./features/dashboard/pages/MedicalRecords";
 import Prescriptions from "./features/dashboard/pages/Prescriptions";
 import Appointments from "./features/dashboard/pages/Appointments";
@@ -47,11 +53,9 @@ import AdminVendors from "./features/admin/pages/AdminVendors";
 import ProviderVerification from "./features/admin/pages/ProviderVerification";
 import AdminDashboard from "./features/admin/pages/AdminDashboard";
 
-
-
 import Cart from "./features/shop/pages/Cart";
 
-// ✅ Feature Imports
+// Feature Imports
 import Pricing from "./features/subscription/pages/PricingPage";
 import Register from "./features/provider/pages/onboarding/OnboardingWizard";
 import OnboardingWizard from "./features/provider/pages/onboarding/OnboardingWizard";
@@ -60,9 +64,50 @@ import UnifiedDashboard from "./features/provider/pages/dashboard/UnifiedDashboa
 import PharmacyDashboard from "./features/provider/pages/dashboard/PharmacyDashboard";
 import TrainerDashboard from "./features/provider/pages/dashboard/TrainerDashboard";
 
-// Legacy Vendor Imports (to be migrated)
+// Legacy Vendor Imports
 import VendorLogin from "./features/provider/legacy/Login";
 import AddProduct from "./features/provider/legacy/AddProduct";
+*/
+// NEW CODE - performance optimization: route-level code splitting via React.lazy
+const Hero = React.lazy(() => import('./features/home/components/Hero'));
+const Framework = React.lazy(() => import('./features/home/components/Framework'));
+const FruitMarketplace = React.lazy(() => import("./features/home/components/FruitMarketplace"));
+const HealthPrograms = React.lazy(() => import("./features/home/components/HealthPrograms"));
+const FitnessClasses = React.lazy(() => import("./features/home/components/FitnessClasses"));
+const VerifiedTrainers = React.lazy(() => import("./features/home/components/VerifiedTrainers"));
+const Dashboard = React.lazy(() => import("./features/dashboard/components/Dashboard"));
+const Diet = React.lazy(() => import("./features/dashboard/components/Diet"));
+const Testimonials = React.lazy(() => import('./components/Testimonials'));
+const AboutUs = React.lazy(() => import("./features/home/components/AboutUs"));
+const Metrics = React.lazy(() => import('./features/home/components/Metrics'));
+const ContactUs = React.lazy(() => import('./features/home/components/ContactUs'));
+const Footer = React.lazy(() => import('./components/common/Footer'));
+const TermsAndConditions = React.lazy(() => import('./components/TermsAndConditions'));
+const ConsultationForm = React.lazy(() => import('./features/auth/components/ConsultationForm'));
+const Login = React.lazy(() => import('./features/auth/components/Login'));
+const TrainerForm = React.lazy(() => import('./components/TrainerForm'));
+
+const UserDashboard = React.lazy(() => import("./features/dashboard/pages/UserDashboard"));
+const AdminCategories = React.lazy(() => import("./features/admin/pages/AdminCategories"));
+const MedicalRecords = React.lazy(() => import("./features/dashboard/pages/MedicalRecords"));
+const Prescriptions = React.lazy(() => import("./features/dashboard/pages/Prescriptions"));
+const Appointments = React.lazy(() => import("./features/dashboard/pages/Appointments"));
+const Doctors = React.lazy(() => import("./features/dashboard/pages/Doctors"));
+const Settings = React.lazy(() => import("./features/dashboard/pages/Settings"));
+const AdminVendors = React.lazy(() => import("./features/admin/pages/AdminVendors"));
+const ProviderVerification = React.lazy(() => import("./features/admin/pages/ProviderVerification"));
+const AdminDashboard = React.lazy(() => import("./features/admin/pages/AdminDashboard"));
+
+const Cart = React.lazy(() => import("./features/shop/pages/Cart"));
+const Pricing = React.lazy(() => import("./features/subscription/pages/PricingPage"));
+const Register = React.lazy(() => import("./features/provider/pages/onboarding/OnboardingWizard"));
+const OnboardingWizard = React.lazy(() => import("./features/provider/pages/onboarding/OnboardingWizard"));
+const ProviderStatus = React.lazy(() => import("./features/provider/pages/onboarding/ProviderStatus"));
+const UnifiedDashboard = React.lazy(() => import("./features/provider/pages/dashboard/UnifiedDashboard"));
+const PharmacyDashboard = React.lazy(() => import("./features/provider/pages/dashboard/PharmacyDashboard"));
+const TrainerDashboard = React.lazy(() => import("./features/provider/pages/dashboard/TrainerDashboard"));
+const VendorLogin = React.lazy(() => import("./features/provider/legacy/Login"));
+const AddProduct = React.lazy(() => import("./features/provider/legacy/AddProduct"));
 // import MyStore from "./vendor/MyStore";
 
 // Route guard to prevent wrong dashboard access and enforce approved status
@@ -143,6 +188,8 @@ function App() {
   const BASE_URL = import.meta.env.VITE_API_URL;
 
   React.useEffect(() => {
+    // OLD CODE (commented by AI)
+    /*
     if (messaging) {
       const unsubscribe = onMessage(messaging, (payload) => {
         console.log('Message received in foreground:', payload);
@@ -158,6 +205,35 @@ function App() {
       });
       return () => unsubscribe();
     }
+    */
+    // NEW CODE - performance optimization: non-blocking deferred load of Firebase messaging
+    let unsubscribe;
+    const initMessaging = async () => {
+      try {
+        const { messaging: fbMessaging } = await import('./config/firebase.js');
+        if (fbMessaging) {
+          const { onMessage: fbOnMessage } = await import('firebase/messaging');
+          unsubscribe = fbOnMessage(fbMessaging, (payload) => {
+            console.log('Message received in foreground:', payload);
+            toast(
+              (t) => (
+                <div>
+                  <p className="font-bold">{payload.notification?.title}</p>
+                  <p className="text-sm">{payload.notification?.body}</p>
+                </div>
+              ),
+              { duration: 5000 }
+            );
+          });
+        }
+      } catch (err) {
+        // Notification unsupported in environment
+      }
+    };
+    initMessaging();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   return (
@@ -176,10 +252,19 @@ function App() {
         !location.pathname.startsWith("/pharmacy") &&
         !location.pathname.startsWith("/trainer") &&
         !location.pathname.startsWith("/dashboard") &&
-        !location.pathname.startsWith("/login") && <Navbar />}
+        !location.pathname.startsWith("/login") && (
+          <React.Suspense fallback={null}>
+            <Navbar />
+          </React.Suspense>
+        )}
 
       <ErrorBoundary>
+        {/* OLD CODE (commented by AI)
         <Routes location={location} key={location.pathname}>
+        */}
+        {/* NEW CODE - performance optimization: React.Suspense boundary for code-split routes */}
+        <React.Suspense fallback={<div className="min-h-screen bg-[#0E1420]" />}>
+          <Routes location={location} key={location.pathname}>
 
           {/* ================= ADMIN ROUTES ================= */}
           <Route path="/cart" element={<Cart />} />
@@ -475,11 +560,16 @@ function App() {
           } />
 
         </Routes>
+        </React.Suspense>
       </ErrorBoundary>
       {/* OLD CODE (commented by AI) */}
       {/* {location.pathname !== '/' && <FloatingContact />} */}
       {/* NEW CODE - Wellwigen restyle / Inquiries feature (hide floating contact in admin) */}
-      {location.pathname !== '/' && !location.pathname.startsWith('/admin') && <FloatingContact />}
+      {location.pathname !== '/' && !location.pathname.startsWith('/admin') && (
+        <React.Suspense fallback={null}>
+          <FloatingContact />
+        </React.Suspense>
+      )}
     </div>
   );
 }
