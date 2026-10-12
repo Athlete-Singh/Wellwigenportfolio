@@ -769,11 +769,11 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
 
             {/* Card 1: Personal Training (Background Image Card with Face-Clear Window) */}
             <div className="reveal-item reveal-stagger-1 rounded-3xl p-8 sm:p-10 relative flex flex-col justify-between overflow-hidden group shadow-2xl border border-slate-700/60 hover:-translate-y-1.5 transition-[transform,box-shadow] duration-250 min-h-[580px] bg-slate-900">
-              {/* Background Image positioned for optimal face clarity */}
+              {/* Background Image positioned for optimal face clarity (shifted left, head fully preserved) */}
               <img
                 src="/images/home_personal_training.jpg"
                 alt="Personal trainer coaching athlete with barbell in fitness studio"
-                className="absolute inset-0 w-full h-full object-cover object-[50%_15%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
+                className="absolute inset-0 w-full h-full object-cover object-[58%_15%] group-hover:scale-105 transition-transform duration-700 ease-out pointer-events-none"
                 loading="lazy"
                 decoding="async"
               />
@@ -784,11 +784,8 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               {/* Card Content on Top */}
               <div className="relative z-10 flex flex-col justify-between h-full">
                 <div>
-                  {/* Top Badge & Icon with window below so faces are clear */}
-                  <div className="flex items-center justify-between mb-28 sm:mb-32">
-                    <span className="text-xs font-display font-extrabold uppercase tracking-wider text-teal-300 bg-slate-950/70 border border-teal-500/40 px-3.5 py-1.5 rounded-full backdrop-blur-md shadow-lg">
-                      1-on-1 FOCUSED
-                    </span>
+                  {/* Top Icon with window below so faces are clear */}
+                  <div className="flex items-center justify-end mb-28 sm:mb-32">
                     <div className="w-11 h-11 rounded-2xl bg-teal-500/90 backdrop-blur-md text-slate-950 flex items-center justify-center shadow-lg border border-teal-300/40">
                       <Target size={22} className="stroke-[2.5]" />
                     </div>
@@ -845,11 +842,8 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
               {/* Card Content on Top */}
               <div className="relative z-10 flex flex-col justify-between h-full">
                 <div>
-                  {/* Top Badge & Icon with window below so faces are clear */}
-                  <div className="flex items-center justify-between mb-28 sm:mb-32">
-                    <span className="text-xs font-display font-extrabold uppercase tracking-wider text-sky-300 bg-slate-950/70 border border-sky-500/40 px-3.5 py-1.5 rounded-full backdrop-blur-md shadow-lg">
-                      LIVE COMMUNITY
-                    </span>
+                  {/* Top Icon with window below so faces are clear */}
+                  <div className="flex items-center justify-end mb-28 sm:mb-32">
                     <div className="w-11 h-11 rounded-2xl bg-sky-500/90 backdrop-blur-md text-slate-950 flex items-center justify-center shadow-lg border border-sky-300/40">
                       <Users size={22} className="stroke-[2.5]" />
                     </div>
