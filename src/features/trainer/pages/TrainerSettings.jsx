@@ -22,11 +22,16 @@ export default function TrainerSettings() {
     ifsc: 'HDFC0001234',
   });
 
-  const [notifications, setNotifications] = useState({
-    whatsappAlerts: true,
-    emailReminders: true,
-    clientChat: true,
-  });
+  const [notifSaved, setNotifSaved] = useState(false);
+  const [notifications, setNotifications] = useState(() => trainerApi.getNotificationSettings());
+
+  const handleToggleNotification = (key, val) => {
+    const updated = { ...notifications, [key]: val };
+    setNotifications(updated);
+    trainerApi.saveNotificationSettings(updated);
+    setNotifSaved(true);
+    setTimeout(() => setNotifSaved(false), 2500);
+  };
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -146,35 +151,56 @@ export default function TrainerSettings() {
 
       {/* Notifications */}
       <div className="p-6 bg-white rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
-        <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-          <Bell size={18} className="text-teal-600" />
-          <span>Notification Preferences</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
+            <Bell size={18} className="text-teal-600" />
+            <span>Notification Preferences</span>
+          </div>
+
+          {notifSaved && (
+            <span className="text-xs text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1">
+              <CheckCircle2 size={13} /> Preferences Saved
+            </span>
+          )}
         </div>
 
         <div className="space-y-3 text-xs">
-          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50">
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
             <div>
               <p className="font-bold text-slate-900">WhatsApp Class Reminders</p>
               <p className="text-slate-500">Receive alerts 30 minutes before your scheduled live group class.</p>
             </div>
             <input
               type="checkbox"
-              checked={notifications.whatsappAlerts}
-              onChange={(e) => setNotifications({ ...notifications, whatsappAlerts: e.target.checked })}
-              className="w-4 h-4 text-teal-600 rounded"
+              checked={!!notifications.whatsappAlerts}
+              onChange={(e) => handleToggleNotification('whatsappAlerts', e.target.checked)}
+              className="w-4 h-4 text-teal-600 rounded cursor-pointer accent-teal-600"
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50">
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
             <div>
               <p className="font-bold text-slate-900">New Client Inquiries</p>
               <p className="text-slate-500">Instant notification when a trainee requests a 1-on-1 slot.</p>
             </div>
             <input
               type="checkbox"
-              checked={notifications.emailReminders}
-              onChange={(e) => setNotifications({ ...notifications, emailReminders: e.target.checked })}
-              className="w-4 h-4 text-teal-600 rounded"
+              checked={!!notifications.emailReminders}
+              onChange={(e) => handleToggleNotification('emailReminders', e.target.checked)}
+              className="w-4 h-4 text-teal-600 rounded cursor-pointer accent-teal-600"
+            />
+          </div>
+
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div>
+              <p className="font-bold text-slate-900">Daily Class &amp; Booking Digest</p>
+              <p className="text-slate-500">Summary email of all classes scheduled for the day.</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={!!notifications.dailySummary}
+              onChange={(e) => handleToggleNotification('dailySummary', e.target.checked)}
+              className="w-4 h-4 text-teal-600 rounded cursor-pointer accent-teal-600"
             />
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Users,
   Search,
@@ -9,6 +10,7 @@ import {
   ExternalLink,
   ChevronRight,
   TrendingUp,
+  ArrowLeft,
 } from 'lucide-react';
 import { trainerApi } from '../../../services/trainerApi';
 
@@ -27,8 +29,33 @@ export default function TrainerClients() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header */}
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Paused Section Notice */}
+      <div className="p-8 sm:p-12 text-center rounded-3xl bg-white border border-slate-200/90 shadow-xs space-y-4">
+        <div className="w-14 h-14 mx-auto rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100">
+          <Users size={28} />
+        </div>
+        <div>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">1-on-1 Client Management Paused</h2>
+          <p className="text-slate-500 text-xs sm:text-sm mt-1.5 max-w-md mx-auto">
+            This section has been temporarily paused and preserved for future updates. You can manage your live classes and public coach profile.
+          </p>
+        </div>
+        <div className="pt-2">
+          <Link
+            to="/trainer/dashboard"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-sm shadow-teal-600/20 transition-all"
+          >
+            <ArrowLeft size={14} />
+            <span>Back to Dashboard</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* [DISABLED FOR FUTURE USE] 1-on-1 Client Roster */}
+      {false && (
+        <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">1-on-1 Client Roster</h1>
@@ -133,6 +160,8 @@ export default function TrainerClients() {
           ))}
         </div>
       )}
+    </div>
+    )}
     </div>
   );
 }

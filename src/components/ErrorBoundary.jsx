@@ -27,6 +27,25 @@ class ErrorBoundary extends React.Component {
             <br />
             {this.state.errorInfo && this.state.errorInfo.componentStack}
           </details>
+          <div style={{ marginTop: '16px' }}>
+            <button
+              onClick={() => {
+                this.setState({ hasError: false, error: null, errorInfo: null });
+                window.location.reload();
+              }}
+              style={{
+                padding: '8px 16px',
+                background: '#990000',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              Reload Page
+            </button>
+          </div>
         </div>
       );
     }

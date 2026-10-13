@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import axios from 'axios';
 import {
   User,
   Award,
@@ -13,14 +14,28 @@ import {
   Edit2,
   Save,
   X,
+  Camera,
+  UploadCloud,
+  Loader2,
+  Trash2,
+  Phone,
+  Image,
 } from 'lucide-react';
 import { trainerApi } from '../../../services/trainerApi';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 export default function TrainerProfile() {
   const [trainer, setTrainer] = useState(() => trainerApi.getCurrentTrainer() || {});
   const [isEditing, setIsEditing] = useState(false);
   const [savedMsg, setSavedMsg] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoMsg, setPhotoMsg] = useState('');
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const fileInputRef = useRef(null);
+  const previewFileInputRef = useRef(null);
 
+  /* [DISABLED FOR FUTURE USE] Old editForm without photoUrl & phone
   const [editForm, setEditForm] = useState({
     name: trainer.name || '',
     specialization: trainer.specialization || '',
@@ -32,7 +47,97 @@ export default function TrainerProfile() {
     oneOnOnePrice: trainer.services?.oneOnOnePriceMonthly || 4999,
     groupSeatPrice: trainer.services?.groupClassSeatPrice || 499,
   });
+  */
 
+  // NEW CODE - Extended editForm with profile photo, phone, and credentials
+  const [editForm, setEditForm] = useState({
+    name: trainer.name || '',
+    specialization: trainer.specialization || '',
+    experience: trainer.experience || '',
+    city: trainer.city || '',
+    phone: trainer.phone || '',
+    bio: trainer.bio || '',
+    photoUrl: trainer.photoUrl || trainer.avatar || '',
+    instagram: trainer.instagram || '',
+    linkedin: trainer.linkedin || '',
+    oneOnOnePrice: trainer.services?.oneOnOnePriceMonthly || 4999,
+    groupSeatPrice: trainer.services?.groupClassSeatPrice || 499,
+  });
+
+  // Photo upload handler with Cloudinary / server upload & local fallback
+  const handlePhotoUpload = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file (JPG, PNG, or WebP).');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image size exceeds 10MB limit. Please choose a smaller photo.');
+      return;
+    }
+
+    setUploadingPhoto(true);
+    setPhotoMsg('');
+
+    // Instant local preview
+    const localPreviewUrl = URL.createObjectURL(file);
+    setPhotoPreview(localPreviewUrl);
+
+    let finalPhotoUrl = localPreviewUrl;
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('file', file);
+      formData.append('folder', 'wellwigen/trainers');
+
+      const res = await axios.post(`${API_BASE}/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 10000,
+      });
+
+      if (res.data?.success && (res.data.url || res.data.secure_url)) {
+        finalPhotoUrl = res.data.url || res.data.secure_url;
+      }
+    } catch (uploadErr) {
+      console.warn('Server upload fallback to persistent base64 data URL:', uploadErr);
+      finalPhotoUrl = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    const updated = await trainerApi.updateProfile({
+      photoUrl: finalPhotoUrl,
+      avatar: finalPhotoUrl,
+    });
+
+    setTrainer(updated);
+    setEditForm((prev) => ({ ...prev, photoUrl: finalPhotoUrl }));
+    setUploadingPhoto(false);
+    setPhotoPreview(null);
+    setPhotoMsg('Profile picture updated successfully!');
+    setTimeout(() => setPhotoMsg(''), 3500);
+
+    // Notify TrainerLayout and dashboard reactively
+    window.dispatchEvent(new Event('trainerProfileUpdated'));
+  };
+
+  const handleRemovePhoto = async () => {
+    const updated = await trainerApi.updateProfile({
+      photoUrl: '',
+      avatar: '',
+    });
+    setTrainer(updated);
+    setEditForm((prev) => ({ ...prev, photoUrl: '' }));
+    setPhotoPreview(null);
+    setPhotoMsg('Profile picture removed.');
+    setTimeout(() => setPhotoMsg(''), 3000);
+    window.dispatchEvent(new Event('trainerProfileUpdated'));
+  };
+
+  /* [DISABLED FOR FUTURE USE] Old handleSave without photoUrl & phone
   const handleSave = async (e) => {
     e.preventDefault();
     const updated = await trainerApi.updateProfile({
@@ -53,6 +158,34 @@ export default function TrainerProfile() {
     setIsEditing(false);
     setSavedMsg(true);
     setTimeout(() => setSavedMsg(false), 3000);
+  };
+  */
+
+  // NEW CODE - Comprehensive profile save including photo and contact
+  const handleSave = async (e) => {
+    e.preventDefault();
+    const updated = await trainerApi.updateProfile({
+      name: editForm.name,
+      specialization: editForm.specialization,
+      experience: editForm.experience,
+      city: editForm.city,
+      phone: editForm.phone,
+      bio: editForm.bio,
+      photoUrl: editForm.photoUrl || trainer.photoUrl || '',
+      avatar: editForm.photoUrl || trainer.avatar || '',
+      instagram: editForm.instagram,
+      linkedin: editForm.linkedin,
+      services: {
+        ...trainer.services,
+        oneOnOnePriceMonthly: parseInt(editForm.oneOnOnePrice, 10),
+        groupClassSeatPrice: parseInt(editForm.groupSeatPrice, 10),
+      },
+    });
+    setTrainer(updated);
+    setIsEditing(false);
+    setSavedMsg(true);
+    setTimeout(() => setSavedMsg(false), 3500);
+    window.dispatchEvent(new Event('trainerProfileUpdated'));
   };
 
   return (
@@ -82,10 +215,85 @@ export default function TrainerProfile() {
         </div>
       )}
 
+      {photoMsg && (
+        <div className="p-4 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 text-xs flex items-center gap-2.5 shadow-xs">
+          <CheckCircle2 size={16} className="text-teal-600 shrink-0" />
+          <span>{photoMsg}</span>
+        </div>
+      )}
+
       {isEditing ? (
         /* Edit Mode */
         <form onSubmit={handleSave} className="p-6 sm:p-8 bg-white rounded-2xl border border-slate-200/90 shadow-sm space-y-5">
-          <h3 className="text-base font-bold text-slate-900 border-b pb-3">Update Coach Details</h3>
+          <div className="flex items-center justify-between border-b pb-3">
+            <h3 className="text-base font-bold text-slate-900">Update Coach Details</h3>
+            <span className="text-xs text-slate-400 font-medium">Public profile information</span>
+          </div>
+
+          {/* Profile Picture Upload Section */}
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center gap-5">
+            <div className="relative group shrink-0">
+              <div className="w-20 h-20 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-xl overflow-hidden border-2 border-white shadow-md">
+                {photoPreview || editForm.photoUrl ? (
+                  <img
+                    src={photoPreview || editForm.photoUrl}
+                    alt={editForm.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  editForm.name?.substring(0, 2).toUpperCase() || 'TR'
+                )}
+              </div>
+              {uploadingPhoto && (
+                <div className="absolute inset-0 bg-slate-900/60 rounded-2xl flex items-center justify-center text-white">
+                  <Loader2 size={22} className="animate-spin" />
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 space-y-1 text-center sm:text-left">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Coach Profile Picture</h4>
+              <p className="text-xs text-slate-500">
+                Upload your picture to appear on your public coach profile and member class cards.
+              </p>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) handlePhotoUpload(e.target.files[0]);
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={uploadingPhoto}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"
+                >
+                  {uploadingPhoto ? <Loader2 size={13} className="animate-spin" /> : <Camera size={13} />}
+                  <span>{uploadingPhoto ? 'Uploading...' : 'Upload New Photo'}</span>
+                </button>
+                {(editForm.photoUrl || photoPreview) && (
+                  <button
+                    type="button"
+                    disabled={uploadingPhoto}
+                    onClick={handleRemovePhoto}
+                    className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-600 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <Trash2 size={13} />
+                    <span>Remove</span>
+                  </button>
+                )}
+              </div>
+              {photoMsg && (
+                <p className="text-[11px] font-semibold text-teal-600 pt-1 flex items-center gap-1 justify-center sm:justify-start">
+                  <CheckCircle2 size={12} /> {photoMsg}
+                </p>
+              )}
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -98,6 +306,19 @@ export default function TrainerProfile() {
               />
             </div>
             <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">WhatsApp / Phone</label>
+              <input
+                type="text"
+                placeholder="+91 98765 43210"
+                value={editForm.phone}
+                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Primary Specialization</label>
               <input
                 type="text"
@@ -106,9 +327,6 @@ export default function TrainerProfile() {
                 className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm"
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Experience</label>
               <input
@@ -118,6 +336,9 @@ export default function TrainerProfile() {
                 className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">City</label>
               <input
@@ -207,14 +428,46 @@ export default function TrainerProfile() {
           <div className="px-6 sm:px-10 -mt-16 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div className="flex items-end gap-4">
-                <div className="w-24 h-24 rounded-2xl bg-white p-1 shadow-lg shrink-0">
-                  <div className="w-full h-full rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-2xl overflow-hidden">
-                    {trainer.photoUrl ? (
-                      <img src={trainer.photoUrl} alt={trainer.name} className="w-full h-full object-cover" />
-                    ) : (
-                      trainer.name?.substring(0, 2).toUpperCase() || 'TR'
-                    )}
+                <div className="relative group shrink-0">
+                  <div className="w-24 h-24 rounded-2xl bg-white p-1 shadow-lg shrink-0">
+                    <div className="w-full h-full rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-2xl overflow-hidden relative">
+                      {photoPreview || trainer.photoUrl ? (
+                        <img
+                          src={photoPreview || trainer.photoUrl}
+                          alt={trainer.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        trainer.name?.substring(0, 2).toUpperCase() || 'TR'
+                      )}
+                      {uploadingPhoto && (
+                        <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center text-white">
+                          <Loader2 size={24} className="animate-spin" />
+                        </div>
+                      )}
+                    </div>
                   </div>
+
+                  {/* [DISABLED FOR FUTURE USE] Quick camera button badge on preview card avatar (now only accessible in Edit Profile mode)
+                  <input
+                    ref={previewFileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/jpg"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) handlePhotoUpload(e.target.files[0]);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    disabled={uploadingPhoto}
+                    onClick={() => previewFileInputRef.current?.click()}
+                    title="Change Profile Picture"
+                    className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center shadow-md transition-transform hover:scale-110 cursor-pointer border-2 border-white"
+                  >
+                    {uploadingPhoto ? <Loader2 size={13} className="animate-spin" /> : <Camera size={14} />}
+                  </button>
+                  */}
                 </div>
 
                 <div className="space-y-1">

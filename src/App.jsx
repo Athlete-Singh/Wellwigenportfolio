@@ -88,14 +88,28 @@ const Login = React.lazy(() => import('./features/auth/components/Login'));
 const TrainerForm = React.lazy(() => import('./components/TrainerForm'));
 
 const UserDashboard = React.lazy(() => import("./features/dashboard/pages/UserDashboard"));
+/* [DISABLED FOR FUTURE USE] AdminCategories Page Import
 const AdminCategories = React.lazy(() => import("./features/admin/pages/AdminCategories"));
+*/
+/* [DISABLED FOR FUTURE USE] MedicalRecords Page Import
 const MedicalRecords = React.lazy(() => import("./features/dashboard/pages/MedicalRecords"));
+*/
+/* [DISABLED FOR FUTURE USE] Prescriptions Page Import
 const Prescriptions = React.lazy(() => import("./features/dashboard/pages/Prescriptions"));
+*/
+/* [DISABLED FOR FUTURE USE] Appointments Page Import
 const Appointments = React.lazy(() => import("./features/dashboard/pages/Appointments"));
+*/
+/* [DISABLED FOR FUTURE USE] Doctors Page Import
 const Doctors = React.lazy(() => import("./features/dashboard/pages/Doctors"));
+*/
 const Settings = React.lazy(() => import("./features/dashboard/pages/Settings"));
+/* [DISABLED FOR FUTURE USE] AdminVendors Page Import
 const AdminVendors = React.lazy(() => import("./features/admin/pages/AdminVendors"));
+*/
+/* [DISABLED FOR FUTURE USE] ProviderVerification Page Import
 const ProviderVerification = React.lazy(() => import("./features/admin/pages/ProviderVerification"));
+*/
 const AdminDashboard = React.lazy(() => import("./features/admin/pages/AdminDashboard"));
 
 const Cart = React.lazy(() => import("./features/shop/pages/Cart"));
@@ -289,7 +303,13 @@ function App() {
           {/* (no /admin/inquiries route previously) */}
           {/* NEW CODE - Wellwigen restyle / Inquiries feature */}
           <Route path="/admin/inquiries" element={<AdminDashboard initialTab="Inquiries" />} />
+          <Route path="/admin/trainers" element={<AdminDashboard initialTab="Trainers" />} />
+          <Route path="/admin/classes" element={<AdminDashboard initialTab="Classes" />} />
+          <Route path="/admin/clients" element={<AdminDashboard initialTab="Clients" />} />
+          <Route path="/admin/subscriptions" element={<AdminDashboard initialTab="Subscriptions" />} />
+          <Route path="/admin/settings" element={<AdminDashboard initialTab="Settings" />} />
 
+          {/* [DISABLED FOR FUTURE USE] Admin Management Sub-Routes (Appointments, Medical Records, Vendors, Categories, Verification)
           <Route path="/admin/manage" element={<AdminLayout />}>
             <Route path="medical-records" element={<MedicalRecords />} />
             <Route path="prescriptions" element={<Prescriptions />} />
@@ -300,16 +320,15 @@ function App() {
             <Route path="categories" element={<AdminCategories />} />
             <Route path="verification" element={<ProviderVerification />} />
           </Route>
+          */}
 
-
-
-          {/* ✅ Flat Admin Route Aliases to prevent 404s from Sidebar links */}
+          {/* [DISABLED FOR FUTURE USE] Flat Admin Route Aliases to prevent 404s from Sidebar links
           <Route path="/admin/appointments" element={<AdminLayout><Appointments /></AdminLayout>} />
           <Route path="/admin/medical-records" element={<AdminLayout><MedicalRecords /></AdminLayout>} />
           <Route path="/admin/vendors" element={<AdminLayout><AdminVendors /></AdminLayout>} />
           <Route path="/admin/categories" element={<AdminLayout><AdminCategories /></AdminLayout>} />
-          <Route path="/admin/settings" element={<AdminLayout><Settings /></AdminLayout>} />
           <Route path="/admin/verification" element={<AdminLayout><ProviderVerification /></AdminLayout>} />
+          */}
 
 
 
@@ -594,8 +613,11 @@ function App() {
       </ErrorBoundary>
       {/* OLD CODE (commented by AI) */}
       {/* {location.pathname !== '/' && <FloatingContact />} */}
-      {/* NEW CODE - Wellwigen restyle / Inquiries feature (hide floating contact in admin) */}
+      {/* OLD CODE (commented by AI)
       {location.pathname !== '/' && !location.pathname.startsWith('/admin') && (
+      */}
+      {/* NEW CODE - Hide floating contact in admin and trainer portal */}
+      {location.pathname !== '/' && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/trainer') && (
         <React.Suspense fallback={null}>
           <FloatingContact />
         </React.Suspense>

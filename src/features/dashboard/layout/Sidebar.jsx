@@ -20,6 +20,7 @@ export default function Sidebar() {
   const location = useLocation();
   const [pendingCount, setPendingCount] = useState(0);
 
+  /* [DISABLED FOR FUTURE USE] Pending Vendor Fetch
   useEffect(() => {
     const fetchPending = async () => {
       try {
@@ -33,13 +34,22 @@ export default function Sidebar() {
     };
     fetchPending();
   }, [location.pathname]);
+  */
 
   const navItems = [
     { name: "Overview", icon: LayoutDashboard, route: "/admin" },
+    /* [DISABLED FOR FUTURE USE] Appointments Nav Item
     { name: "Appointments", icon: Calendar, route: "/admin/appointments" },
+    */
+    /* [DISABLED FOR FUTURE USE] Medical Records Nav Item
     { name: "Medical Records", icon: FileText, route: "/admin/medical-records" },
+    */
+    /* [DISABLED FOR FUTURE USE] Vendor Partners Nav Item
     { name: "Vendor Partners", icon: Users, route: "/admin/vendors" },
+    */
+    /* [DISABLED FOR FUTURE USE] Health Categories Nav Item
     { name: "Health Categories", icon: Tag, route: "/admin/categories" },
+    */
     { name: "Subscription Plans", icon: Sparkles, route: "/admin/subscriptions" },
     { name: "System Config", icon: Settings, route: "/admin/settings" },
   ];

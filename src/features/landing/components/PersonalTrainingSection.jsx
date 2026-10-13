@@ -1,4 +1,7 @@
-import React from 'react';
+// OLD CODE (commented by AI)
+// import React from 'react';
+// NEW CODE - Added useState, useEffect for Approved Coaches fetching
+import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import {
@@ -14,6 +17,10 @@ import {
   Calendar,
   Quote,
   Zap,
+  // NEW CODE - Coach card icons
+  Star,
+  ShieldCheck,
+  Award,
 } from 'lucide-react';
 import {
   PT_BENEFITS,
@@ -26,8 +33,38 @@ import {
 // import personalTrainingManImg from '../../../assets/personal-training-man.png';
 // NEW CODE - performance optimization: WebP image (33KB vs 354KB)
 import personalTrainingManImg from '../../../assets/personal-training-man.webp';
+// NEW CODE - Trainer API for fetching verified approved coaches
+import { trainerApi } from '../../../services/trainerApi';
 
 export default function PersonalTrainingSection({ onOpenLeadModal }) {
+  // NEW CODE - Approved coaches state (TASK 2: sirf approved trainers dikhao)
+  const [approvedCoaches, setApprovedCoaches] = useState([]);
+  const [loadingCoaches, setLoadingCoaches] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchApproved = async () => {
+      try {
+        setLoadingCoaches(true);
+        const data = await trainerApi.getApprovedTrainers();
+        if (isMounted) {
+          // Strictly display only approved trainers
+          const verifiedOnly = Array.isArray(data)
+            ? data.filter((t) => t.status === 'approved' || !t.status)
+            : [];
+          setApprovedCoaches(verifiedOnly);
+        }
+      } catch (err) {
+        console.error('Failed to load approved trainers:', err);
+      } finally {
+        if (isMounted) setLoadingCoaches(false);
+      }
+    };
+    fetchApproved();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   const getBenefitIcon = (name) => {
     switch (name) {
       case 'FileText': return <FileText className="w-6 h-6 text-teal-600" />;
@@ -501,6 +538,118 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
               ))}
             </div>
           </div>
+
+          {/* ================= CERTIFIED MASTER COACHES (APPROVED TRAINERS ONLY) ================= */}
+          {approvedCoaches.length > 0 && (
+            <div className="mt-20 sm:mt-24 lg:mt-28">
+              <div className="text-center max-w-2xl mx-auto mb-12">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-[11px] font-extrabold uppercase tracking-wider mb-3">
+                  <ShieldCheck size={14} className="text-teal-600" />
+                  <span>ATHLETIC BOARD VERIFIED COACHES</span>
+                </div>
+                <h3 className="font-heading text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                  Meet Our Certified Personal Trainers
+                </h3>
+                <p className="text-sm sm:text-base text-slate-600 mt-2">
+                  Only accredited coaches with verified certifications and athletic background coach our 1-on-1 transformations.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {approvedCoaches.map((coach, idx) => (
+                  <div
+                    key={coach._id || coach.id || idx}
+                    className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-xl transition-all duration-300 p-6 flex flex-col justify-between group hover:-translate-y-1"
+                  >
+                    <div>
+                      {/* Avatar and verification badge */}
+                      <div className="flex items-start gap-4 mb-5">
+                        <div className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-900 border-2 border-teal-500/30 shrink-0 shadow-md">
+                          {coach.photoUrl || coach.avatar ? (
+                            <img
+                              src={coach.photoUrl || coach.avatar}
+                              alt={coach.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center font-black text-white text-base">
+                              {coach.name?.substring(0, 2).toUpperCase() || 'TR'}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                              <ShieldCheck size={11} className="text-emerald-600" />
+                              <span>Verified Coach</span>
+                            </span>
+                          </div>
+                          <h4 className="font-heading font-black text-lg text-slate-900 truncate">
+                            {coach.name}
+                          </h4>
+                          <p className="text-xs font-semibold text-teal-600 truncate">
+                            {coach.specialization || coach.specialty || 'Strength & Conditioning'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Bio snippet */}
+                      <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-4">
+                        {coach.bio || 'Certified fitness professional helping athletes and beginners build strength, longevity, and sustainable fitness habits.'}
+                      </p>
+
+                      {/* Experience and City tag */}
+                      <div className="flex items-center gap-2 mb-4 text-[11px] text-slate-500">
+                        <span className="font-bold text-slate-800">
+                          {coach.experience || `${coach.experienceYears || 4} Years`} Exp
+                        </span>
+                        <span>&bull;</span>
+                        <span>{coach.city || 'Pan India'}</span>
+                        <span>&bull;</span>
+                        <span className="flex items-center gap-0.5 text-amber-600 font-bold">
+                          <Star size={12} className="fill-amber-400 text-amber-400" />
+                          <span>{coach.rating || '4.9'}</span>
+                        </span>
+                      </div>
+
+                      {/* Certifications badges */}
+                      {Array.isArray(coach.certifications) && coach.certifications.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-5">
+                          {coach.certifications.slice(0, 2).map((cert, cIdx) => (
+                            <span
+                              key={cIdx}
+                              className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-semibold flex items-center gap-1"
+                            >
+                              <Award size={10} className="text-teal-600" />
+                              <span className="truncate max-w-[130px]">
+                                {typeof cert === 'string' ? cert : cert.title || 'Certified'}
+                              </span>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Button */}
+                    <button
+                      onClick={() =>
+                        onOpenLeadModal({
+                          program: 'Personal Training',
+                          plan: `1-on-1 with Coach ${coach.name}`,
+                        })
+                      }
+                      className="w-full py-2.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer group-hover:shadow-md"
+                    >
+                      <span>Train with {coach.name.split(' ')[0]}</span>
+                      <ArrowRight size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ================= CLOSING STRIP (POP-OUT CTA BANNER) ================= */}
           {/* Outer wrapper: relative with overflow-visible so trainer's head & shoulders pop out */}

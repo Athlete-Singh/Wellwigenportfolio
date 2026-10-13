@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -18,6 +18,11 @@ import {
   ChevronRight,
   ArrowLeft,
   ShieldCheck,
+  // NEW CODE - Wellwigen rejection alert icon
+  AlertCircle,
+  CheckCheck,
+  Trash2,
+  Video,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trainerApi } from '../../../services/trainerApi';
@@ -26,7 +31,52 @@ export default function TrainerLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const trainer = trainerApi.getCurrentTrainer() || {};
+  const [trainer, setTrainer] = useState(() => trainerApi.getCurrentTrainer() || {});
+  
+  // Interactive Notifications State
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState(() => trainerApi.getNotifications());
+
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      setTrainer(trainerApi.getCurrentTrainer() || {});
+    };
+    const handleNotificationsUpdate = () => {
+      setNotifications(trainerApi.getNotifications());
+    };
+
+    window.addEventListener('trainerProfileUpdated', handleProfileUpdate);
+    window.addEventListener('storage', handleProfileUpdate);
+    window.addEventListener('trainerNotificationsUpdated', handleNotificationsUpdate);
+
+    return () => {
+      window.removeEventListener('trainerProfileUpdated', handleProfileUpdate);
+      window.removeEventListener('storage', handleProfileUpdate);
+      window.removeEventListener('trainerNotificationsUpdated', handleNotificationsUpdate);
+    };
+  }, []);
+
+  const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const handleMarkAllAsRead = () => {
+    const updated = trainerApi.markAllNotificationsAsRead();
+    setNotifications(updated);
+  };
+
+  const handleClearAllNotifications = () => {
+    const updated = trainerApi.clearAllNotifications();
+    setNotifications(updated);
+  };
+
+  const handleNotificationClick = (item) => {
+    if (item.unread) {
+      trainerApi.markNotificationAsRead(item.id);
+    }
+    setIsNotificationsOpen(false);
+    if (item.link) {
+      navigate(item.link);
+    }
+  };
 
   const handleLogout = () => {
     trainerApi.logout();
@@ -36,7 +86,9 @@ export default function TrainerLayout({ children }) {
   const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard, route: '/trainer/dashboard' },
     { name: 'My Classes', icon: Dumbbell, route: '/trainer/classes' },
+    /* [DISABLED FOR FUTURE USE] Trainer Clients navigation
     { name: 'Clients', icon: Users, route: '/trainer/clients' },
+    */
     { name: 'Availability', icon: Calendar, route: '/trainer/availability' },
     { name: 'Public Profile', icon: User, route: '/trainer/profile' },
     { name: 'Settings', icon: Settings, route: '/trainer/settings' },
@@ -212,6 +264,7 @@ export default function TrainerLayout({ children }) {
 
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Status Pill */}
+            {/* OLD CODE (commented by AI)
             {isPending ? (
               <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
                 <Clock size={13} className="text-amber-600" />
@@ -221,6 +274,24 @@ export default function TrainerLayout({ children }) {
               <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">
                 <ShieldCheck size={13} className="text-teal-600" />
                 Verified Coach
+              </span>
+            )}
+            */}
+            {/* NEW CODE - Wellwigen 3-state status badge */}
+            {isPending ? (
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                <Clock size={13} className="text-amber-600" />
+                Under Review
+              </span>
+            ) : trainer.status === 'rejected' ? (
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200">
+                <AlertCircle size={13} className="text-rose-600" />
+                Action Required
+              </span>
+            ) : (
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <ShieldCheck size={13} className="text-emerald-600" />
+                Approved Coach
               </span>
             )}
 
@@ -233,7 +304,7 @@ export default function TrainerLayout({ children }) {
               <span>Website</span>
             </Link>
 
-            {/* Notification Bell */}
+            {/* [DISABLED FOR FUTURE USE] Static Notification Bell
             <div className="relative">
               <button
                 className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer"
@@ -242,6 +313,145 @@ export default function TrainerLayout({ children }) {
                 <Bell size={17} />
               </button>
               <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-teal-500" />
+            </div>
+            */}
+
+            {/* NEW CODE - Interactive Notification Bell with Popover Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                className={`w-9 h-9 rounded-xl border transition-all flex items-center justify-center cursor-pointer relative ${
+                  isNotificationsOpen
+                    ? 'border-teal-500 bg-teal-50 text-teal-700 ring-2 ring-teal-500/20'
+                    : 'border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                }`}
+                aria-label="Coach Notifications"
+                title="Notifications & Alerts"
+              >
+                <Bell size={17} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center bg-teal-600 text-white font-black text-[10px] rounded-full shadow-xs">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification Popover Dropdown */}
+              <AnimatePresence>
+                {isNotificationsOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setIsNotificationsOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className="absolute right-0 top-full mt-3 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden"
+                    >
+                      {/* Dropdown Header */}
+                      <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-teal-50/60 to-white">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-teal-600/10 text-teal-700 flex items-center justify-center">
+                            <Bell size={15} />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900 leading-tight">Coach Alerts</h4>
+                            <p className="text-[11px] text-slate-500 font-medium">
+                              {unreadCount > 0 ? `${unreadCount} unread notifications` : 'All caught up'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {unreadCount > 0 && (
+                          <button
+                            type="button"
+                            onClick={handleMarkAllAsRead}
+                            className="text-[11px] font-bold text-teal-600 hover:text-teal-800 hover:underline flex items-center gap-1 cursor-pointer"
+                          >
+                            <CheckCheck size={13} />
+                            <span>Mark all read</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Notification Items List */}
+                      <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
+                        {notifications.length === 0 ? (
+                          <div className="p-8 text-center space-y-2">
+                            <Bell size={28} className="mx-auto text-slate-300" />
+                            <p className="text-xs font-bold text-slate-700">No notifications yet</p>
+                            <p className="text-[11px] text-slate-400">
+                              Upcoming class reminders and profile updates will show up here.
+                            </p>
+                          </div>
+                        ) : (
+                          notifications.map((item) => (
+                            <div
+                              key={item.id}
+                              onClick={() => handleNotificationClick(item)}
+                              className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer hover:bg-slate-50 ${
+                                item.unread ? 'bg-teal-50/40' : 'bg-white'
+                              }`}
+                            >
+                              <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 mt-0.5">
+                                {item.type === 'class' && <Dumbbell size={15} className="text-teal-600" />}
+                                {item.type === 'approval' && <CheckCircle2 size={15} className="text-emerald-600" />}
+                                {item.type === 'zoom' && <Video size={15} className="text-sky-600" />}
+                                {!['class', 'approval', 'zoom'].includes(item.type) && <Sparkles size={15} className="text-amber-600" />}
+                              </div>
+
+                              <div className="flex-1 min-w-0 space-y-0.5">
+                                <div className="flex items-center justify-between gap-1">
+                                  <h5 className={`text-xs font-bold truncate ${item.unread ? 'text-slate-900' : 'text-slate-700'}`}>
+                                    {item.title}
+                                  </h5>
+                                  <span className="text-[10px] text-slate-400 shrink-0 font-medium">
+                                    {item.time}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                                  {item.message}
+                                </p>
+                              </div>
+
+                              {item.unread && (
+                                <span className="w-2 h-2 rounded-full bg-teal-600 shrink-0 mt-1.5" />
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+
+                      {/* Footer Actions */}
+                      <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <Link
+                          to="/trainer/settings"
+                          onClick={() => setIsNotificationsOpen(false)}
+                          className="text-[11px] text-slate-600 hover:text-slate-900 font-bold flex items-center gap-1"
+                        >
+                          <Settings size={12} />
+                          <span>Notification Settings</span>
+                        </Link>
+
+                        {notifications.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={handleClearAllNotifications}
+                            className="text-[11px] text-slate-400 hover:text-rose-600 font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            <Trash2 size={12} />
+                            <span>Clear all</span>
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* User Avatar */}

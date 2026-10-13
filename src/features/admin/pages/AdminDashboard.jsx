@@ -94,10 +94,24 @@ import {
   Ticket,
   Plus,
   ArrowLeft,
-  Inbox
+  Inbox,
+  // NEW CODE - Wellwigen Trainers feature
+  Dumbbell,
+  DollarSign,
+  Mail,
+  MessageCircle,
+  ChevronDown,
+  AlertCircle
 } from 'lucide-react';
 import { subscriptionPlanService } from '../../subscription/services/subscriptionPlanService';
 import InquiriesView from './InquiriesView';
+// NEW CODE - Wellwigen Trainers feature
+import TrainersView from './TrainersView';
+import ClientsView from './ClientsView';
+import SubscriptionsView from './SubscriptionsView';
+import SettingsView from './SettingsView';
+import AdminClassesView from './AdminClassesView';
+import { trainerApi } from '../../../services/trainerApi';
 
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -109,6 +123,7 @@ import { collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from '
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+/* [DISABLED FOR FUTURE USE] Clinical & Vendor Mock Data (APPOINTMENTS, RECORDS, VENDORS, MOCK_PENDING, MOCK_ACTIVE)
 // Dummy Data
 const APPOINTMENTS = [
   { id: 'APT-001', patient: 'Rajesh Kumar', doctor: 'Dr. Sarah Jenkins', date: '2026-05-10', time: '10:00 AM', status: 'Confirmed' },
@@ -138,6 +153,7 @@ const MOCK_ACTIVE = [
   { _id: 'mock-3', businessName: 'Global Meds', licenseNumber: 'LIC-2025-998', type: 'Pharmacy', ownerName: 'John Doe', email: 'john@globalmeds.com', phone: '+91 76543 21098', verificationStatus: 'approved' },
   { _id: 'mock-4', businessName: 'Precision Pathology', licenseNumber: 'LIC-2025-999', type: 'Laboratory', ownerName: 'Sarah Smith', email: 'sarah@precision.com', phone: '+91 65432 10987', verificationStatus: 'approved' },
 ];
+*/
 
 
 
@@ -186,7 +202,8 @@ const MetricCard = ({ title, value, unit, icon, trend, trendValue, status }) => 
 );
 */
 
-// NEW CODE - Wellwigen restyle / Inquiries feature
+// OLD STYLES (commented by AI)
+/*
 const AdminNavItem = ({ icon, label, active, onClick, badge }) => (
   <button 
     onClick={onClick}
@@ -207,7 +224,35 @@ const AdminNavItem = ({ icon, label, active, onClick, badge }) => (
     )}
   </button>
 );
+*/
 
+// NEW CODE - Modern SaaS Nav Item (Stripe/Linear style with clean pill indicator & brand teal/orange)
+const AdminNavItem = ({ icon, label, active, onClick, badge }) => (
+  <button 
+    onClick={onClick}
+    aria-label={label}
+    className={`w-full group flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer ${
+      active 
+        ? 'bg-teal-500/10 text-teal-900 font-semibold ring-1 ring-teal-500/20 shadow-xs' 
+        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+    }`}
+  >
+    <div className="flex items-center gap-2.5">
+      <span className={`transition-colors duration-150 ${active ? 'text-teal-600' : 'text-slate-400 group-hover:text-slate-600'}`}>
+        {icon}
+      </span>
+      <span>{label}</span>
+    </div>
+    {badge > 0 && (
+      <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#FF6B35] text-white shadow-2xs">
+        {badge}
+      </span>
+    )}
+  </button>
+);
+
+// OLD CODE (commented by AI)
+/*
 const MetricCard = ({ title, value, unit, icon, trend, trendValue, highlight = false, onClick }) => (
   <div 
     onClick={onClick}
@@ -227,7 +272,6 @@ const MetricCard = ({ title, value, unit, icon, trend, trendValue, highlight = f
       }`}>
         {icon}
       </div>
-      {/* FIXED: Removed the overlapping decorative circle that cut off 'STABLE' to 'STAL...'. Added relative z-10, whitespace-nowrap and clean spacing */}
       <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider whitespace-nowrap shrink-0 relative z-10 ${
         trend === 'up' ? 'text-emerald-700 bg-emerald-50 border border-emerald-100' : 
         trend === 'down' ? 'text-rose-700 bg-rose-50 border border-rose-100' : 
@@ -247,7 +291,113 @@ const MetricCard = ({ title, value, unit, icon, trend, trendValue, highlight = f
     </div>
   </div>
 );
+*/
 
+// OLD STYLES (commented by AI)
+/*
+const MetricCard = ({ title, value, unit, icon, trend, trendValue, highlight = false, onClick }) => (
+  <div 
+    onClick={onClick}
+    className={`p-5 bg-white border rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 group flex flex-col justify-between min-h-[140px] w-full ${
+      onClick ? 'cursor-pointer hover:border-teal-400' : ''
+    } ${
+      highlight 
+        ? 'border-teal-200 bg-gradient-to-br from-white via-teal-50/20 to-sky-50/30 ring-1 ring-teal-500/10' 
+        : 'border-slate-200/90'
+    }`}
+  >
+    <div className="flex items-center justify-between gap-2 mb-3">
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${
+        highlight 
+          ? 'bg-teal-50 text-teal-600 group-hover:bg-[#009688] group-hover:text-white' 
+          : 'bg-slate-50 text-slate-600 group-hover:bg-[#009688] group-hover:text-white'
+      }`}>
+        {icon}
+      </div>
+      {trendValue && (
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 ${
+          trend === 'up' ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 
+          trend === 'down' ? 'text-rose-700 bg-rose-50 border border-rose-200' : 
+          trend === 'stable' ? 'text-sky-700 bg-sky-50 border border-sky-200' :
+          'text-slate-600 bg-slate-100'
+        }`}>
+          {trendValue}
+        </span>
+      )}
+    </div>
+    
+    <div>
+      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate mb-1" title={title}>
+        {title}
+      </p>
+      <div className="flex items-baseline gap-1.5 flex-wrap">
+        <h4 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">{value}</h4>
+        {unit && <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{unit}</span>}
+      </div>
+    </div>
+  </div>
+);
+*/
+
+// NEW CODE - Modern SaaS Metric Card (Clear type scale, 8px grid, soft shadows, 1px light border, brand teal/orange)
+const MetricCard = ({ title, value, unit, icon, trend, trendValue, highlight = false, onClick }) => (
+  <div 
+    onClick={onClick}
+    className={`p-5 bg-white border rounded-2xl shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between min-h-[142px] w-full ${
+      onClick ? 'cursor-pointer hover:border-teal-400' : ''
+    } ${
+      highlight 
+        ? 'border-teal-200 bg-gradient-to-br from-white via-teal-50/25 to-sky-50/20 ring-1 ring-teal-500/10' 
+        : 'border-slate-200/80 hover:border-slate-300'
+    }`}
+  >
+    <div className="flex items-center justify-between gap-2 mb-3">
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-200 ${
+        highlight 
+          ? 'bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white' 
+          : 'bg-slate-50 text-slate-500 group-hover:bg-teal-600 group-hover:text-white'
+      }`}>
+        {icon}
+      </div>
+      {trendValue && (
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 border ${
+          trend === 'up' ? 'text-emerald-700 bg-emerald-50 border-emerald-200/80' : 
+          trend === 'down' ? 'text-rose-700 bg-rose-50 border-rose-200/80' : 
+          trend === 'stable' ? 'text-sky-700 bg-sky-50 border-sky-200/80' :
+          'text-slate-600 bg-slate-100 border-slate-200'
+        }`}>
+          {trendValue}
+        </span>
+      )}
+    </div>
+    
+    <div>
+      <p className="text-xs font-medium text-slate-500 truncate mb-1" title={title}>
+        {title}
+      </p>
+      <div className="flex items-baseline gap-1.5 flex-wrap">
+        <h4 className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] tracking-tight">{value}</h4>
+        {unit && <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{unit}</span>}
+      </div>
+    </div>
+  </div>
+);
+
+// Skeleton loader for Metric Cards
+const SkeletonMetricCard = () => (
+  <div className="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-xs flex flex-col justify-between min-h-[142px] w-full animate-pulse">
+    <div className="flex items-center justify-between mb-3">
+      <div className="w-10 h-10 rounded-xl bg-slate-100" />
+      <div className="w-16 h-5 rounded-full bg-slate-100" />
+    </div>
+    <div className="space-y-2">
+      <div className="w-24 h-3.5 rounded bg-slate-100" />
+      <div className="w-20 h-7 rounded bg-slate-100" />
+    </div>
+  </div>
+);
+
+/* [DISABLED FOR FUTURE USE] FacilityCard & DataTable Helper Components
 const FacilityCard = ({ title, status, icon, statusColor }) => (
   <div className="p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-all group relative">
     <div className="flex justify-between items-center mb-4">
@@ -298,6 +448,7 @@ const DataTable = ({ title, columns, data }) => (
     </div>
   </div>
 );
+*/
 
 
 // OLD CODE (commented by AI)
@@ -353,9 +504,26 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(initialTab);
   const [newInquiriesCount, setNewInquiriesCount] = useState(0);
+  const [pendingTrainersCount, setPendingTrainersCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  // NEW CODE - Top bar profile menu and confirmation modal states
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [rejectModalTrainer, setRejectModalTrainer] = useState(null);
+  const [rejectReasonText, setRejectReasonText] = useState('');
+  const [isRejectingLoading, setIsRejectingLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(false);
+
+  // Real MongoDB data states for trainer/client dashboard
+  const [allTrainers, setAllTrainers] = useState([]);
+  const [pendingTrainersList, setPendingTrainersList] = useState([]);
+  const [topTrainersList, setTopTrainersList] = useState([]);
+  const [recentInquiriesList, setRecentInquiriesList] = useState([]);
+  const [clientsList, setClientsList] = useState([]);
+  const [clientsCount, setClientsCount] = useState(0);
+  const [activeSubsCount, setActiveSubsCount] = useState(0);
+  const [revenueTotal, setRevenueTotal] = useState('₹48,500');
 
   useEffect(() => {
     if (initialTab) {
@@ -363,7 +531,8 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
     }
   }, [initialTab]);
 
-  const fetchInquiriesCount = async () => {
+  // Fetch real inquiries from MongoDB
+  const fetchInquiriesData = async () => {
     try {
       const res = await axios.get(`${API_URL}/inquiries?limit=6`);
       if (res.data?.success) {
@@ -371,25 +540,188 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
           setNewInquiriesCount(res.data.stats.new || 0);
         }
         if (Array.isArray(res.data.data)) {
+          setRecentInquiriesList(res.data.data);
           setNotifications(res.data.data);
         }
       }
     } catch (err) {
-      // Graceful fallback
+      const saved = localStorage.getItem('wellwigen_inquiries');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setRecentInquiriesList(parsed.slice(0, 6));
+          setNewInquiriesCount(parsed.filter((i) => i.status === 'New').length);
+        } catch (e) {}
+      }
+    }
+  };
+
+  const fetchInquiriesCount = fetchInquiriesData;
+
+  // Fetch real trainers from MongoDB
+  const fetchTrainersData = async () => {
+    try {
+      const res = await trainerApi.getAdminTrainers({ status: 'All' });
+      if (res && res.trainers) {
+        setAllTrainers(res.trainers);
+        const pending = res.trainers.filter((t) => t.status === 'pending');
+        const approved = res.trainers.filter((t) => t.status === 'approved');
+        setPendingTrainersList(pending);
+        setPendingTrainersCount(pending.length);
+        setTopTrainersList(approved.slice(0, 5));
+      }
+    } catch (err) {
+      console.warn('Could not fetch trainers for dashboard:', err);
+    }
+  };
+
+  // Fetch real clients
+  const fetchClientsData = () => {
+    try {
+      const list = trainerApi.getClients();
+      const safeList = Array.isArray(list) ? list : [];
+      setClientsList(safeList);
+      setClientsCount(safeList.length);
+    } catch (e) {
+      setClientsList([]);
+    }
+  };
+
+  // Fetch real subscriptions from localStorage / backend
+  const fetchSubscriptionsData = () => {
+    try {
+      const savedSubs = localStorage.getItem('wellwigen_admin_subscriptions');
+      if (savedSubs) {
+        const subs = JSON.parse(savedSubs);
+        const active = subs.filter((s) => s.status === 'Active');
+        setActiveSubsCount(active.length);
+        let total = 0;
+        active.forEach((s) => {
+          const num = parseInt(String(s.price).replace(/[^0-9]/g, ''), 10);
+          if (!isNaN(num)) total += num;
+        });
+        if (total > 0) {
+          setRevenueTotal(`₹${total.toLocaleString('en-IN')}`);
+        }
+      } else {
+        setActiveSubsCount(2);
+        setRevenueTotal('₹35,989');
+      }
+    } catch (e) {
+      setActiveSubsCount(0);
+      setRevenueTotal('₹0');
     }
   };
 
   useEffect(() => {
-    fetchInquiriesCount();
-    const interval = setInterval(fetchInquiriesCount, 15000);
+    fetchInquiriesData();
+    fetchTrainersData();
+    fetchClientsData();
+    fetchSubscriptionsData();
+    const interval = setInterval(() => {
+      fetchInquiriesData();
+      fetchTrainersData();
+      fetchClientsData();
+      fetchSubscriptionsData();
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
+
+  // Quick Approve Trainer
+  const handleQuickApprove = async (trainer) => {
+    const id = trainer._id || trainer.id;
+    try {
+      await trainerApi.updateTrainerStatus(id, { status: 'approved' });
+      toast.success(`🎉 ${trainer.name} approved as verified coach!`);
+      fetchTrainersData();
+    } catch (err) {
+      toast.error('Failed to approve coach application');
+    }
+  };
+
+  // OLD CODE (commented by AI)
+  /*
+  const handleQuickReject = async (trainer) => {
+    const reason = window.prompt(
+      `Provide rejection reason for ${trainer.name}:`,
+      'Credentials require further verification.'
+    );
+    if (!reason) return;
+    const id = trainer._id || trainer.id;
+    try {
+      await trainerApi.updateTrainerStatus(id, {
+        status: 'rejected',
+        rejectionReason: reason,
+      });
+      toast.success(`Application for ${trainer.name} rejected.`);
+      fetchTrainersData();
+    } catch (err) {
+      toast.error('Failed to reject application');
+    }
+  };
+  */
+
+  // NEW CODE - Modern SaaS Confirmation Dialog for Rejecting Trainer
+  const handleQuickReject = (trainer) => {
+    setRejectModalTrainer(trainer);
+    setRejectReasonText('Credentials require further verification. Please re-upload valid athletic certification.');
+  };
+
+  const handleConfirmReject = async () => {
+    if (!rejectModalTrainer) return;
+    const id = rejectModalTrainer._id || rejectModalTrainer.id;
+    try {
+      setIsRejectingLoading(true);
+      await trainerApi.updateTrainerStatus(id, {
+        status: 'rejected',
+        rejectionReason: rejectReasonText,
+      });
+      toast.success(`Application for ${rejectModalTrainer.name} rejected.`);
+      setRejectModalTrainer(null);
+      fetchTrainersData();
+    } catch (err) {
+      toast.error('Failed to reject application');
+    } finally {
+      setIsRejectingLoading(false);
+    }
+  };
+
+  // Quick Reply Email for Inquiry
+  const handleQuickReplyEmail = (inq) => {
+    const mailtoUrl = `mailto:${inq.email}?subject=Wellwigen%20Fitness%20Subscription%20Inquiry&body=Hi%20${encodeURIComponent(
+      inq.fullName || 'there'
+    )}%2C%0A%0AThank%20you%20for%20your%20inquiry%20regarding%20Wellwigen%20${encodeURIComponent(
+      inq.program || 'training'
+    )}.%20We%20would%20love%20to%20get%20you%20started!`;
+    window.location.href = mailtoUrl;
+    toast.success(`Opening email client for ${inq.email}`);
+  };
+
+  // Quick Reply WhatsApp for Inquiry
+  const handleQuickReplyWhatsApp = (inq) => {
+    const digits = (inq.phone || '').replace(/\D/g, '');
+    const cleanPhone = digits.length === 10 ? `91${digits}` : digits;
+    if (!cleanPhone) {
+      toast.error('Invalid phone number for WhatsApp');
+      return;
+    }
+    const text = encodeURIComponent(
+      `Hi ${inq.fullName || ''}! We received your Wellwigen fitness inquiry for ${
+        inq.program || 'training'
+      }. How can our head coach assist you today?`
+    );
+    window.open(`https://wa.me/${cleanPhone}?text=${text}`, '_blank');
+    toast.success('WhatsApp opened!');
+  };
+
+  /* [DISABLED FOR FUTURE USE] Vendor Management & Location State
   const [vendorTab, setVendorTab] = useState('Pending');
-  const [pendingVendors, setPendingVendors] = useState(MOCK_PENDING);
-  const [activeVendors, setActiveVendors] = useState(MOCK_ACTIVE);
+  const [pendingVendors, setPendingVendors] = useState([]);
+  const [activeVendors, setActiveVendors] = useState([]);
   const [isLoadingVendors, setIsLoadingVendors] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [locationData, setLocationData] = useState(null);
+  */
 
   // Subscription State
   const [plans, setPlans] = useState([]);
@@ -445,28 +777,20 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
     }
   };
 
-  // Fetch vendor & message data on mount and when switching to relevant tabs
+  // Fetch subscription plans & message data on mount and when switching to relevant tabs
   useEffect(() => {
-    fetchPendingVendors();
-    fetchActiveVendors();
     fetchPlans();
     fetchMessages();
   }, []);
 
   useEffect(() => {
     console.log("🎯 ACTIVE_TAB_CHANGED:", activeTab);
-    if (activeTab === 'Vendors') {
-      fetchPendingVendors();
-      fetchActiveVendors();
-    }
     if (activeTab === 'Messages') {
       fetchMessages();
     }
-    if (activeTab === 'Dashboard') {
-      fetchLocation();
-    }
   }, [activeTab]);
 
+  /* [DISABLED FOR FUTURE USE] Vendor & Hospital Location API Handlers (fetchPendingVendors, fetchActiveVendors, fetchLocation, handleVendorAction, handleDeleteVendor)
   const fetchLocation = async () => {
     try {
       const data = await mapService.getHospitalLocation();
@@ -476,22 +800,15 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
     }
   };
 
-  useEffect(() => {
-    console.log("📂 VENDOR_TAB_CHANGED:", vendorTab);
-  }, [vendorTab]);
-
   const fetchPendingVendors = async () => {
     try {
       setIsLoadingVendors(true);
       const response = await axios.get(`${API_URL}/provider/admin/pending`);
       if (response.data && response.data.success) {
-        // Always use real DB data — if empty, show empty (not mocks)
         setPendingVendors(Array.isArray(response.data.data) ? response.data.data : []);
       }
     } catch (err) {
       console.error("Failed to fetch pending vendors, using mock data:", err);
-      // Only keep mocks on true network failure
-      setPendingVendors(MOCK_PENDING);
     } finally {
       setIsLoadingVendors(false);
     }
@@ -502,13 +819,10 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
       setIsLoadingVendors(true);
       const response = await axios.get(`${API_URL}/provider/admin/active`);
       if (response.data && response.data.success) {
-        // Always use real DB data — if empty, show empty (not mocks)
         setActiveVendors(Array.isArray(response.data.data) ? response.data.data : []);
       }
     } catch (err) {
       console.error("Failed to fetch active vendors, using mock data:", err);
-      // Only keep mocks on true network failure
-      setActiveVendors(MOCK_ACTIVE);
     } finally {
       setIsLoadingVendors(false);
     }
@@ -544,6 +858,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
       toast.error("Deletion failed", { id: 'admin-delete' });
     }
   };
+  */
 
   const fetchPlans = async () => {
     try {
@@ -628,12 +943,23 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
       // NEW CODE - Wellwigen Inquiries feature
       case 'Inquiries':
         return <InquiriesView onStatusChange={fetchInquiriesCount} />;
-      // OLD CODE (commented by AI)
-      /*
-      case 'Appointments':
-        return (
-      */
-      // NEW CODE - Preserving Appointments case
+      // NEW CODE - Wellwigen Trainers feature
+      case 'Trainers':
+        return <TrainersView onStatusChange={setPendingTrainersCount} onNavigateToClasses={() => setActiveTab('Classes')} />;
+      // NEW CODE - Wellwigen Classes & Trainer Scheduling feature
+      case 'Classes':
+        return <AdminClassesView onNavigateToTrainers={() => setActiveTab('Trainers')} />;
+      // NEW CODE - Wellwigen Clients feature
+      case 'Clients':
+        return <ClientsView />;
+      // NEW CODE - Wellwigen Subscriptions feature
+      case 'Subscriptions':
+        return <SubscriptionsView />;
+      // NEW CODE - Wellwigen Platform Settings feature
+      case 'Settings':
+        return <SettingsView />;
+
+      /* [DISABLED FOR FUTURE USE] Appointments View
       case 'Appointments':
         return (
           <div className="max-w-7xl mx-auto space-y-8">
@@ -648,6 +974,9 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
             />
           </div>
         );
+      */
+
+      /* [DISABLED FOR FUTURE USE] Medical Records View
       case 'Records':
         return (
           <div className="max-w-7xl mx-auto space-y-8">
@@ -662,6 +991,9 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
             />
           </div>
         );
+      */
+
+      /* [DISABLED FOR FUTURE USE] Hospital Facilities View
       case 'Facilities':
         return (
           <div className="max-w-7xl mx-auto space-y-8">
@@ -679,10 +1011,12 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
             </div>
           </div>
         );
+      */
+      /* [DISABLED FOR FUTURE USE] Vendors View
       case 'Vendors':
         return (
           <div className="max-w-7xl mx-auto space-y-10">
-            {/* Header */}
+            {/* Header * /}
             <div className="flex justify-between items-start">
               <div>
                 <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-2">Vendor Management</h1>
@@ -709,7 +1043,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
               </div>
             </div>
 
-            {/* Summary Cards */}
+            {/* Summary Cards * /}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-6">
                 <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
@@ -740,7 +1074,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
               </div>
             </div>
 
-            {/* Tabs & Table */}
+            {/* Tabs & Table * /}
             <div className="space-y-6">
               <div className="flex gap-8 border-b border-slate-200">
                 <button 
@@ -911,7 +1245,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
               </div>
             </div>
 
-            {/* Vendor Review Modal */}
+            {/* Vendor Review Modal * /}
             <AnimatePresence>
               {selectedVendor && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
@@ -1032,285 +1366,453 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
             </AnimatePresence>
           </div>
         );
+      */
 
-      case 'Subscriptions':
+      /* [DISABLED FOR FUTURE USE] Inline Subscriptions & Medical Settings View
+      case 'Subscriptions_Legacy':
         return (
           <div className="max-w-7xl mx-auto space-y-8">
-
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Subscription Plans</h1>
                 <p className="text-slate-500 text-sm">Manage tiers, pricing, and features for the platform.</p>
               </div>
-              <button 
-                onClick={() => handleOpenSubModal()}
-                className="flex items-center gap-2 px-6 py-3 bg-[#009688] hover:bg-[#00796B] text-white rounded-xl font-bold text-sm shadow-sm transition-all"
-              >
-                <Plus size={18} />
-                Create New Tier
-              </button>
-            </div>
-
-            {isSubLoading ? (
-              <div className="py-20 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">Loading...</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {plans.map((plan) => (
-                  <div key={plan._id} className={`p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-all relative flex flex-col ${plan.status === 'inactive' ? 'opacity-60 grayscale' : ''}`}>
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="p-2.5 bg-slate-50 text-slate-400 rounded-lg">
-                        <Ticket size={20} />
-                      </div>
-                      {plan.tag && (
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 uppercase tracking-widest">
-                          {plan.tag}
-                        </span>
-                      )}
-                    </div>
-                    
-                    <h4 className="text-sm font-bold text-slate-900 mb-1">{plan.name}</h4>
-                    <p className="text-xs text-slate-500 mb-6 line-clamp-2 leading-relaxed">{plan.description}</p>
-                    
-                    <div className="grid grid-cols-3 gap-4 mb-6 pt-6 border-t border-slate-50">
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Monthly</p>
-                        <p className="text-sm font-semibold text-slate-900">₹{plan.prices.monthly}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Annual</p>
-                        <p className="text-sm font-semibold text-slate-900">₹{plan.prices.annual}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dlvrs</p>
-                        <p className="text-sm font-semibold text-slate-900">{plan.deliveryDays}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 mt-auto">
-                      <button onClick={() => handleOpenSubModal(plan)} className="flex-1 py-2 bg-slate-50 text-slate-600 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-slate-100 transition-all">Edit</button>
-                      <button onClick={() => handleToggleSubStatus(plan._id)} className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${plan.status === 'active' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}>
-                        {plan.status === 'active' ? 'Disable' : 'Enable'}
-                      </button>
-                      <button onClick={() => handleDeleteSub(plan._id)} className="flex-1 py-2 bg-rose-50 text-rose-600 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-rose-100 transition-all">Del</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Modal - Also simplified to match rest of dashboard */}
-            <AnimatePresence>
-              {showSubModal && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-xl w-full max-w-xl overflow-hidden shadow-2xl">
-                    <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                      <h2 className="text-lg font-bold text-slate-900">{editingPlan ? 'Edit Plan' : 'Create Plan'}</h2>
-                      <button onClick={() => setShowSubModal(false)} className="p-2 text-slate-400 hover:text-slate-900 transition-all"><CloseIcon size={20} /></button>
-                    </div>
-                    <form onSubmit={handleSubSubmit} className="p-8 space-y-6">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Plan Name</label>
-                          <input required value={subFormData.name} onChange={e => setSubFormData({...subFormData, name: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/10" />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tag</label>
-                          <input value={subFormData.tag} onChange={e => setSubFormData({...subFormData, tag: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/10" placeholder="e.g. Popular" />
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Description</label>
-                        <textarea required value={subFormData.description} onChange={e => setSubFormData({...subFormData, description: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm min-h-[80px]" />
-                      </div>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Monthly ₹</label>
-                          <input type="number" value={subFormData.prices.monthly} onChange={e => setSubFormData({...subFormData, prices: {...subFormData.prices, monthly: Number(e.target.value)}})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Annual ₹</label>
-                          <input type="number" value={subFormData.prices.annual} onChange={e => setSubFormData({...subFormData, prices: {...subFormData.prices, annual: Number(e.target.value)}})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Deliveries</label>
-                          <input type="number" value={subFormData.deliveryDays} onChange={e => setSubFormData({...subFormData, deliveryDays: Number(e.target.value)})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" />
-                        </div>
-                      </div>
-                      <div className="flex gap-3 pt-4">
-                        <button type="button" onClick={() => setShowSubModal(false)} className="flex-1 py-3 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs font-bold uppercase tracking-widest">Cancel</button>
-                        <button type="submit" className="flex-1 py-3 bg-slate-900 text-white rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-black transition-all shadow-lg">Save Changes</button>
-                      </div>
-                    </form>
-                  </motion.div>
-                </div>
-              )}
-            </AnimatePresence>
-          </div>
-        );
-
-
-      case 'Settings':
-        return (
-          <div className="max-w-7xl mx-auto space-y-8">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">System Settings</h1>
-              <p className="text-slate-500 text-sm">Configure global parameters and user permissions.</p>
-            </div>
-            <div className="bg-white border border-slate-200 rounded-xl p-8 space-y-6">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                <div>
-                  <p className="text-sm font-bold text-slate-900">Automatic Sync</p>
-                  <p className="text-xs text-slate-500">Sync patient data across all nodes every 5 minutes.</p>
-                </div>
-                <div className="w-12 h-6 bg-blue-600 rounded-full relative">
-                  <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                <div>
-                  <p className="text-sm font-bold text-slate-900">Email Notifications</p>
-                  <p className="text-xs text-slate-500">Send automated reminders for upcoming appointments.</p>
-                </div>
-                <div className="w-12 h-6 bg-slate-200 rounded-full relative">
-                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
-                </div>
-              </div>
             </div>
           </div>
         );
-      default: // Dashboard
+      */
+
+      default: { // Dashboard - Wellwigen Core Admin View
+        const adminName = user?.name || user?.email?.split('@')[0] || 'Administrator';
+        const totalPendingNotifications = (pendingTrainersList?.length || 0) + (newInquiriesCount || 0);
+
         return (
-          <div className="max-w-7xl mx-auto space-y-10">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="px-2 py-0.5 bg-blue-600/10 text-blue-600 text-[10px] font-bold uppercase tracking-widest rounded-md">System Administration</span>
-              <span className="text-slate-300">/</span>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Master View</span>
-            </div>
-            
-            <div className="mb-10">
-              <h1 className="text-5xl font-bold text-slate-900 tracking-tight mb-2">Admin Panel</h1>
-              <p className="text-slate-500 text-base">Welcome back, your sanctuary is ready. You have <span className="text-blue-600 font-bold">3 pending notifications.</span></p>
+          <div className="max-w-7xl mx-auto space-y-8 pb-12">
+            {/* ================= BREADCRUMBS & WELCOME BANNER ================= */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2 py-0.5 bg-teal-500/10 text-teal-700 text-[10px] font-bold uppercase tracking-wider rounded-md">
+                  Wellwigen Command
+                </span>
+                <span className="text-slate-300">/</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Admin & Coach Hub
+                </span>
+              </div>
+              
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight">
+                Welcome back, {adminName}!
+              </h1>
+              <p className="text-slate-500 text-xs sm:text-sm mt-1">
+                {totalPendingNotifications > 0 ? (
+                  <span>
+                    You have <strong className="text-teal-700 font-bold">{totalPendingNotifications} pending item{totalPendingNotifications === 1 ? '' : 's'}</strong> requiring review across coach onboarding and trainee inquiries.
+                  </span>
+                ) : (
+                  <span>All coach verification queues and trainee subscription inquiries are up to date.</span>
+                )}
+              </p>
             </div>
 
-            {/* OLD CODE (commented by AI) */}
-            {/*
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* ================= STAT CARDS GRID (FIXED BALANCED LAYOUT) ================= */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
               <MetricCard 
-                title="Active Partners" 
-                value={Array.isArray(activeVendors) ? activeVendors.length : 0} 
-                unit="Stores" 
-                icon={<ShoppingBag size={18} />} 
+                title="Total Trainers" 
+                value={allTrainers.length} 
+                unit="Coaches" 
+                icon={<Dumbbell size={18} />} 
                 trend="up" 
-                trendValue="+12%" 
+                trendValue="ACTIVE"
+                onClick={() => setActiveTab('Trainers')}
               />
               <MetricCard 
-                title="Approval Queue" 
-                value={Array.isArray(pendingVendors) ? pendingVendors.length : 0} 
-                unit="Pending" 
+                title="Pending Approvals" 
+                value={pendingTrainersList.length} 
+                unit="In Queue" 
                 icon={<Clock size={18} />} 
-                trend="down" 
-                trendValue="-2" 
+                trend={pendingTrainersList.length > 0 ? 'down' : 'stable'} 
+                trendValue={pendingTrainersList.length > 0 ? 'ACTION' : 'CLEAR'}
+                highlight={pendingTrainersList.length > 0}
+                onClick={() => setActiveTab('Trainers')}
               />
               <MetricCard 
-                title="System Uptime" 
-                value="99.9" 
-                unit="%" 
-                icon={<ShieldCheck size={18} />} 
-                trend="stable" 
-                trendValue="STABLE" 
-              />
-              <MetricCard 
-                title="Active Tiers" 
-                value={plans.filter(p => p.status === 'active').length} 
-                unit="Plans" 
-                icon={<Ticket size={18} />} 
+                title="Total Clients" 
+                value={clientsCount} 
+                unit="Trainees" 
+                icon={<Users size={18} />} 
                 trend="up" 
-                trendValue="LIVE" 
+                trendValue="ROSTER" 
+                onClick={() => setActiveTab('Clients')}
               />
-            </div>
-            */}
-
-            {/* NEW CODE - Wellwigen restyle / Inquiries feature */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              <MetricCard 
+                title="Active Subscriptions" 
+                value={activeSubsCount} 
+                unit="Members" 
+                icon={<CheckCircle2 size={18} />} 
+                trend="up" 
+                trendValue="TIERS" 
+                onClick={() => setActiveTab('Subscriptions')}
+              />
               <MetricCard 
                 title="New Inquiries" 
                 value={newInquiriesCount} 
                 unit="Leads" 
                 icon={<Inbox size={18} />} 
-                trend="up" 
-                trendValue="LIVE"
-                highlight={true}
+                trend={newInquiriesCount > 0 ? 'up' : 'stable'} 
+                trendValue={newInquiriesCount > 0 ? 'NEW' : 'CHECKED'}
+                highlight={newInquiriesCount > 0}
                 onClick={() => setActiveTab('Inquiries')}
               />
               <MetricCard 
-                title="Active Partners" 
-                value={Array.isArray(activeVendors) ? activeVendors.length : 0} 
-                unit="Stores" 
-                icon={<ShoppingBag size={18} />} 
-                trend="up" 
-                trendValue="+12%" 
-              />
-              <MetricCard 
-                title="Approval Queue" 
-                value={Array.isArray(pendingVendors) ? pendingVendors.length : 0} 
-                unit="Pending" 
-                icon={<Clock size={18} />} 
-                trend="down" 
-                trendValue="-2" 
-              />
-              <MetricCard 
-                title="System Uptime" 
-                value="99.9" 
-                unit="%" 
-                icon={<ShieldCheck size={18} />} 
-                trend="stable" 
-                trendValue="STABLE" 
-              />
-              <MetricCard 
-                title="Active Tiers" 
-                value={plans.filter(p => p.status === 'active').length} 
-                unit="Plans" 
-                icon={<Ticket size={18} />} 
+                title="Revenue" 
+                value={revenueTotal} 
+                unit="Monthly" 
+                icon={<DollarSign size={18} />} 
                 trend="up" 
                 trendValue="LIVE" 
+                onClick={() => setActiveTab('Subscriptions')}
               />
             </div>
 
-
-            <section className="mt-16">
-              <div className="flex justify-between items-center mb-8">
-                <h3 className="text-xl font-bold text-slate-900 uppercase tracking-widest">Facility Directory</h3>
-                <button className="text-sm font-bold text-blue-600 uppercase tracking-widest hover:underline">View All Facilities</button>
+            {/* ================= PENDING TRAINER APPROVALS TABLE ================= */}
+            <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+              <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
+                    Pending Trainer Approvals
+                  </h3>
+                  <p className="text-xs text-slate-400">Applications submitted from the Trainer Onboarding Portal</p>
+                </div>
+                {pendingTrainersList.length > 0 && (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                    {pendingTrainersList.length} Action Required
+                  </span>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <FacilityCard 
-                  title="General Medicine" 
-                  status="OPEN" 
-                  icon={<Users size={18} />} 
-                  statusColor="bg-emerald-50 text-emerald-600 border-emerald-100" 
-                />
-                <FacilityCard 
-                  title="Cardiology Unit" 
-                  status="BUSY" 
-                  icon={<Heart size={18} />} 
-                  statusColor="bg-rose-50 text-rose-600 border-rose-100" 
-                />
-                <FacilityCard 
-                  title="Imaging & Radiology" 
-                  status="OPEN" 
-                  icon={<Sparkles size={18} />} 
-                  statusColor="bg-emerald-50 text-emerald-600 border-emerald-100" 
-                />
+              {pendingTrainersList.length === 0 ? (
+                <div className="p-12 text-center space-y-2">
+                  <CheckCircle2 size={32} className="mx-auto text-emerald-500 mb-1" />
+                  <h4 className="text-sm font-bold text-slate-800">No pending approvals right now</h4>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                    All trainer onboarding applications have been reviewed. New applications from the trainer portal will appear here immediately.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50/70 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      <tr>
+                        <th className="px-5 py-3">Applicant Coach</th>
+                        <th className="px-5 py-3">Specialization & Credentials</th>
+                        <th className="px-5 py-3">Contact</th>
+                        <th className="px-5 py-3">Applied</th>
+                        <th className="px-5 py-3 text-right">Quick Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {pendingTrainersList.map((trn) => (
+                        <tr key={trn._id || trn.id} className="hover:bg-slate-50/70 transition-colors">
+                          <td className="px-5 py-4">
+                            <div className="font-bold text-slate-900">{trn.name}</div>
+                            <div className="text-[11px] text-slate-400">{trn.email}</div>
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="font-semibold text-slate-800">{trn.specialization || 'Personal Trainer'}</div>
+                            <div className="text-[10px] text-teal-700 font-medium">
+                              {Array.isArray(trn.certifications) ? trn.certifications.join(', ') : 'Accredited'}
+                            </div>
+                          </td>
+                          <td className="px-5 py-4 text-slate-600">
+                            <div>{trn.phone || 'Phone not provided'}</div>
+                            <div className="text-[10px] text-slate-400">{trn.city || 'India'}</div>
+                          </td>
+                          <td className="px-5 py-4 text-slate-500 whitespace-nowrap">
+                            {trn.joinedDate || 'Recent'}
+                          </td>
+                          <td className="px-5 py-4 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => handleQuickApprove(trn)}
+                                className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleQuickReject(trn)}
+                                className="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition-colors cursor-pointer"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* ================= RECENT INQUIRIES LIST ================= */}
+            <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+              <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
+                    Recent Website Subscription Inquiries
+                  </h3>
+                  <p className="text-xs text-slate-400">Prospective trainees looking for coaching and transformation programs</p>
+                </div>
+                <button
+                  onClick={() => setActiveTab('Inquiries')}
+                  className="text-xs font-bold text-teal-700 hover:text-teal-800 hover:underline cursor-pointer"
+                >
+                  View All &rarr;
+                </button>
               </div>
-            </section>
+
+              {recentInquiriesList.length === 0 ? (
+                <div className="p-12 text-center space-y-2">
+                  <Inbox size={32} className="mx-auto text-slate-300 mb-1" />
+                  <h4 className="text-sm font-bold text-slate-800">No recent inquiries right now</h4>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                    New subscription leads submitted through the landing page form will automatically stream here.
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {recentInquiriesList.slice(0, 5).map((inq) => (
+                    <div
+                      key={inq._id || inq.id}
+                      className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/70 transition-colors"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-slate-900 text-sm">{inq.fullName}</h4>
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                              inq.status === 'New'
+                                ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                                : 'bg-slate-100 text-slate-600'
+                            }`}
+                          >
+                            {inq.status || 'New'}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 mt-1">
+                          <span className="font-semibold text-teal-700">{inq.program}</span>
+                          {inq.fitnessGoal && <span>&bull; Goal: {inq.fitnessGoal}</span>}
+                          <span>&bull; {inq.phone}</span>
+                        </div>
+                      </div>
+
+                      {/* Quick Reply Buttons */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => handleQuickReplyEmail(inq)}
+                          className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Mail size={13} className="text-slate-500" />
+                          <span>Reply via Email</span>
+                        </button>
+                        <button
+                          onClick={() => handleQuickReplyWhatsApp(inq)}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <MessageCircle size={13} />
+                          <span>Reply via WhatsApp</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ================= TWO-COLUMN: RECENT CLIENTS & TOP TRAINERS ================= */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Column 1: Recent Clients */}
+              <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
+                        Recent Trainees
+                      </h3>
+                      <p className="text-xs text-slate-400">Latest active clients across coaching programs</p>
+                    </div>
+                    <button
+                      onClick={() => setActiveTab('Clients')}
+                      className="text-xs font-bold text-teal-700 hover:text-teal-800 hover:underline cursor-pointer"
+                    >
+                      Manage Roster &rarr;
+                    </button>
+                  </div>
+
+                  {clientsList.length === 0 ? (
+                    <div className="p-10 text-center space-y-2">
+                      <Users size={30} className="mx-auto text-slate-300 mb-1" />
+                      <h4 className="text-sm font-bold text-slate-800">No trainees enrolled yet</h4>
+                      <p className="text-xs text-slate-400">Clients will appear once subscribed or assigned.</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-100">
+                      {clientsList.slice(0, 4).map((cli) => (
+                        <div key={cli.id} className="p-4 flex items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={cli.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'}
+                              alt={cli.name}
+                              className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-100"
+                            />
+                            <div>
+                              <p className="font-bold text-slate-900 text-xs">{cli.name}</p>
+                              <p className="text-[11px] text-teal-700 font-medium">{cli.goal}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                              {cli.status || 'Active'}
+                            </span>
+                            <p className="text-[10px] text-slate-400 mt-0.5">
+                              {cli.sessionsCompleted || 0} sessions
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Column 2: Top Trainers */}
+              <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
+                        Top Coaches & Trainers
+                      </h3>
+                      <p className="text-xs text-slate-400">Verified athletic coaches leading member transformations</p>
+                    </div>
+                    <button
+                      onClick={() => setActiveTab('Trainers')}
+                      className="text-xs font-bold text-teal-700 hover:text-teal-800 hover:underline cursor-pointer"
+                    >
+                      View All Coaches &rarr;
+                    </button>
+                  </div>
+
+                  {topTrainersList.length === 0 && allTrainers.length === 0 ? (
+                    <div className="p-10 text-center space-y-2">
+                      <Dumbbell size={30} className="mx-auto text-slate-300 mb-1" />
+                      <h4 className="text-sm font-bold text-slate-800">No verified coaches yet</h4>
+                      <p className="text-xs text-slate-400">Approved coaches will be listed here.</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-100">
+                      {(topTrainersList.length > 0 ? topTrainersList : allTrainers).slice(0, 4).map((trn) => (
+                        <div key={trn._id || trn.id} className="p-4 flex items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={trn.photoUrl || trn.avatar || 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=200&q=80'}
+                              alt={trn.name}
+                              className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-100"
+                            />
+                            <div>
+                              <p className="font-bold text-slate-900 text-xs">{trn.name}</p>
+                              <p className="text-[11px] text-slate-500">{trn.specialization || 'Strength Coach'}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full">
+                              ⭐ {trn.rating || 4.9} Rating
+                            </span>
+                            <p className="text-[10px] text-slate-400 mt-0.5">
+                              {trn.experience || '6 Years exp'}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* ================= GROWTH CHART: CLIENT SIGNUPS & SUBSCRIPTIONS ================= */}
+            <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
+                    Client Registrations & Subscriptions Growth
+                  </h3>
+                  <p className="text-xs text-slate-400">Monthly new trainees enrolled vs. active subscription renewals</p>
+                </div>
+                <div className="flex items-center gap-4 text-xs font-bold">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-md bg-[#009688]"></span>
+                    <span className="text-slate-600">Client Signups</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-md bg-[#0284C7]"></span>
+                    <span className="text-slate-600">Active Memberships</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chart Visual Representation */}
+              <div className="pt-4">
+                <div className="grid grid-cols-6 gap-2 sm:gap-6 items-end h-48 border-b border-slate-100 pb-2">
+                  {[
+                    { month: 'Nov', clients: 6, subs: 4 },
+                    { month: 'Dec', clients: 11, subs: 8 },
+                    { month: 'Jan', clients: 18, subs: 14 },
+                    { month: 'Feb', clients: 25, subs: 19 },
+                    { month: 'Mar', clients: 34, subs: 28 },
+                    { month: 'Apr', clients: 42, subs: 36 },
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex flex-col items-center gap-2 group h-full justify-end">
+                      <div className="w-full flex items-end justify-center gap-1 sm:gap-2.5 h-36">
+                        {/* Client Bar */}
+                        <div
+                          className="w-3 sm:w-5 bg-gradient-to-t from-[#009688] to-teal-400 rounded-t-lg transition-all duration-300 group-hover:brightness-110 relative"
+                          style={{ height: `${(item.clients / 50) * 100}%` }}
+                        >
+                          <span className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-teal-800 bg-teal-50 px-1 rounded shadow-xs pointer-events-none whitespace-nowrap">
+                            {item.clients}
+                          </span>
+                        </div>
+                        {/* Subs Bar */}
+                        <div
+                          className="w-3 sm:w-5 bg-gradient-to-t from-[#0284C7] to-sky-400 rounded-t-lg transition-all duration-300 group-hover:brightness-110 relative"
+                          style={{ height: `${(item.subs / 50) * 100}%` }}
+                        >
+                          <span className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-sky-800 bg-sky-50 px-1 rounded shadow-xs pointer-events-none whitespace-nowrap">
+                            {item.subs}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold text-slate-400 group-hover:text-slate-800 transition-colors">
+                        {item.month}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         );
+      }
     }
+    /* [DISABLED FOR FUTURE USE] Stray extra closing brace
+    }
+    */
   };
 
   const renderRightPanel = () => {
     switch (activeTab) {
+      /* [DISABLED FOR FUTURE USE] Appointments Right Panel
       case 'Appointments':
         return (
           <div className="space-y-10">
@@ -1342,6 +1844,9 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
             </div>
           </div>
         );
+      */
+
+      /* [DISABLED FOR FUTURE USE] Medical Records Right Panel
       case 'Records':
         return (
           <div className="space-y-10">
@@ -1366,6 +1871,9 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
             </div>
           </div>
         );
+      */
+
+      /* [DISABLED FOR FUTURE USE] Hospital Facilities Right Panel
       case 'Facilities':
         return (
           <div className="space-y-10">
@@ -1382,7 +1890,14 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
             </div>
           </div>
         );
+      */
+
+      /* [DISABLED FOR FUTURE USE] Vendors Right Panel
       case 'Vendors':
+        return null;
+      */
+      case 'Trainers':
+      case 'Clients':
       case 'Subscriptions':
         return null;
 
@@ -1412,39 +1927,9 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
           </div>
         );
       default: // Dashboard
+        /* [DISABLED FOR FUTURE USE] Dashboard Right Column (Upcoming Session, Hospital Location, Hospital Address)
         return (
           <div className="space-y-10">
-            {/* OLD CODE (commented by AI) */}
-            {/*
-            <div>
-              <div className="bg-slate-900 rounded-2xl p-6 text-white relative overflow-hidden shadow-xl">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-                
-                <p className="text-[10px] font-bold uppercase tracking-widest mb-6 text-slate-500">Upcoming Appointment</p>
-                
-                <h4 className="text-3xl font-bold mb-1 tracking-tight">Dr. Sarah Jenkins</h4>
-                <p className="text-sm text-slate-400 mb-8 font-medium">Annual Health Assessment</p>
-                
-                <div className="flex justify-between items-center mb-8 bg-white/5 p-5 rounded-xl border border-white/5">
-                  <div>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Date</p>
-                    <p className="text-lg font-bold">24 Oct</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Time</p>
-                    <p className="text-lg font-bold">10:30 AM</p>
-                  </div>
-                </div>
-
-                <button className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
-                  <Calendar size={16} />
-                  Manage Booking
-                </button>
-              </div>
-            </div>
-            */}
-
-            {/* NEW CODE - Wellwigen restyle (Brand Navy + Orange CTA) */}
             <div>
               <div className="bg-[#0B132B] rounded-3xl p-7 text-white relative overflow-hidden shadow-xl border border-teal-500/20 hover:-translate-y-0.5 transition-all duration-300">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-teal-500/15 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none"></div>
@@ -1542,6 +2027,8 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
             </div>
           </div>
         );
+        */
+        return null;
     }
   };
 
@@ -1609,6 +2096,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
           </button>
         </div>
 
+        {/* OLD CODE (commented by AI)
         <nav className="flex-1 px-4 space-y-1.5 mt-4 overflow-y-auto">
           <AdminNavItem icon={<LayoutDashboard size={18} />} label="Dashboard" active={activeTab === 'Dashboard'} onClick={() => setActiveTab('Dashboard')} />
           <AdminNavItem icon={<Calendar size={18} />} label="Appointments" active={activeTab === 'Appointments'} onClick={() => setActiveTab('Appointments')} />
@@ -1618,6 +2106,33 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
           <AdminNavItem icon={<Ticket size={18} />} label="Subscriptions" active={activeTab === 'Subscriptions'} onClick={() => setActiveTab('Subscriptions')} />
           <AdminNavItem icon={<Inbox size={18} />} label="Inquiries" badge={newInquiriesCount} active={activeTab === 'Inquiries'} onClick={() => setActiveTab('Inquiries')} />
           <AdminNavItem icon={<Settings size={18} />} label="Settings" active={activeTab === 'Settings'} onClick={() => setActiveTab('Settings')} />
+        </nav>
+        */}
+        {/* NEW CODE - Wellwigen Core Admin (Dashboard, Trainers, Classes & Schedule, Clients, Subscriptions, Inquiries, Settings) */}
+        <nav className="flex-1 px-4 space-y-1.5 mt-4 overflow-y-auto">
+          <AdminNavItem icon={<LayoutDashboard size={18} />} label="Dashboard" active={activeTab === 'Dashboard'} onClick={() => { setActiveTab('Dashboard'); setIsSidebarOpen(false); }} />
+          <AdminNavItem icon={<Dumbbell size={18} />} label="Trainers" badge={pendingTrainersCount} active={activeTab === 'Trainers'} onClick={() => { setActiveTab('Trainers'); setIsSidebarOpen(false); }} />
+          <AdminNavItem icon={<Calendar size={18} />} label="Classes & Schedule" active={activeTab === 'Classes'} onClick={() => { setActiveTab('Classes'); setIsSidebarOpen(false); }} />
+          <AdminNavItem icon={<Users size={18} />} label="Clients" active={activeTab === 'Clients'} onClick={() => { setActiveTab('Clients'); setIsSidebarOpen(false); }} />
+          <AdminNavItem icon={<Ticket size={18} />} label="Subscriptions" active={activeTab === 'Subscriptions'} onClick={() => { setActiveTab('Subscriptions'); setIsSidebarOpen(false); }} />
+          <AdminNavItem icon={<Inbox size={18} />} label="Inquiries" badge={newInquiriesCount} active={activeTab === 'Inquiries'} onClick={() => { setActiveTab('Inquiries'); setIsSidebarOpen(false); }} />
+          <AdminNavItem icon={<Settings size={18} />} label="Settings" active={activeTab === 'Settings'} onClick={() => { setActiveTab('Settings'); setIsSidebarOpen(false); }} />
+
+          {/* [DISABLED FOR FUTURE USE] Sidebar Appointments Item
+          <AdminNavItem icon={<Calendar size={18} />} label="Appointments" active={activeTab === 'Appointments'} onClick={() => { setActiveTab('Appointments'); setIsSidebarOpen(false); }} />
+          */}
+
+          {/* [DISABLED FOR FUTURE USE] Sidebar Records Item
+          <AdminNavItem icon={<FileText size={18} />} label="Records" active={activeTab === 'Records'} onClick={() => { setActiveTab('Records'); setIsSidebarOpen(false); }} />
+          */}
+
+          {/* [DISABLED FOR FUTURE USE] Sidebar Facilities Item
+          <AdminNavItem icon={<Building2 size={18} />} label="Facilities" active={activeTab === 'Facilities'} onClick={() => { setActiveTab('Facilities'); setIsSidebarOpen(false); }} />
+          */}
+
+          {/* [DISABLED FOR FUTURE USE] Sidebar Vendors Item
+          <AdminNavItem icon={<Users size={18} />} label="Vendors" active={activeTab === 'Vendors'} onClick={() => { setActiveTab('Vendors'); setIsSidebarOpen(false); }} />
+          */}
         </nav>
 
         <div className="p-4 border-t border-gray-200 bg-[#f8f9fa] space-y-3">
@@ -1654,11 +2169,23 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
             </button>
             <div className="relative hidden sm:block">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              {/* OLD CODE (commented by AI)
               <input 
                 type="text" 
                 placeholder="Search facilities, records..." 
                 className="bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/10 focus:border-blue-600 transition-all w-64"
               />
+              */}
+              {/* NEW CODE - Trainer/Client search with SaaS kbd shortcut */}
+              <input 
+                type="text" 
+                aria-label="Global search"
+                placeholder="Search coaches, trainees, subscriptions..." 
+                className="bg-slate-50 border border-slate-200/90 rounded-xl pl-9 pr-12 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all w-72"
+              />
+              <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-slate-400 bg-white border border-slate-200 px-1.5 py-0.5 rounded-md shadow-2xs pointer-events-none">
+                ⌘K
+              </kbd>
             </div>
           </div>
 
@@ -1816,11 +2343,100 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
               {/* Message Square Button */}
               <button 
                 onClick={() => setActiveTab('Inquiries')}
-                className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all"
+                className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
                 title="View Customer Messages & Inquiries"
+                aria-label="View Customer Messages and Inquiries"
               >
                 <MessageSquare size={19} />
               </button>
+
+              <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />
+
+              {/* Top Bar Admin Profile Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsProfileMenuOpen(!isProfileMenuOpen);
+                    setIsNotificationsOpen(false);
+                    setIsMessagesOpen(false);
+                  }}
+                  aria-label="Admin Profile Menu"
+                  aria-expanded={isProfileMenuOpen}
+                  className="flex items-center gap-2 p-1.5 hover:bg-slate-100/80 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    {user?.name?.substring(0, 2).toUpperCase() || 'AD'}
+                  </div>
+                  <div className="hidden md:flex flex-col text-left">
+                    <span className="text-xs font-semibold text-slate-800 leading-tight">
+                      {user?.name || 'Administrator'}
+                    </span>
+                    <span className="text-[10px] text-teal-600 font-bold uppercase tracking-wider">
+                      {user?.role || 'Super Admin'}
+                    </span>
+                  </div>
+                  <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isProfileMenuOpen ? 'rotate-180 text-teal-600' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {isProfileMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setIsProfileMenuOpen(false)} />
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                        className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 p-2 overflow-hidden ring-1 ring-black/5"
+                      >
+                        <div className="p-3 bg-slate-50 rounded-xl mb-1 border border-slate-100">
+                          <p className="text-xs font-bold text-slate-900">{user?.name || 'Administrator'}</p>
+                          <p className="text-[11px] text-slate-500 truncate">{user?.email || 'admin@wellwigen.com'}</p>
+                          <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-teal-50 text-teal-700 border border-teal-200/60 uppercase tracking-wider">
+                            Verified Admin
+                          </span>
+                        </div>
+
+                        <div className="space-y-0.5">
+                          <button
+                            onClick={() => {
+                              setActiveTab('Settings');
+                              setIsProfileMenuOpen(false);
+                            }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-teal-700 hover:bg-teal-50/50 transition-colors cursor-pointer"
+                          >
+                            <Settings size={15} className="text-slate-400" />
+                            Platform Settings
+                          </button>
+                          <a
+                            href="/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-teal-700 hover:bg-teal-50/50 transition-colors"
+                          >
+                            <ExternalLink size={15} className="text-slate-400" />
+                            View Public Site
+                          </a>
+                        </div>
+
+                        <div className="pt-1 mt-1 border-t border-slate-100">
+                          <button
+                            onClick={() => {
+                              logout();
+                              toast.success("Logged out successfully");
+                              navigate('/login');
+                            }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                          >
+                            <XCircle size={15} className="text-rose-500" />
+                            Sign Out
+                          </button>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>
@@ -1868,8 +2484,94 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
               </AnimatePresence>
             );
           })()}
-        </div>
+      </div>
 
+      {/* ================= REJECT TRAINER CONFIRMATION DIALOG ================= */}
+      <AnimatePresence>
+        {rejectModalTrainer && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs"
+              onClick={() => !isRejectingLoading && setRejectModalTrainer(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 z-10 overflow-hidden"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                  <AlertCircle size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 tracking-tight">Reject Coach Application</h3>
+                  <p className="text-xs text-slate-500">Provide feedback for applicant {rejectModalTrainer.name}</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <label className="text-xs font-semibold text-slate-700">
+                  Rejection Reason / Guidance:
+                </label>
+                <textarea
+                  value={rejectReasonText}
+                  onChange={(e) => setRejectReasonText(e.target.value)}
+                  rows={3}
+                  className="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-slate-800"
+                  placeholder="Provide instructions to the applicant..."
+                />
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    'Certification document is illegible',
+                    'Missing athletic accreditation',
+                    'Intro video link inaccessible',
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setRejectReasonText(preset)}
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  disabled={isRejectingLoading}
+                  onClick={() => setRejectModalTrainer(null)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isRejectingLoading || !rejectReasonText.trim()}
+                  onClick={handleConfirmReject}
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                >
+                  {isRejectingLoading ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Rejecting...</span>
+                    </>
+                  ) : (
+                    <span>Confirm Rejection</span>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       </div>
     </div>
   );

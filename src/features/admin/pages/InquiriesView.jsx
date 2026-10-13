@@ -529,10 +529,34 @@ const InquiriesView = () => {
           <span className="text-xs text-slate-400">Click any row to view details & reply</span>
         </div>
 
+        {/* OLD CODE (commented by AI)
         {loading ? (
           <div className="py-24 flex flex-col items-center justify-center text-slate-400 space-y-3">
             <div className="w-8 h-8 border-3 border-[#1FB5A3] border-t-transparent rounded-full animate-spin" />
             <p className="text-xs font-semibold tracking-wider uppercase">Loading Inquiries...</p>
+          </div>
+        ) : ...
+        */}
+        {/* NEW CODE - Modern SaaS Skeleton Table Loader */}
+        {loading ? (
+          <div className="p-6 space-y-4 animate-pulse">
+            {[1, 2, 3, 4, 5].map((idx) => (
+              <div key={idx} className="flex items-center justify-between gap-4 py-3 border-b border-slate-100 last:border-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-slate-100" />
+                  <div className="space-y-1.5">
+                    <div className="w-32 h-4 rounded bg-slate-100" />
+                    <div className="w-40 h-3 rounded bg-slate-100" />
+                  </div>
+                </div>
+                <div className="hidden sm:block space-y-1.5">
+                  <div className="w-28 h-4 rounded bg-slate-100" />
+                  <div className="w-20 h-3 rounded bg-slate-100" />
+                </div>
+                <div className="hidden md:block w-20 h-6 rounded-full bg-slate-100" />
+                <div className="w-20 h-7 rounded-xl bg-slate-100" />
+              </div>
+            ))}
           </div>
         ) : inquiries.length === 0 ? (
           <div className="py-24 text-center px-4">
