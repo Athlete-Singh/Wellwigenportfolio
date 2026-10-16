@@ -2533,7 +2533,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                       >
                         <div className="p-3 bg-slate-50 rounded-xl mb-1 border border-slate-100">
                           <p className="text-xs font-bold text-slate-900">{user?.name || 'Administrator'}</p>
-                          <p className="text-[11px] text-slate-500 truncate">{user?.email || 'admin@wellwigen.com'}</p>
+                          <p className="text-[11px] text-slate-500 truncate">{user?.email || 'wellwigen@gmail.com'}</p>
                           <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-teal-50 text-teal-700 border border-teal-200/60 uppercase tracking-wider">
                             Verified Admin
                           </span>

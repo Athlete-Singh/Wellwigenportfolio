@@ -110,7 +110,7 @@ const ProviderStatus = () => {
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-900">Need help?</p>
-              <p className="text-xs text-gray-500 mt-0.5">Contact our support team at support@wellwigen.com if you have any questions about your application.</p>
+              <p className="text-xs text-gray-500 mt-0.5">Contact our support team at <a href="mailto:wellwigen@gmail.com" className="font-semibold text-teal-700 underline">wellwigen@gmail.com</a> or WhatsApp <a href="https://wa.me/919598506627" target="_blank" rel="noopener noreferrer" className="font-semibold text-teal-700 underline">+91 9598506627</a> if you have any questions.</p>
             </div>
           </div>
         </div>

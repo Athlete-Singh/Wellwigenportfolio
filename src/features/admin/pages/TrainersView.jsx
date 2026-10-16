@@ -277,7 +277,7 @@ Please log into your Coach Hub portal to update your credentials and re-submit y
 
 Once updated, re-submit your profile for fast-track review.
 
-For assistance, please contact support@wellwigen.com.
+For assistance, please contact wellwigen@gmail.com or WhatsApp +91 9598506627.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 *Wellwigen Verification Team*`;
   };

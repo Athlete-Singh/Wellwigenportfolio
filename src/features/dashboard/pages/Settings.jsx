@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 export default function Settings() {
   const [username, setUsername] = useState("Admin");
-  const [email, setEmail] = useState("admin@wellwigen.com");
+  const [email, setEmail] = useState("wellwigen@gmail.com");
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
 
