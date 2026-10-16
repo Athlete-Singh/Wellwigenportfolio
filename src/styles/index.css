@@ -28,14 +28,17 @@
   --color-dark-muted: #CBD5E1;
 
   /* Live 3D Athlete Configuration Variables (Home Page Only) */
-  --athlete-scale: 1;                 /* Scale factor for figure height (e.g. 0.95 to 1.1) */
-  --athlete-top-offset: 52px;         /* Vertical offset of hair from top */
-  --athlete-opacity-scrolled: 0.18;   /* Faded opacity on scroll past hero (0.15 - 0.25) */
+  --athlete-scale: 1;                 /* Scale factor for figure height */
+  --athlete-top-offset: clamp(38px, 5.2vh, 52px); /* Vertical offset from top */
+  --athlete-opacity-scrolled: 0.18;   /* Faded opacity on scroll past hero */
   --athlete-parallax-speed: 0.06;     /* Parallax scrolling rate */
-  --athlete-height: calc(77vh * var(--athlete-scale, 1));
+  --header-h: 80px;
+
+  /* Fluid Hero Visual Dimensions (Coordinated scaling across 50%, 75%, 90%, 100%, 125% zoom and all screen sizes) */
+  --hero-visual-height: clamp(540px, 76vh, 720px);
+  --athlete-height: calc(var(--hero-visual-height) * var(--athlete-scale, 1));
   --athlete-width: calc(var(--athlete-height) * 1.7778);
   --athlete-gap-center: 72vw;
-  --header-h: 80px;
 
   /* ================= FLAT SOLID BACKGROUND DESIGN TOKENS (Home Page Only) ================= */
   --solid-teal: #1FB5A3;                 /* Site primary teal */
@@ -45,13 +48,29 @@
   --solid-navy: #0F172A;                 /* Existing heading navy */
   --solid-white: #FFFFFF;                /* Flat pure white */
 
-  /* User-tweakable parameters */
-  --hero-arch-width: 500px;              /* Width of main solid-teal arch */
-  --hero-arch-height: 680px;             /* Height of main solid-teal arch */
-  --hero-arch-tilt: -5deg;               /* Tilt angle of main arch (-4 to -6deg) */
-  --hero-arch-radius: 250px;             /* Rounded arch top radius */
-  --hero-circle-size: 320px;             /* Diameter of lighter teal tint circle */
-  --class-band-height: 250px;            /* Full-width solid-teal band height behind class cards */
+  /* Proportional Hero Arch Parameters (locked directly to athlete dimensions) */
+  --hero-arch-height: calc(var(--athlete-height) * 0.96);
+  --hero-arch-width: calc(var(--hero-arch-height) * 0.735);
+  --hero-arch-tilt: -5deg;
+  --hero-arch-radius: calc(var(--hero-arch-width) / 2);
+  --hero-circle-size: calc(var(--hero-arch-width) * 0.64);
+  --class-band-height: 250px;
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  :root {
+    --hero-visual-height: clamp(480px, 70vh, 590px);
+  }
+}
+@media (min-width: 1280px) and (max-width: 1535px) {
+  :root {
+    --hero-visual-height: clamp(560px, 75vh, 700px);
+  }
+}
+@media (min-width: 1536px) {
+  :root {
+    --hero-visual-height: clamp(620px, 76vh, 740px);
+  }
 }
 
 /* Subtle life animation for background floating circles (transform only, 2-4px, 8-12s loop) */

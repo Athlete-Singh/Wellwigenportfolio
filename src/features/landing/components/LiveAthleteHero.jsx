@@ -24,11 +24,11 @@ export default function LiveAthleteHero() {
       className="hidden lg:block absolute inset-0 pointer-events-none select-none overflow-hidden w-full max-w-full"
       style={{
         perspective: '1000px',
-        zIndex: 55,
+        zIndex: 25,
       }}
       aria-hidden="true"
     >
-      {/* Positioned Athlete Container inside Hero */}
+      {/* Positioned Hero Visual Container (Arch + Athlete in Lockstep) */}
       <motion.div
         initial={{ opacity: 0, y: 15, filter: 'blur(8px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -36,14 +36,111 @@ export default function LiveAthleteHero() {
         style={{
           position: 'absolute',
           top: 'var(--athlete-top-offset, 52px)',
-          right: 'calc((100vw - 1440px) / 2 - 130px)',
+          right: 'clamp(-180px, calc((100vw - 1440px) / 2 - 130px), 140px)',
           width: 'var(--athlete-width)',
           height: 'var(--athlete-height)',
           maskImage: 'linear-gradient(to bottom, black 84%, transparent 99%)',
           WebkitMaskImage: 'linear-gradient(to bottom, black 84%, transparent 99%)',
         }}
       >
-        {/* 3D Tilt Card Canvas */}
+        {/* Layer 1: Flat Solid Background Shapes (Anchored directly to visual container) */}
+        <div className="absolute inset-0 pointer-events-none select-none z-0">
+          {/* Shape 2: Dark Teal Accent Panel peeking behind main arch */}
+          <div
+            className="absolute shadow-[0_16px_36px_rgba(15,23,42,0.10)]"
+            style={{
+              width: 'var(--hero-arch-width)',
+              height: 'var(--hero-arch-height)',
+              backgroundColor: 'var(--solid-teal-dark, #0F766E)',
+              borderRadius: 'var(--hero-arch-radius) var(--hero-arch-radius) 44px 44px',
+              transform: 'rotate(-9deg) translate(-28px, 16px)',
+              right: 'calc(var(--athlete-width) * 0.165)',
+              top: 'calc(var(--athlete-height) * 0.076)',
+            }}
+          />
+
+          {/* Shape 3: Light Teal Circle peeking on left of arch */}
+          <div
+            className="absolute rounded-full shadow-[0_12px_30px_rgba(15,23,42,0.08)]"
+            style={{
+              width: 'var(--hero-circle-size)',
+              height: 'var(--hero-circle-size)',
+              backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
+              right: 'calc(var(--athlete-width) * 0.355)',
+              top: 'calc(var(--athlete-height) * 0.25)',
+            }}
+          />
+
+          {/* Shape 1: Main Solid Teal Rounded-Arch Panel (tilted -5deg) */}
+          <div
+            className="absolute shadow-[0_24px_48px_rgba(15,23,42,0.14)]"
+            style={{
+              width: 'var(--hero-arch-width)',
+              height: 'var(--hero-arch-height)',
+              backgroundColor: 'var(--solid-teal, #1FB5A3)',
+              borderRadius: 'var(--hero-arch-radius) var(--hero-arch-radius) 44px 44px',
+              transform: 'rotate(var(--hero-arch-tilt, -5deg))',
+              right: 'calc(var(--athlete-width) * 0.14)',
+              top: 'calc(var(--athlete-height) * 0.091)',
+            }}
+          />
+
+          {/* Floating Accent Shapes */}
+          <div
+            className="bg-drift-1 absolute rounded-full shadow-md"
+            style={{
+              width: '26px',
+              height: '26px',
+              backgroundColor: 'var(--solid-teal, #1FB5A3)',
+              right: 'calc(var(--athlete-width) * 0.52)',
+              top: 'calc(var(--athlete-height) * 0.18)',
+            }}
+          />
+          <div
+            className="bg-drift-2 absolute rounded-full shadow-sm"
+            style={{
+              width: '18px',
+              height: '18px',
+              backgroundColor: 'var(--solid-teal-dark, #0F766E)',
+              right: 'calc(var(--athlete-width) * 0.22)',
+              top: 'calc(var(--athlete-height) * 0.06)',
+            }}
+          />
+          <div
+            className="bg-drift-1 absolute rounded-full shadow-md"
+            style={{
+              width: '38px',
+              height: '38px',
+              backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
+              right: 'calc(var(--athlete-width) * 0.47)',
+              top: 'calc(var(--athlete-height) * 0.74)',
+            }}
+          />
+          <div
+            className="bg-drift-2 absolute rounded-full shadow-sm"
+            style={{
+              width: '46px',
+              height: '46px',
+              border: '3.5px solid var(--solid-teal, #1FB5A3)',
+              backgroundColor: 'transparent',
+              right: 'calc(var(--athlete-width) * 0.56)',
+              top: 'calc(var(--athlete-height) * 0.44)',
+            }}
+          />
+          <div
+            className="bg-drift-1 absolute rounded-full shadow-sm"
+            style={{
+              width: '28px',
+              height: '28px',
+              border: '2.5px solid var(--solid-teal-dark, #0F766E)',
+              backgroundColor: 'transparent',
+              right: 'calc(var(--athlete-width) * 0.14)',
+              top: 'calc(var(--athlete-height) * 0.78)',
+            }}
+          />
+        </div>
+
+        {/* Layer 2: 3D Tilt Card Canvas with Athlete */}
         <motion.div
           style={{
             position: 'relative',
@@ -67,7 +164,7 @@ export default function LiveAthleteHero() {
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="w-full h-full flex items-start justify-center"
+          className="relative z-10 w-full h-full flex items-start justify-center"
         >
           {/* OLD CODE (commented by AI) - neon colored glow without studio wall shadows
           <picture className="w-full h-full block">

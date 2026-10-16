@@ -311,123 +311,12 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
         </div>
         */}
 
-        {/* ================= NEW CODE: FLAT SOLID HERO BACKGROUND SHAPES ================= */}
-        {/* Layered at z-0: strictly LOWER than athletes (z-55) and LOWER than all text (z-10). Desktop only. */}
-        <div
-          className="hidden lg:block absolute inset-0 z-0 pointer-events-none select-none overflow-hidden"
-          aria-hidden="true"
-        >
-          {/* Shapes positioned on right side behind athletes; left text column remains completely clean */}
-          <div
-            className="absolute top-16 right-0 w-[50vw] max-w-[850px] h-full"
-            style={{
-              right: 'max(-20px, calc((100vw - 1440px) / 2 - 40px))',
-            }}
-          >
-            {/* Shape 2: Second Offset Outline/Panel in --solid-teal-dark peeking behind the main arch */}
-            <div
-              className="absolute shadow-[0_16px_36px_rgba(15,23,42,0.10)]"
-              style={{
-                width: 'var(--hero-arch-width, 500px)',
-                height: 'var(--hero-arch-height, 680px)',
-                backgroundColor: 'var(--solid-teal-dark, #0F766E)',
-                borderRadius: 'var(--hero-arch-radius, 250px) var(--hero-arch-radius, 250px) 44px 44px',
-                transform: 'rotate(-9deg) translate(-28px, 16px)',
-                right: '110px',
-                top: '40px',
-              }}
-            />
-
-            {/* Shape 3: Big Solid Circle in lighter teal tint peeking behind */}
-            <div
-              className="absolute rounded-full shadow-[0_12px_30px_rgba(15,23,42,0.08)]"
-              style={{
-                width: 'var(--hero-circle-size, 320px)',
-                height: 'var(--hero-circle-size, 320px)',
-                backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
-                right: '340px',
-                top: '160px',
-              }}
-            />
-
-            {/* Shape 1: Big Solid --solid-teal Rounded-Arch Panel (tilted -5deg) */}
-            <div
-              className="absolute shadow-[0_24px_48px_rgba(15,23,42,0.14)]"
-              style={{
-                width: 'var(--hero-arch-width, 500px)',
-                height: 'var(--hero-arch-height, 680px)',
-                backgroundColor: 'var(--solid-teal, #1FB5A3)',
-                borderRadius: 'var(--hero-arch-radius, 250px) var(--hero-arch-radius, 250px) 44px 44px',
-                transform: 'rotate(var(--hero-arch-tilt, -5deg))',
-                right: '80px',
-                top: '50px',
-              }}
-            />
-
-            {/* Accent Shapes: 3 to 5 small flat solid circles/rings with soft drop shadows */}
-            {/* Accent 1: Small solid teal circle (drifts very slowly) */}
-            <div
-              className="bg-drift-1 absolute rounded-full shadow-md"
-              style={{
-                width: '26px',
-                height: '26px',
-                backgroundColor: 'var(--solid-teal, #1FB5A3)',
-                right: '540px',
-                top: '110px',
-              }}
-            />
-
-            {/* Accent 2: Small solid dark teal circle */}
-            <div
-              className="bg-drift-2 absolute rounded-full shadow-sm"
-              style={{
-                width: '18px',
-                height: '18px',
-                backgroundColor: 'var(--solid-teal-dark, #0F766E)',
-                right: '180px',
-                top: '30px',
-              }}
-            />
-
-            {/* Accent 3: Flat solid mint circle */}
-            <div
-              className="bg-drift-1 absolute rounded-full shadow-md"
-              style={{
-                width: '38px',
-                height: '38px',
-                backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
-                right: '480px',
-                top: '490px',
-              }}
-            />
-
-            {/* Accent 4: Solid teal ring */}
-            <div
-              className="bg-drift-2 absolute rounded-full shadow-sm"
-              style={{
-                width: '46px',
-                height: '46px',
-                border: '3.5px solid var(--solid-teal, #1FB5A3)',
-                backgroundColor: 'transparent',
-                right: '590px',
-                top: '290px',
-              }}
-            />
-
-            {/* Accent 5: Solid dark teal ring */}
-            <div
-              className="bg-drift-1 absolute rounded-full shadow-sm"
-              style={{
-                width: '28px',
-                height: '28px',
-                border: '2.5px solid var(--solid-teal-dark, #0F766E)',
-                backgroundColor: 'transparent',
-                right: '80px',
-                top: '520px',
-              }}
-            />
-          </div>
+        {/* OLD CODE (commented by AI) - Uncoordinated floating arch shapes that drifted independently from athlete on zoom/screen resize
+        <div className="hidden lg:block absolute inset-0 z-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
+          ...
         </div>
+        */}
+        {/* NEW CODE - Background shapes are now unified directly inside LiveAthleteHero to guarantee 100% lockstep scaling across all zoom levels & screen sizes */}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-1 sm:pt-4 lg:pt-16 pb-12 sm:pb-16 lg:pb-20">
           <div className="max-w-2xl lg:max-w-4xl xl:max-w-5xl">
