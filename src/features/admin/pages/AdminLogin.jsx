@@ -300,7 +300,7 @@ export default function AdminLogin() {
       <div className="flex-1 flex flex-col lg:flex-row relative overflow-hidden">
         {/* ================= LEFT COLUMN: IMAGE PORTION IN A LITTLE DARK THEME ================= */}
         <div
-          className="relative w-full lg:w-1/2 xl:w-5/12 min-h-[440px] sm:min-h-[500px] lg:min-h-[calc(100vh-73px)] bg-slate-900 flex flex-col justify-end p-6 sm:p-10 lg:p-12 overflow-hidden text-white border-r border-slate-200/80"
+          className="relative w-full lg:w-1/2 xl:w-5/12 min-h-[440px] sm:min-h-[500px] lg:min-h-[calc(100vh-73px)] bg-slate-900 flex flex-col justify-end px-6 sm:px-10 lg:px-12 pt-6 sm:pt-8 pb-3 sm:pb-4 lg:pb-5 overflow-hidden text-white border-r border-slate-200/80"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
@@ -323,7 +323,7 @@ export default function AdminLogin() {
           </AnimatePresence>
 
           {/* A LITTLE DARK THEME: Gentle ambient vignette (not too dark, natural image visibility) */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent z-0 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent z-0 pointer-events-none" />
           <div className="absolute inset-0 bg-black/20 z-0 pointer-events-none" />
 
           {/* Top Right Slide Counter inside the image portion */}
@@ -331,30 +331,30 @@ export default function AdminLogin() {
             0{activeSlide + 1} / 0{SLIDES.length}
           </div>
 
-          {/* Bottom Content: Slide Title, Subtitle, and Slide Controls */}
-          <div className="relative z-10 space-y-4">
+          {/* Bottom Content: Shifted Down Toward Footer */}
+          <div className="relative z-10 space-y-2.5 sm:space-y-3">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeSlide}
-                initial={{ opacity: 0, y: 14 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4, ease: 'easeOut' }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
               >
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-2.5 tracking-tight drop-shadow-md">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-1.5 tracking-tight drop-shadow-md">
                   {current.title.split(' ')[0]}{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-300 to-teal-200">
                     {current.title.split(' ').slice(1).join(' ')}
                   </span>
                 </h2>
-                <p className="text-slate-200/90 text-sm sm:text-base font-medium max-w-lg leading-relaxed drop-shadow-sm">
+                <p className="text-slate-200/90 text-xs sm:text-sm font-medium max-w-lg leading-relaxed drop-shadow-sm">
                   {current.subtitle}
                 </p>
               </motion.div>
             </AnimatePresence>
 
             {/* Slider Controls: Progress bars + Prev/Next buttons */}
-            <div className="flex items-center justify-between gap-4 pt-3 border-t border-white/20">
+            <div className="flex items-center justify-between gap-4 pt-2.5 border-t border-white/20">
               {/* Progress Indicators */}
               <div className="flex items-center gap-1.5 flex-1">
                 {SLIDES.map((_, idx) => (
@@ -377,18 +377,18 @@ export default function AdminLogin() {
                 <button
                   type="button"
                   onClick={prevSlide}
-                  className="w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-sm"
+                  className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-sm"
                   title="Previous Slide"
                 >
-                  <ChevronLeft size={18} />
+                  <ChevronLeft size={16} />
                 </button>
                 <button
                   type="button"
                   onClick={nextSlide}
-                  className="w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-sm"
+                  className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-sm"
                   title="Next Slide"
                 >
-                  <ChevronRight size={18} />
+                  <ChevronRight size={16} />
                 </button>
               </div>
             </div>
