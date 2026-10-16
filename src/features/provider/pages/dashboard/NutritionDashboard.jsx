@@ -39,7 +39,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { io } from "socket.io-client";
-import socket from '../../../../config/socket';
+import socket, { getSocketUrl } from '../../../../config/socket';
 
 const NavItem = ({ icon, label, active, onClick }) => (
   <button 
@@ -224,12 +224,16 @@ const NutritionDashboard = () => {
   }, [API, token]);
 
   useEffect(() => {
+    const socketBaseUrl = getSocketUrl();
+    if (!socketBaseUrl) {
+      console.log("ℹ️ No remote socket URL available - skipping socket initialization.");
+      return;
+    }
+
     console.log("🔌 Initializing socket connection...");
-    
-    // Use the same socket initialization pattern as UserDashboard for consistency
-    const socketBaseUrl = API.replace('/api', '');
     const newSocket = io(socketBaseUrl, {
-      transports: ["polling", "websocket"],
+      transports: ["websocket", "polling"],
+      reconnectionAttempts: 5,
     });
 
     socketRef.current = newSocket;

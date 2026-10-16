@@ -26,6 +26,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from "socket.io-client";
+import { getSocketUrl } from '../../../../config/socket';
 import toast, { Toaster } from 'react-hot-toast';
 
 const NavItem = ({ icon: Icon, label, active, onClick, badge }) => (
@@ -114,8 +115,9 @@ const DoctorDashboard = () => {
 
   useEffect(() => {
     fetchConsultations();
-    const socketBaseUrl = API.replace('/api', '');
-    const socket = io(socketBaseUrl, { transports: ["polling", "websocket"] });
+    const socketBaseUrl = getSocketUrl();
+    if (!socketBaseUrl) return;
+    const socket = io(socketBaseUrl, { transports: ["websocket", "polling"], reconnectionAttempts: 5 });
     socketRef.current = socket;
     socket.on("connect", () => setSocketConnected(true));
     socket.on("newOrder", () => fetchConsultations());

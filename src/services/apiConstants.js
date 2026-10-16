@@ -1,4 +1,18 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export const API_BASE_URL = (() => {
+  const base = import.meta.env.VITE_API_BASE_URL;
+  if (base) return base.replace(/\/+$/, '');
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (apiUrl) return apiUrl.replace(/\/api\/?$/, '');
+  if (typeof window !== 'undefined') {
+    const isLocal =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+    if (!isLocal) {
+      return '';
+    }
+  }
+  return 'http://localhost:8000';
+})();
 
 export const ENDPOINTS = {
   // Existing

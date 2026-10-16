@@ -37,6 +37,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { getSocketUrl } from "../../../config/socket";
 import useAppStore from "../../../store/useAppStore";
 
 const getUpcomingDeliveries = (plan, status) => {
@@ -344,54 +345,61 @@ export default function UserDashboard() {
     // Setup Socket.io
     const socketUserInfo = JSON.parse(localStorage.getItem("userInfo") || localStorage.getItem("user") || "{}");
     const userId = socketUserInfo._id || socketUserInfo.id || 'demo-user-id';
-    const socketBaseUrl = API.replace('/api', '');
-    const socket = io(socketBaseUrl, {
-      transports: ["polling", "websocket"],
-      reconnection: true
-    });
-    
-    socket.on("connect", () => {
-      console.log("✅ [REAL-TIME] Socket Connected:", socket.id);
-      setSocketConnected(true);
-      socket.emit("registerUser", userId); 
-    });
+    const socketBaseUrl = getSocketUrl();
+    let socket = null;
+    let registrationInterval = null;
 
-    // Keep the handshake alive by re-registering every 5 seconds
-    const registrationInterval = setInterval(() => {
-      if (socket.connected && userId) {
-        socket.emit("registerUser", userId);
-      }
-    }, 5000);
+    if (socketBaseUrl) {
+      socket = io(socketBaseUrl, {
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionAttempts: 5,
+      });
 
-    socket.on("connect_error", () => setSocketConnected(false));
+      socket.on("connect", () => {
+        console.log("✅ [REAL-TIME] Socket Connected:", socket.id);
+        setSocketConnected(true);
+        socket.emit("registerUser", userId); 
+      });
 
-    socket.on("orderStatusUpdated", (data) => {
-      console.log("📡 [REAL-TIME] Update received:", data);
-      setLastSynced(new Date().toLocaleTimeString()); // Force UI repaint
-      fetchUserData(); 
-      toast.success("🚚 Real-time update received!", { position: 'bottom-right' });
-    });
+      // Keep the handshake alive by re-registering every 5 seconds
+      registrationInterval = setInterval(() => {
+        if (socket?.connected && userId) {
+          socket.emit("registerUser", userId);
+        }
+      }, 5000);
 
-    socket.on("subscriptionExpiringSoon", (data) => {
-      console.log("🔔 Subscription Expiring Soon:", data);
-      toast(data.message, { icon: '⚠️', duration: 6000 });
-      setSubscription(prev => ({ ...prev, status: "Expiring Soon" }));
-    });
+      socket.on("connect_error", () => setSocketConnected(false));
 
-    socket.on("subscriptionExpired", (data) => {
-      console.log("🛑 Subscription Expired:", data);
-      toast.error(data.message, { duration: 6000 });
-      setSubscription(prev => ({ ...prev, status: "Expired" }));
-    });
+      socket.on("orderStatusUpdated", (data) => {
+        console.log("📡 [REAL-TIME] Update received:", data);
+        setLastSynced(new Date().toLocaleTimeString()); // Force UI repaint
+        fetchUserData(); 
+        toast.success("🚚 Real-time update received!", { position: 'bottom-right' });
+      });
 
-    socket.on("storesClosed", (data) => {
-      console.log("🛑 Stores Closed Alert:", data);
-      toast.error(data.message, { icon: '🏪', duration: 8000 });
-    });
+      socket.on("subscriptionExpiringSoon", (data) => {
+        console.log("🔔 Subscription Expiring Soon:", data);
+        toast(data.message, { icon: '⚠️', duration: 6000 });
+        setSubscription(prev => ({ ...prev, status: "Expiring Soon" }));
+      });
+
+      socket.on("subscriptionExpired", (data) => {
+        console.log("🛑 Subscription Expired:", data);
+        toast.error(data.message, { duration: 6000 });
+        setSubscription(prev => ({ ...prev, status: "Expired" }));
+      });
+
+      socket.on("storesClosed", (data) => {
+        console.log("🛑 Stores Closed Alert:", data);
+        toast.error(data.message, { icon: '🏪', duration: 8000 });
+      });
+    }
 
     return () => {
       clearInterval(refreshInterval);
-      socket.disconnect();
+      if (registrationInterval) clearInterval(registrationInterval);
+      if (socket) socket.disconnect();
     };
   }, [API]);
 

@@ -28,15 +28,15 @@
   --color-dark-muted: #CBD5E1;
 
   /* Live 3D Athlete Configuration Variables (Home Page Only) */
-  --athlete-scale: 1;                 /* Scale factor for figure height */
-  --athlete-top-offset: clamp(38px, 5.2vh, 52px); /* Vertical offset from top */
+  --athlete-scale: 0.95;              /* Minor reduction in scale per user request */
+  --athlete-top-offset: clamp(58px, 7.5vh, 76px); /* Shifted down from navbar per user request */
   --athlete-opacity-scrolled: 0.18;   /* Faded opacity on scroll past hero */
   --athlete-parallax-speed: 0.06;     /* Parallax scrolling rate */
   --header-h: 80px;
 
-  /* Fluid Hero Visual Dimensions (Coordinated scaling across 50%, 75%, 90%, 100%, 125% zoom and all screen sizes) */
-  --hero-visual-height: clamp(540px, 76vh, 720px);
-  --athlete-height: calc(var(--hero-visual-height) * var(--athlete-scale, 1));
+  /* Fluid Hero Visual Dimensions (minor small size per user request) */
+  --hero-visual-height: clamp(510px, 71vh, 660px);
+  --athlete-height: calc(var(--hero-visual-height) * var(--athlete-scale, 0.95));
   --athlete-width: calc(var(--athlete-height) * 1.7778);
   --athlete-gap-center: 72vw;
 
@@ -49,7 +49,7 @@
   --solid-white: #FFFFFF;                /* Flat pure white */
 
   /* Proportional Hero Arch Parameters (locked directly to athlete dimensions) */
-  --hero-arch-height: calc(var(--athlete-height) * 0.96);
+  --hero-arch-height: calc(var(--athlete-height) * 0.94);
   --hero-arch-width: calc(var(--hero-arch-height) * 0.735);
   --hero-arch-tilt: -5deg;
   --hero-arch-radius: calc(var(--hero-arch-width) / 2);
@@ -59,17 +59,17 @@
 
 @media (min-width: 1024px) and (max-width: 1279px) {
   :root {
-    --hero-visual-height: clamp(480px, 70vh, 590px);
+    --hero-visual-height: clamp(450px, 65vh, 550px);
   }
 }
 @media (min-width: 1280px) and (max-width: 1535px) {
   :root {
-    --hero-visual-height: clamp(560px, 75vh, 700px);
+    --hero-visual-height: clamp(520px, 70vh, 650px);
   }
 }
 @media (min-width: 1536px) {
   :root {
-    --hero-visual-height: clamp(620px, 76vh, 740px);
+    --hero-visual-height: clamp(570px, 72vh, 690px);
   }
 }
 

@@ -43,7 +43,7 @@ export default function LiveAthleteHero() {
           WebkitMaskImage: 'linear-gradient(to bottom, black 84%, transparent 99%)',
         }}
       >
-        {/* Layer 1: Flat Solid Background Shapes (Anchored directly to visual container) */}
+        {/* Layer 1: Flat Solid Background Shapes (Anchored directly to visual container, shifted left & down per request) */}
         <div className="absolute inset-0 pointer-events-none select-none z-0">
           {/* Shape 2: Dark Teal Accent Panel peeking behind main arch */}
           <div
@@ -54,8 +54,8 @@ export default function LiveAthleteHero() {
               backgroundColor: 'var(--solid-teal-dark, #0F766E)',
               borderRadius: 'var(--hero-arch-radius) var(--hero-arch-radius) 44px 44px',
               transform: 'rotate(-9deg) translate(-28px, 16px)',
-              right: 'calc(var(--athlete-width) * 0.165)',
-              top: 'calc(var(--athlete-height) * 0.076)',
+              right: 'calc(var(--athlete-width) * 0.225)',
+              top: 'calc(var(--athlete-height) * 0.14)',
             }}
           />
 
@@ -66,8 +66,8 @@ export default function LiveAthleteHero() {
               width: 'var(--hero-circle-size)',
               height: 'var(--hero-circle-size)',
               backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
-              right: 'calc(var(--athlete-width) * 0.355)',
-              top: 'calc(var(--athlete-height) * 0.25)',
+              right: 'calc(var(--athlete-width) * 0.415)',
+              top: 'calc(var(--athlete-height) * 0.31)',
             }}
           />
 
@@ -80,8 +80,8 @@ export default function LiveAthleteHero() {
               backgroundColor: 'var(--solid-teal, #1FB5A3)',
               borderRadius: 'var(--hero-arch-radius) var(--hero-arch-radius) 44px 44px',
               transform: 'rotate(var(--hero-arch-tilt, -5deg))',
-              right: 'calc(var(--athlete-width) * 0.14)',
-              top: 'calc(var(--athlete-height) * 0.091)',
+              right: 'calc(var(--athlete-width) * 0.20)',
+              top: 'calc(var(--athlete-height) * 0.155)',
             }}
           />
 
@@ -92,8 +92,8 @@ export default function LiveAthleteHero() {
               width: '26px',
               height: '26px',
               backgroundColor: 'var(--solid-teal, #1FB5A3)',
-              right: 'calc(var(--athlete-width) * 0.52)',
-              top: 'calc(var(--athlete-height) * 0.18)',
+              right: 'calc(var(--athlete-width) * 0.58)',
+              top: 'calc(var(--athlete-height) * 0.24)',
             }}
           />
           <div
@@ -102,8 +102,8 @@ export default function LiveAthleteHero() {
               width: '18px',
               height: '18px',
               backgroundColor: 'var(--solid-teal-dark, #0F766E)',
-              right: 'calc(var(--athlete-width) * 0.22)',
-              top: 'calc(var(--athlete-height) * 0.06)',
+              right: 'calc(var(--athlete-width) * 0.28)',
+              top: 'calc(var(--athlete-height) * 0.12)',
             }}
           />
           <div
@@ -112,8 +112,8 @@ export default function LiveAthleteHero() {
               width: '38px',
               height: '38px',
               backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
-              right: 'calc(var(--athlete-width) * 0.47)',
-              top: 'calc(var(--athlete-height) * 0.74)',
+              right: 'calc(var(--athlete-width) * 0.53)',
+              top: 'calc(var(--athlete-height) * 0.80)',
             }}
           />
           <div
@@ -123,8 +123,8 @@ export default function LiveAthleteHero() {
               height: '46px',
               border: '3.5px solid var(--solid-teal, #1FB5A3)',
               backgroundColor: 'transparent',
-              right: 'calc(var(--athlete-width) * 0.56)',
-              top: 'calc(var(--athlete-height) * 0.44)',
+              right: 'calc(var(--athlete-width) * 0.62)',
+              top: 'calc(var(--athlete-height) * 0.50)',
             }}
           />
           <div
@@ -134,8 +134,8 @@ export default function LiveAthleteHero() {
               height: '28px',
               border: '2.5px solid var(--solid-teal-dark, #0F766E)',
               backgroundColor: 'transparent',
-              right: 'calc(var(--athlete-width) * 0.14)',
-              top: 'calc(var(--athlete-height) * 0.78)',
+              right: 'calc(var(--athlete-width) * 0.20)',
+              top: 'calc(var(--athlete-height) * 0.84)',
             }}
           />
         </div>
