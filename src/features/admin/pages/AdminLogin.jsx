@@ -251,9 +251,9 @@ export default function AdminLogin() {
       data-panel="admin"
       className="min-h-screen bg-white flex flex-col lg:flex-row relative overflow-hidden select-none"
     >
-      {/* ================= LEFT COLUMN: FULL-HEIGHT SLIDING SHOWCASE (Format inspired by /login) ================= */}
+      {/* ================= LEFT COLUMN: FULL-HEIGHT SLIDING SHOWCASE (Light Theme) ================= */}
       <div
-        className="relative w-full lg:w-1/2 xl:w-5/12 min-h-[440px] sm:min-h-[520px] lg:min-h-screen bg-slate-950 flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-hidden text-white"
+        className="relative w-full lg:w-1/2 xl:w-5/12 min-h-[440px] sm:min-h-[520px] lg:min-h-screen bg-gradient-to-br from-[#EAF5F2] via-[#F4FAF8] to-[#E3F2EF] flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-hidden text-slate-900 border-r border-teal-100/80"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
@@ -275,17 +275,17 @@ export default function AdminLogin() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Ambient Rich Overlays for High Legibility & Premium Atmosphere */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/45 to-slate-950/70 z-0 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-transparent to-slate-950/30 z-0 pointer-events-none" />
+        {/* Ambient Light Overlays for Clean Light Theme & High Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/50 to-white/20 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-transparent to-transparent z-0 pointer-events-none" />
 
         {/* TOP: Brand Logo & Interactive Admin Badge */}
         <div className="relative z-10 flex items-center justify-between w-full">
           <Link to="/" className="flex items-center gap-3 group cursor-pointer select-none">
             {/* Glowing Logo Icon */}
             <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-400 rounded-2xl blur-xs opacity-70 group-hover:opacity-100 transition duration-300" />
-              <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-teal-700/30 group-hover:scale-105 transition-transform duration-200">
+              <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-400 rounded-2xl blur-xs opacity-50 group-hover:opacity-100 transition duration-300" />
+              <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-teal-700/20 group-hover:scale-105 transition-transform duration-200">
                 <span className="font-heading font-black text-xl sm:text-2xl tracking-tight">W</span>
               </div>
             </div>
@@ -293,41 +293,34 @@ export default function AdminLogin() {
             {/* Brand Title + Admin Gateway Badge */}
             <div className="flex flex-col text-left">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-heading font-extrabold text-xl sm:text-2xl tracking-tight text-white leading-none">
+                <span className="font-heading font-extrabold text-xl sm:text-2xl tracking-tight text-slate-900 leading-none">
                   WELLWIGEN
                 </span>
 
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-500/20 border border-teal-400/40 text-teal-300 font-extrabold text-[10px] tracking-wider uppercase backdrop-blur-md shadow-2xs">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 font-extrabold text-[10px] tracking-wider uppercase backdrop-blur-md shadow-2xs">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                   </span>
                   <span>Admin Gateway</span>
                 </div>
               </div>
 
-              <span className="text-[8px] sm:text-[9px] font-extrabold tracking-[0.22em] text-teal-300/80 uppercase mt-1 whitespace-nowrap">
+              <span className="text-[8px] sm:text-[9px] font-extrabold tracking-[0.22em] text-teal-700 uppercase mt-1 whitespace-nowrap">
                 STRONGER BODY. BETTER YOU.
               </span>
             </div>
           </Link>
 
-          {/* Top Right Slide Counter */}
-          <div className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white/95 text-xs font-mono font-bold shadow-sm">
+          {/* Top Right Slide Counter in Light Theme */}
+          <div className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-slate-200/80 text-slate-800 text-xs font-mono font-bold shadow-xs">
             0{activeSlide + 1} / 0{SLIDES.length}
           </div>
         </div>
 
-        {/* BOTTOM: Slide Title, Subtitle, and Slide Controls (Like /login left format) */}
+        {/* BOTTOM: Slide Title, Subtitle, and Slide Controls (Light Theme) */}
         <div className="relative z-10 mt-auto pt-10">
-          {/* Slide Tag */}
-          <div className="mb-2.5">
-            <span className="inline-block text-[11px] font-extrabold uppercase tracking-widest text-teal-300 bg-teal-950/80 border border-teal-400/30 px-3 py-1 rounded-full backdrop-blur-md">
-              {current.tag}
-            </span>
-          </div>
-
-          {/* Main Slide Title with Vibrant Gradient */}
+          {/* Main Slide Title with Light-Theme Gradient */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeSlide}
@@ -336,20 +329,20 @@ export default function AdminLogin() {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.45, ease: 'easeOut' }}
             >
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-3 tracking-tight">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-slate-900 leading-tight mb-3 tracking-tight">
                 {current.title.split(' ')[0]}{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-300 to-teal-200">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-teal-700 to-emerald-700">
                   {current.title.split(' ').slice(1).join(' ')}
                 </span>
               </h2>
-              <p className="text-slate-300 text-sm sm:text-base font-medium max-w-lg leading-relaxed mb-6 drop-shadow-sm">
+              <p className="text-slate-600 text-sm sm:text-base font-medium max-w-lg leading-relaxed mb-6">
                 {current.subtitle}
               </p>
             </motion.div>
           </AnimatePresence>
 
-          {/* Slider Controls: Progress bars + Prev/Next buttons */}
-          <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/15">
+          {/* Slider Controls: Progress bars + Prev/Next buttons (Light Theme) */}
+          <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200/80">
             {/* Progress Indicators (all 8 slides) */}
             <div className="flex items-center gap-1.5 flex-1">
               {SLIDES.map((_, idx) => (
@@ -357,10 +350,10 @@ export default function AdminLogin() {
                   key={idx}
                   type="button"
                   onClick={() => setActiveSlide(idx)}
-                  className="h-1.5 rounded-full transition-all duration-300 cursor-pointer relative overflow-hidden"
+                  className="h-2 rounded-full transition-all duration-300 cursor-pointer relative overflow-hidden"
                   style={{
                     width: activeSlide === idx ? '32px' : '10px',
-                    backgroundColor: activeSlide === idx ? '#2DD4BF' : 'rgba(255,255,255,0.3)',
+                    backgroundColor: activeSlide === idx ? '#0D9488' : 'rgba(15, 23, 42, 0.16)',
                   }}
                   title={`Slide ${idx + 1}`}
                 />
@@ -372,7 +365,7 @@ export default function AdminLogin() {
               <button
                 type="button"
                 onClick={prevSlide}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20"
+                className="w-9 h-9 rounded-full bg-white/90 hover:bg-white active:scale-95 text-slate-700 hover:text-teal-700 shadow-sm border border-slate-200/80 flex items-center justify-center transition-all cursor-pointer"
                 title="Previous Slide"
               >
                 <ChevronLeft size={18} />
@@ -380,7 +373,7 @@ export default function AdminLogin() {
               <button
                 type="button"
                 onClick={nextSlide}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20"
+                className="w-9 h-9 rounded-full bg-white/90 hover:bg-white active:scale-95 text-slate-700 hover:text-teal-700 shadow-sm border border-slate-200/80 flex items-center justify-center transition-all cursor-pointer"
                 title="Next Slide"
               >
                 <ChevronRight size={18} />
@@ -392,18 +385,8 @@ export default function AdminLogin() {
 
       {/* ================= RIGHT COLUMN: CLEAN & SPACIOUS LOGIN FORM ================= */}
       <div className="w-full lg:w-1/2 xl:w-7/12 min-h-screen bg-white flex flex-col justify-between p-6 sm:p-10 lg:p-16 relative">
-        {/* Top Header Bar on Right: Security Indicator + Back to Home */}
-        <div className="flex items-center justify-between w-full pb-6 border-b border-slate-100">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50/80 border border-teal-200/80 text-[11px] font-bold text-teal-900 shadow-2xs">
-            <ShieldCheck size={14} className="text-teal-600" />
-            <span className="hidden sm:inline">256-Bit SSL Console</span>
-            <span className="hidden sm:inline text-teal-300">&bull;</span>
-            <span className="text-emerald-700 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Operational v2.4
-            </span>
-          </div>
-
+        {/* Top Header Bar on Right: Back to Home */}
+        <div className="flex items-center justify-end w-full pb-6 border-b border-slate-100">
           <Link
             to="/"
             className="group px-3.5 sm:px-4 py-2 rounded-xl bg-slate-50 hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-200 hover:border-teal-300 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-2xs"
