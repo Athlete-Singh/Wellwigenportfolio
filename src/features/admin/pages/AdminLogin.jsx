@@ -432,7 +432,11 @@ export default function AdminLogin() {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
+            {/* Hidden dummy fields to neutralize Chrome password manager autofill */}
+            <input type="text" name="chrome_prevent_autofill_username" className="hidden" tabIndex="-1" aria-hidden="true" autoComplete="off" />
+            <input type="password" name="chrome_prevent_autofill_password" className="hidden" tabIndex="-1" aria-hidden="true" autoComplete="new-password" />
+
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                 Admin Username or Email
@@ -443,11 +447,14 @@ export default function AdminLogin() {
                 </div>
                 <input
                   type="text"
+                  name="wellwigen_admin_portal_identifier"
+                  id="wellwigen_admin_portal_identifier"
+                  autoComplete="off"
                   required
-                  placeholder="aditya.singh@wellwigen.com"
+                  placeholder="Admin@gmail.com"
                   value={formData.identifier}
                   onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
-                  className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium placeholder-slate-400 shadow-2xs"
+                  className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium placeholder:text-slate-400 shadow-2xs"
                 />
               </div>
             </div>
@@ -462,11 +469,14 @@ export default function AdminLogin() {
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  name="wellwigen_admin_portal_secret"
+                  id="wellwigen_admin_portal_secret"
+                  autoComplete="new-password"
                   required
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium placeholder-slate-400 shadow-2xs"
+                  className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium placeholder:text-slate-400 shadow-2xs"
                 />
                 <button
                   type="button"

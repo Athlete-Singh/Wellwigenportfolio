@@ -123,37 +123,7 @@ import { collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from '
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
-/* [DISABLED FOR FUTURE USE] Clinical & Vendor Mock Data (APPOINTMENTS, RECORDS, VENDORS, MOCK_PENDING, MOCK_ACTIVE)
-// Dummy Data
-const APPOINTMENTS = [
-  { id: 'APT-001', patient: 'Rajesh Kumar', doctor: 'Dr. Sarah Jenkins', date: '2026-05-10', time: '10:00 AM', status: 'Confirmed' },
-  { id: 'APT-002', patient: 'Ananya Sharma', doctor: 'Dr. Julianne Smith', date: '2026-05-10', time: '11:30 AM', status: 'Pending' },
-  { id: 'APT-003', patient: 'Vikram Singh', doctor: 'Dr. Michael Chen', date: '2026-05-11', time: '02:00 PM', status: 'Confirmed' },
-  { id: 'APT-004', patient: 'Priya Verma', doctor: 'Dr. Sarah Jenkins', date: '2026-05-11', time: '04:30 PM', status: 'Cancelled' },
-];
 
-const RECORDS = [
-  { id: 'REC-9921', patient: 'Rajesh Kumar', type: 'Blood Test', date: '2026-05-01', laboratory: 'Apollo Diagnostics' },
-  { id: 'REC-9922', patient: 'Ananya Sharma', type: 'X-Ray Chest', date: '2026-04-28', laboratory: 'General Imaging' },
-  { id: 'REC-9923', patient: 'Suresh Raina', type: 'MRI Scan', date: '2026-04-25', laboratory: 'City Scan Center' },
-];
-
-const VENDORS = [
-  { id: 'VEN-001', name: 'Wellness Pharmacy', type: 'Pharmacy', status: 'Active', contact: 'Mr. Gupta' },
-  { id: 'VEN-002', name: 'Precision Labs', type: 'Laboratory', status: 'Pending', contact: 'Ms. Reddy' },
-  { id: 'VEN-003', name: 'MedEquip Inc', type: 'Equipment', status: 'Active', contact: 'Mr. Wilson' },
-];
-
-const MOCK_PENDING = [
-  { _id: 'mock-1', businessName: 'City Pharma', licenseNumber: 'LIC-2026-001', type: 'Pharmacy', ownerName: 'Amit Shah', email: 'amit@citypharma.com', phone: '+91 98765 43210', verificationStatus: 'pending' },
-  { _id: 'mock-2', businessName: 'Stellar Diagnostics', licenseNumber: 'LIC-2026-002', type: 'Laboratory', ownerName: 'Dr. Neha Kapoor', email: 'neha@stellar.com', phone: '+91 87654 32109', verificationStatus: 'pending' },
-];
-
-const MOCK_ACTIVE = [
-  { _id: 'mock-3', businessName: 'Global Meds', licenseNumber: 'LIC-2025-998', type: 'Pharmacy', ownerName: 'John Doe', email: 'john@globalmeds.com', phone: '+91 76543 21098', verificationStatus: 'approved' },
-  { _id: 'mock-4', businessName: 'Precision Pathology', licenseNumber: 'LIC-2025-999', type: 'Laboratory', ownerName: 'Sarah Smith', email: 'sarah@precision.com', phone: '+91 65432 10987', verificationStatus: 'approved' },
-];
-*/
 
 
 

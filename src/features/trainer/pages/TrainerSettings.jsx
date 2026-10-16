@@ -129,7 +129,7 @@ export default function TrainerSettings() {
             <input
               type="text"
               disabled
-              value={trainer.email || 'coach@example.com'}
+              value={trainer.email || 'Not provided'}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-medium"
             />
           </div>

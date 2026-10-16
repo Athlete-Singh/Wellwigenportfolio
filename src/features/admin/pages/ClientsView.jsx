@@ -47,11 +47,11 @@ const AVAILABLE_PLANS = [
 // Real client activity logs
 const DEFAULT_CLIENT_ACTIVITIES = {};
 
-export default function ClientsView() {
+export default function ClientsView({ onNavigateToMemberships }) {
   const [clients, setClients] = useState([]);
   const [coaches, setCoaches] = useState([]);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'expired' | 'trial'
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'pending_trainer' | 'memberships' | 'active' | 'expired'
   const [selectedClient, setSelectedClient] = useState(null);
   const [activities, setActivities] = useState(DEFAULT_CLIENT_ACTIVITIES);
   const [newActivityNote, setNewActivityNote] = useState('');
@@ -63,7 +63,7 @@ export default function ClientsView() {
   const [editingClient, setEditingClient] = useState(null);
   const [editFormData, setEditFormData] = useState({ name: '', email: '', phone: '', goal: '', assignedCoach: '' });
   const [editingMembership, setEditingMembership] = useState(null);
-  const [membershipFormData, setMembershipFormData] = useState({ plan: '', subscriptionStatus: 'Active', renewalDate: '' });
+  const [membershipFormData, setMembershipFormData] = useState({ plan: '', subscriptionStatus: 'Active', renewalDate: '', assignedCoach: '' });
   const [showAddModal, setShowAddModal] = useState(false);
   const [addFormData, setAddFormData] = useState({
     name: '',
@@ -138,13 +138,17 @@ export default function ClientsView() {
   const handleSaveEditProfile = (e) => {
     e.preventDefault();
     if (!editingClient) return;
-    trainerApi.updateClient(editingClient.id, editFormData);
+    const matchCoach = coaches.find((c) => c.name === editFormData.assignedCoach);
+    const updatedClientData = {
+      ...editFormData,
+      assignedCoachId: matchCoach?.id || matchCoach?._id || '',
+    };
+    trainerApi.updateClient(editingClient.id, updatedClientData);
     if (selectedClient && selectedClient.id === editingClient.id) {
-      setSelectedClient((prev) => ({ ...prev, ...editFormData }));
+      setSelectedClient((prev) => ({ ...prev, ...updatedClientData }));
     }
 
-    if (editFormData.assignedCoach && editFormData.assignedCoach !== editingClient.assignedCoach && editFormData.assignedCoach !== 'Unassigned') {
-      const matchCoach = coaches.find((c) => c.name === editFormData.assignedCoach);
+    if (editFormData.assignedCoach && editFormData.assignedCoach !== 'Unassigned') {
       trainerApi.assignCoachToTarget({
         assignmentType: 'client',
         targetId: editingClient.id,
@@ -158,11 +162,22 @@ export default function ClientsView() {
         coachId: matchCoach?.id || matchCoach?._id || '',
         adminNotes: 'Assigned via Profile Edit in Admin Panel',
       });
+
+      if (editingClient.plan && editingClient.plan !== 'No Active Subscription') {
+        trainerApi.syncClientToMembership({
+          ...editingClient,
+          ...updatedClientData,
+        });
+        toast.success(`🎉 ${editFormData.name} assigned to Coach ${editFormData.assignedCoach} and shifted to Memberships section!`);
+      } else {
+        toast.success('Client profile updated successfully!');
+      }
+    } else {
+      toast.success('Client profile updated successfully!');
     }
 
     setEditingClient(null);
     loadClientsData();
-    toast.success('Client profile updated successfully!');
   };
 
   // Open Edit Membership Modal
@@ -172,6 +187,7 @@ export default function ClientsView() {
       plan: client.plan || AVAILABLE_PLANS[0],
       subscriptionStatus: client.subscriptionStatus || 'Active',
       renewalDate: client.renewalDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      assignedCoach: (client.assignedCoach && client.assignedCoach !== 'Unassigned' && client.assignedCoach !== 'Vikram Rajput') ? client.assignedCoach : '',
     });
   };
 
@@ -179,24 +195,48 @@ export default function ClientsView() {
   const handleSaveMembership = (e) => {
     e.preventDefault();
     if (!editingMembership) return;
-    trainerApi.updateClient(editingMembership.id, {
+    const matchCoach = coaches.find((c) => c.name === membershipFormData.assignedCoach);
+    const updated = {
       plan: membershipFormData.plan,
       subscriptionStatus: membershipFormData.subscriptionStatus,
       status: membershipFormData.subscriptionStatus,
       renewalDate: membershipFormData.renewalDate,
-    });
+      assignedCoach: membershipFormData.assignedCoach || '',
+      assignedCoachId: matchCoach?.id || matchCoach?._id || '',
+    };
+    trainerApi.updateClient(editingMembership.id, updated);
+
+    if (membershipFormData.assignedCoach && membershipFormData.assignedCoach !== 'Unassigned') {
+      trainerApi.assignCoachToTarget({
+        assignmentType: 'client',
+        targetId: editingMembership.id,
+        targetName: editingMembership.name,
+        targetEmail: editingMembership.email,
+        targetPhone: editingMembership.phone,
+        targetGoal: editingMembership.goal,
+        plan: membershipFormData.plan,
+        totalSessions: editingMembership.totalSessions || 12,
+        coachName: membershipFormData.assignedCoach,
+        coachId: matchCoach?.id || matchCoach?._id || '',
+        adminNotes: 'Assigned via Membership in Admin Panel',
+      });
+    }
+
+    if (membershipFormData.assignedCoach && membershipFormData.assignedCoach !== 'Unassigned' && membershipFormData.plan && membershipFormData.plan !== 'No Active Subscription') {
+      trainerApi.syncClientToMembership({ ...editingMembership, ...updated });
+      toast.success(`🎉 ${editingMembership.name} shifted to the Memberships section!`);
+    } else {
+      toast.success('Membership & subscription updated!');
+    }
+
     if (selectedClient && selectedClient.id === editingMembership.id) {
       setSelectedClient((prev) => ({
         ...prev,
-        plan: membershipFormData.plan,
-        subscriptionStatus: membershipFormData.subscriptionStatus,
-        status: membershipFormData.subscriptionStatus,
-        renewalDate: membershipFormData.renewalDate,
+        ...updated,
       }));
     }
     setEditingMembership(null);
     loadClientsData();
-    toast.success('Membership & subscription updated!');
   };
 
   // Create New Subscriber
@@ -250,7 +290,7 @@ export default function ClientsView() {
         const fallbackRenewal = new Date(createdTime + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         const isFakePhone = c.phone && (c.phone.startsWith('+91 98765 1') || c.phone === '+91 98765 43210');
 
-        return {
+        const clientObj = {
           ...c,
           phone: isFakePhone ? '' : (c.phone || ''),
           subscriptionStatus: c.subscriptionStatus || (c.status === 'Active' ? 'Active' : 'Active'),
@@ -258,6 +298,12 @@ export default function ClientsView() {
           assignedCoach: (c.assignedCoach && c.assignedCoach !== 'Vikram Rajput' && c.assignedCoach !== 'Unassigned') ? c.assignedCoach : '',
           assignedCoachId: (c.assignedCoachId && c.assignedCoachId !== 'trn_demo_101') ? c.assignedCoachId : '',
         };
+
+        if (clientObj.assignedCoach && clientObj.plan && clientObj.plan !== 'No Active Subscription') {
+          trainerApi.syncClientToMembership(clientObj);
+        }
+
+        return clientObj;
       });
       setClients(enriched);
     } catch (e) {
@@ -267,6 +313,9 @@ export default function ClientsView() {
 
   useEffect(() => {
     loadClientsData();
+    trainerApi.syncConvertedInquiriesFromBackend().then(() => {
+      loadClientsData();
+    });
 
     // Load coaches
     const loadCoaches = async () => {
@@ -299,9 +348,18 @@ export default function ClientsView() {
         c.email?.toLowerCase().includes(search.toLowerCase()) ||
         c.assignedCoach?.toLowerCase().includes(search.toLowerCase());
 
-      const matchStatus =
-        statusFilter === 'all' ||
-        c.subscriptionStatus?.toLowerCase() === statusFilter.toLowerCase();
+      const isAssigned = c.assignedCoach && c.assignedCoach !== 'Unassigned' && c.assignedCoach.trim() !== '';
+      const hasPlan = c.plan && c.plan !== 'No Active Subscription' && c.plan.trim() !== '';
+      const isInMembership = isAssigned && hasPlan;
+
+      let matchStatus = true;
+      if (statusFilter === 'pending_trainer') {
+        matchStatus = !isAssigned || !hasPlan;
+      } else if (statusFilter === 'memberships') {
+        matchStatus = isInMembership;
+      } else if (statusFilter !== 'all') {
+        matchStatus = c.subscriptionStatus?.toLowerCase() === statusFilter.toLowerCase();
+      }
 
       return matchSearch && matchStatus;
     });
@@ -322,12 +380,26 @@ export default function ClientsView() {
   const handleReassignCoach = (clientId, newCoachName, newCoachId) => {
     const coachNameClean = newCoachName === 'Unassigned' ? '' : newCoachName;
     const coachIdClean = newCoachName === 'Unassigned' ? '' : newCoachId;
+    trainerApi.updateClient(clientId, {
+      assignedCoach: coachNameClean,
+      assignedCoachId: coachIdClean,
+    });
     setClients((prev) =>
-      prev.map((c) =>
-        c.id === clientId
-          ? { ...c, assignedCoach: coachNameClean, assignedCoachId: coachIdClean }
-          : c
-      )
+      prev.map((c) => {
+        if (c.id === clientId) {
+          const updated = {
+            ...c,
+            assignedCoach: coachNameClean,
+            assignedCoachId: coachIdClean,
+          };
+          if (coachNameClean && c.plan && c.plan !== 'No Active Subscription') {
+            trainerApi.syncClientToMembership(updated);
+            toast.success(`🎉 ${c.name} assigned to Coach ${coachNameClean} and shifted to Memberships section!`);
+          }
+          return updated;
+        }
+        return c;
+      })
     );
     if (selectedClient && selectedClient.id === clientId) {
       setSelectedClient((prev) => ({
@@ -336,10 +408,6 @@ export default function ClientsView() {
         assignedCoachId: coachIdClean,
       }));
     }
-    trainerApi.updateClient(clientId, {
-      assignedCoach: coachNameClean,
-      assignedCoachId: coachIdClean,
-    });
 
     if (coachNameClean) {
       const targetClient = clients.find((c) => c.id === clientId) || selectedClient;
@@ -358,7 +426,6 @@ export default function ClientsView() {
           adminNotes: `Reassigned by Admin to Coach ${coachNameClean}`,
         });
       }
-      toast.success(`Assigned coach updated to ${coachNameClean}! Automated cron will notify them via Panel, WhatsApp, and Email.`);
     } else {
       toast.success('Coach status set to Unassigned');
     }
@@ -510,17 +577,23 @@ export default function ClientsView() {
 
           {/* Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-            {['all', 'active', 'expired'].map((st) => (
+            {[
+              { id: 'all', label: 'All Clients' },
+              { id: 'pending_trainer', label: 'Needs Trainer' },
+              { id: 'memberships', label: 'In Memberships' },
+              { id: 'active', label: 'Active' },
+              { id: 'expired', label: 'Expired' },
+            ].map((tab) => (
               <button
-                key={st}
-                onClick={() => setStatusFilter(st)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer ${
-                  statusFilter === st
+                key={tab.id}
+                onClick={() => setStatusFilter(tab.id)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  statusFilter === tab.id
                     ? 'bg-[#009688] text-white shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                {st === 'all' ? 'All Clients' : st}
+                {tab.label}
               </button>
             ))}
           </div>
@@ -628,13 +701,43 @@ export default function ClientsView() {
                   {/* Right: Next Session & Action */}
                   {/* Right: Actions */}
                   <div className="flex items-center justify-between lg:justify-end gap-2 shrink-0">
+                    {/* Shifted to Memberships badge/link OR Assign Trainer prompt */}
+                    {client.assignedCoach && client.assignedCoach !== 'Unassigned' && client.plan && client.plan !== 'No Active Subscription' ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onNavigateToMemberships) onNavigateToMemberships();
+                        }}
+                        title="Shifted to Memberships - Click to view in Memberships section"
+                        className="px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                      >
+                        <CheckCircle2 size={13} className="text-teal-600" />
+                        <span className="hidden sm:inline">In Memberships</span>
+                        <ArrowRight size={11} className="text-teal-500" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditProfile(client);
+                        }}
+                        title="Assign Trainer & Enroll to shift this trainee to Memberships"
+                        className="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-800 border border-amber-300 font-bold text-xs transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
+                      >
+                        <UserCheck size={13} className="text-amber-600" />
+                        <span className="hidden sm:inline">Assign Trainer</span>
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleOpenEditMembership(client);
                       }}
-                      title="Manage / Change Membership Plan"
+                      title="Manage / Change Membership Plan & Coach"
                       className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs transition-all flex items-center gap-1 cursor-pointer"
                     >
                       <CreditCard size={13} />

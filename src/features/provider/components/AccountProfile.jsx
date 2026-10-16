@@ -35,17 +35,17 @@ const AccountProfile = () => {
   const storedInfo = JSON.parse(localStorage.getItem("providerInfo") || localStorage.getItem("vendorInfo") || "{}");
   
   const [profile, setProfile] = useState({
-    name: storedInfo.ownerName || storedInfo.name || 'John Doe',
-    email: storedInfo.email || 'john@example.com',
-    phone: storedInfo.phone || '+91 98765 43210',
-    profileImage: storedInfo.profileImage || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    shopName: storedInfo.businessName || storedInfo.name || 'Wellness Solutions',
-    address: storedInfo.location || storedInfo.storeAddress || 'Gomti Nagar, Lucknow, UP',
-    gstNumber: storedInfo.gstNumber || '09AAAAA0000A1Z5',
-    category: storedInfo.category || 'Nutrition & Health',
-    plan: 'Premium Partner',
-    planStatus: 'Active',
-    renewalDate: 'May 01, 2027'
+    name: storedInfo.ownerName || storedInfo.name || '',
+    email: storedInfo.email || '',
+    phone: storedInfo.phone || '',
+    profileImage: storedInfo.profileImage || '',
+    shopName: storedInfo.businessName || storedInfo.name || '',
+    address: storedInfo.location || storedInfo.storeAddress || '',
+    gstNumber: storedInfo.gstNumber || '',
+    category: storedInfo.category || '',
+    plan: storedInfo.plan || 'Standard Partner',
+    planStatus: storedInfo.planStatus || 'Active',
+    renewalDate: storedInfo.renewalDate || ''
   });
 
   const [editedProfile, setEditedProfile] = useState({ ...profile });

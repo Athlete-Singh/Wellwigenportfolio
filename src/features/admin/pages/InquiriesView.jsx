@@ -381,7 +381,10 @@ const InquiriesView = ({ onStatusChange, onNavigateToClients }) => {
             i.plan?.toLowerCase().includes(q)
         );
       }
-      if (statusFilter && statusFilter !== 'All') {
+      if (statusFilter === 'All') {
+        // Converted inquiries have finished and shifted to the Clients section; remove them from active inquiry list
+        finalInquiries = finalInquiries.filter((i) => i.status !== 'Converted');
+      } else if (statusFilter) {
         finalInquiries = finalInquiries.filter((i) => i.status === statusFilter);
       }
       if (programFilter && programFilter !== 'All') {
@@ -479,10 +482,29 @@ const InquiriesView = ({ onStatusChange, onNavigateToClients }) => {
       });
       if (res.data.success) {
         setSelectedInquiry(res.data.data);
-        setInquiries((prev) =>
-          prev.map((item) => (item._id === selectedInquiry._id ? res.data.data : item))
-        );
-        toast.success(`Status updated to ${newStatus}`);
+        if (newStatus === 'Converted') {
+          // Shift to Clients section
+          trainerApi.addClient({
+            name: selectedInquiry.fullName,
+            email: selectedInquiry.email,
+            phone: selectedInquiry.phone,
+            goal: selectedInquiry.fitnessGoal || 'General Fitness',
+            plan: selectedInquiry.plan || 'Total Wellness Monthly',
+            program: selectedInquiry.program || 'Personal Training',
+            status: 'Active',
+            subscriptionStatus: 'Active',
+          });
+          // Remove from inquiry records list
+          setInquiries((prev) =>
+            prev.filter((item) => (item._id || item.id) !== (selectedInquiry._id || selectedInquiry.id))
+          );
+          toast.success(`🎉 ${selectedInquiry.fullName} shifted to Clients section and removed from Inquiries!`);
+        } else {
+          setInquiries((prev) =>
+            prev.map((item) => (item._id === selectedInquiry._id ? res.data.data : item))
+          );
+          toast.success(`Status updated to ${newStatus}`);
+        }
         fetchInquiries();
       }
     } catch (err) {
@@ -679,18 +701,19 @@ const InquiriesView = ({ onStatusChange, onNavigateToClients }) => {
           coachId: convertCoachId,
           adminNotes: convertNotes || `Converted from Inquiry`,
         });
+        trainerApi.syncClientToMembership(clientData);
       }
+
+      // Remove converted inquiry from active inquiries table
       setInquiries((prev) =>
-        prev.map((item) =>
-          item._id === convertModalInquiry._id ? { ...item, status: 'Converted' } : item
-        )
+        prev.filter((item) => (item._id || item.id) !== (convertModalInquiry._id || convertModalInquiry.id))
       );
 
       if (selectedInquiry?._id === convertModalInquiry._id) {
         setSelectedInquiry((prev) => ({ ...prev, status: 'Converted' }));
       }
 
-      toast.success(`🎉 ${convertModalInquiry.fullName} successfully enrolled as Active Client!`);
+      toast.success(`🎉 ${convertModalInquiry.fullName} shifted to Clients section and removed from Inquiries!`);
       setConvertModalInquiry(null);
       fetchInquiries();
       if (onStatusChange) onStatusChange();

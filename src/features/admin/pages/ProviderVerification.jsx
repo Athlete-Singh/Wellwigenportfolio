@@ -26,18 +26,7 @@ const ProviderVerification = () => {
       const response = await axios.get(`${API_URL}/provider/admin/pending`);
       setProviders(response.data.data || []);
     } catch (err) {
-      setProviders([
-        {
-          _id: '1',
-          businessName: 'Apollo Diagnostics',
-          ownerName: 'Dr. Sarah Chen',
-          type: 'LAB',
-          phone: '+91 98765 43210',
-          email: 'sarah@apollo.com',
-          licenseNumber: 'NABL-123456',
-          createdAt: new Date().toISOString()
-        }
-      ]);
+      setProviders([]);
     } finally {
       setLoading(false);
     }

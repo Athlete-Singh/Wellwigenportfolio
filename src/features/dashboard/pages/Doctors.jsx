@@ -1,11 +1,6 @@
 import React from "react";
 
-const doctorsData = [
-  { id: 1, name: "Dr. Smith", specialization: "Cardiologist", contact: "9876543210", email: "smith@hospital.com" },
-  { id: 2, name: "Dr. Johnson", specialization: "Dermatologist", contact: "9123456780", email: "johnson@hospital.com" },
-  { id: 3, name: "Dr. Lee", specialization: "Neurologist", contact: "9988776655", email: "lee@hospital.com" },
-  { id: 4, name: "Dr. Patel", specialization: "Pediatrician", contact: "9871122334", email: "patel@hospital.com" }
-];
+const doctorsData = [];
 
 export default function Doctors() {
   return (
@@ -25,15 +20,23 @@ export default function Doctors() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {doctorsData.map((doctor) => (
-              <tr key={doctor.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm text-gray-600">{doctor.id}</td>
-                <td className="px-6 py-4 text-sm text-gray-800">{doctor.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{doctor.specialization}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{doctor.contact}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{doctor.email}</td>
+            {doctorsData.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="px-6 py-12 text-center text-sm text-gray-400">
+                  No doctors registered yet.
+                </td>
               </tr>
-            ))}
+            ) : (
+              doctorsData.map((doctor) => (
+                <tr key={doctor.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-600">{doctor.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{doctor.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{doctor.specialization}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{doctor.contact}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{doctor.email}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

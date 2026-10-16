@@ -198,11 +198,11 @@ export default function UserDashboard() {
     }
 
     return {
-      name: "Rajesh Kumar",
-      email: "rajesh@example.com",
-      phone: "+91 98765 43210",
-      avatar: "https://i.pravatar.cc/150?img=32",
-      joinDate: "January 2026"
+      name: "User",
+      email: "",
+      phone: "",
+      avatar: "",
+      joinDate: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     };
   });
 

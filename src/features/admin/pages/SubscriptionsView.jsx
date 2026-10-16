@@ -65,7 +65,7 @@ const INITIAL_DEFAULT_PLANS = [
 // Production subscription records mapping clients to plans
 const INITIAL_MOCK_SUBSCRIPTIONS = [];
 
-export default function SubscriptionsView() {
+export default function SubscriptionsView({ onNavigateToClients }) {
   const [activeSubTab, setActiveSubTab] = useState('memberships'); // 'memberships' | 'mapping' | 'plans'
   const [plans, setPlans] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
@@ -104,24 +104,94 @@ export default function SubscriptionsView() {
     }
   };
 
-  useEffect(() => {
-    fetchPlans();
-    // Load subscriptions from local state/storage (purge legacy mock subscriptions)
+  // Load and auto-sync subscriptions from storage and clients with assigned coach + enrolled plan
+  const loadSubscriptions = () => {
     try {
+      let subs = [];
       const savedSubs = localStorage.getItem('wellwigen_admin_subscriptions');
       if (savedSubs) {
-        if (savedSubs.includes('sub_101') || savedSubs.includes('Arjun Mehra')) {
-          localStorage.setItem('wellwigen_admin_subscriptions', JSON.stringify([]));
-          setSubscriptions([]);
-        } else {
-          setSubscriptions(JSON.parse(savedSubs));
+        if (!savedSubs.includes('sub_101') && !savedSubs.includes('Arjun Mehra')) {
+          subs = JSON.parse(savedSubs);
+          if (!Array.isArray(subs)) subs = [];
         }
-      } else {
-        setSubscriptions([]);
       }
+
+      // Auto-sync clients who have assigned trainer AND enrolled plan from trainerApi
+      const clients = trainerApi.getClients();
+      let modified = false;
+
+      (Array.isArray(clients) ? clients : []).forEach((c) => {
+        const hasCoach = c.assignedCoach && c.assignedCoach !== 'Unassigned' && c.assignedCoach !== 'Vikram Rajput' && String(c.assignedCoach).trim() !== '';
+        const hasPlan = c.plan && c.plan !== 'No Active Subscription' && String(c.plan).trim() !== '';
+
+        if (hasCoach && hasPlan) {
+          const existingIdx = subs.findIndex(
+            (s) => s.clientId === c.id || (s.clientEmail && c.email && s.clientEmail.toLowerCase() === c.email.toLowerCase())
+          );
+
+          const planName = c.plan || 'Total Wellness Monthly';
+          let planTier = 'Active Tier';
+          let price = '₹2,999';
+          if (planName.toLowerCase().includes('elite') || planName.toLowerCase().includes('premium') || planName.toLowerCase().includes('1-on-1')) {
+            planTier = 'VIP Elite';
+            price = '₹5,999';
+          } else if (planName.toLowerCase().includes('strength') || planName.toLowerCase().includes('transform')) {
+            planTier = 'Popular';
+            price = '₹2,999';
+          } else if (planName.toLowerCase().includes('mobility') || planName.toLowerCase().includes('flex') || planName.toLowerCase().includes('group')) {
+            planTier = 'Starter';
+            price = '₹1,999';
+          }
+
+          const record = {
+            id: existingIdx !== -1 ? subs[existingIdx].id : `sub_${c.id || Date.now()}`,
+            clientId: c.id,
+            clientName: c.name,
+            clientEmail: c.email,
+            clientPhone: c.phone || '',
+            planName: c.plan,
+            planTier,
+            price,
+            billingCycle: 'Monthly',
+            assignedCoach: c.assignedCoach,
+            assignedCoachId: c.assignedCoachId || '',
+            startDate: c.createdAt ? new Date(c.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            expiryDate: c.renewalDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            status: c.subscriptionStatus || 'Active',
+          };
+
+          if (existingIdx !== -1) {
+            subs[existingIdx] = { ...subs[existingIdx], ...record };
+          } else {
+            subs.unshift(record);
+            modified = true;
+          }
+        }
+      });
+
+      if (modified) {
+        localStorage.setItem('wellwigen_admin_subscriptions', JSON.stringify(subs));
+      }
+      setSubscriptions(subs);
     } catch {
       setSubscriptions([]);
     }
+  };
+
+  useEffect(() => {
+    fetchPlans();
+    loadSubscriptions();
+
+    const handleUpdate = () => {
+      loadSubscriptions();
+    };
+
+    window.addEventListener('wellwigen_subscriptions_updated', handleUpdate);
+    window.addEventListener('wellwigen_clients_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('wellwigen_subscriptions_updated', handleUpdate);
+      window.removeEventListener('wellwigen_clients_updated', handleUpdate);
+    };
   }, []);
 
   // Save subscriptions to storage
@@ -266,6 +336,13 @@ export default function SubscriptionsView() {
         const currentExp = new Date(s.expiryDate);
         currentExp.setDate(currentExp.getDate() + 30);
         const newExpStr = currentExp.toISOString().split('T')[0];
+        if (s.clientId || s.clientEmail) {
+          trainerApi.updateClient(s.clientId || s.clientEmail, {
+            renewalDate: newExpStr,
+            subscriptionStatus: 'Active',
+            status: 'Active',
+          });
+        }
         return { ...s, expiryDate: newExpStr, status: 'Active' };
       }
       return s;
@@ -313,6 +390,12 @@ export default function SubscriptionsView() {
   const handleChangeSubStatus = (subId, newStatus) => {
     const updated = subscriptions.map((s) => {
       if (s.id === subId) {
+        if (s.clientId || s.clientEmail) {
+          trainerApi.updateClient(s.clientId || s.clientEmail, {
+            subscriptionStatus: newStatus,
+            status: newStatus,
+          });
+        }
         return { ...s, status: newStatus };
       }
       return s;

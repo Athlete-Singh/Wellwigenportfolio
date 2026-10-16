@@ -36,7 +36,7 @@ const initStorage = () => {
           let modified = false;
           // Filter out dummy users
           const filtered = clientsList.filter(
-            (c) => c.name !== 'Arjun Mehra' && c.name !== 'Simran Kaur' && c.id !== 'cli_1'
+            (c) => c.name !== 'Arjun Mehra' && c.name !== 'Simran Kaur' && c.id !== 'cli_1' && c.name !== 'Test Deletion Target' && c.email !== 'testdelete@test.com'
           ).map((c) => {
             let updated = { ...c };
             if (updated.assignedCoach === 'Vikram Rajput') {
@@ -52,7 +52,7 @@ const initStorage = () => {
               updated.avatar = '';
               modified = true;
             }
-            if (updated.phone && updated.phone.startsWith('+91 98765 1')) {
+            if (updated.phone && (updated.phone.startsWith('+91 98765 1') || updated.phone === '+91 98765 43210' || updated.phone === '9999999999')) {
               updated.phone = '';
               modified = true;
             }
@@ -493,6 +493,7 @@ export const trainerApi = {
           updatedAt: new Date().toISOString(),
         };
         localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(clients));
+        this.syncClientToMembership(clients[existingIdx]);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new Event('wellwigen_clients_updated'));
         }
@@ -513,7 +514,7 @@ export const trainerApi = {
         status: 'Active',
         subscriptionStatus: 'Active',
         renewalDate: clientData.renewalDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        assignedCoach: (clientData.assignedCoach && clientData.assignedCoach !== 'Vikram Rajput') ? clientData.assignedCoach : '',
+        assignedCoach: (clientData.assignedCoach && clientData.assignedCoach !== 'Vikram Rajput' && clientData.assignedCoach !== 'Unassigned') ? clientData.assignedCoach : '',
         assignedCoachId: (clientData.assignedCoachId && clientData.assignedCoachId !== 'trn_demo_101') ? clientData.assignedCoachId : '',
         avatar: clientData.avatar || '',
         source: 'inquiry_converted',
@@ -522,6 +523,7 @@ export const trainerApi = {
 
       clients.unshift(newClient);
       localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(clients));
+      this.syncClientToMembership(newClient);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('wellwigen_clients_updated'));
       }
@@ -529,6 +531,93 @@ export const trainerApi = {
     } catch (e) {
       console.error('Failed to add client:', e);
       return null;
+    }
+  },
+
+  // Shift client to Membership section when trainer assigned and plan enrolled
+  syncClientToMembership(client) {
+    if (!client) return;
+    const hasCoach = client.assignedCoach && client.assignedCoach !== 'Unassigned' && client.assignedCoach !== 'Vikram Rajput' && String(client.assignedCoach).trim() !== '';
+    const hasPlan = client.plan && client.plan !== 'No Active Subscription' && String(client.plan).trim() !== '';
+    if (!hasCoach || !hasPlan) return;
+
+    try {
+      const rawSubs = localStorage.getItem('wellwigen_admin_subscriptions');
+      let subs = rawSubs ? JSON.parse(rawSubs) : [];
+      if (!Array.isArray(subs)) subs = [];
+
+      const existingIdx = subs.findIndex(
+        (s) => s.clientId === client.id || (s.clientEmail && client.email && s.clientEmail.toLowerCase() === client.email.toLowerCase())
+      );
+
+      const planName = client.plan || 'Total Wellness Monthly';
+      let planTier = 'Active Tier';
+      let price = '₹2,999';
+      if (planName.toLowerCase().includes('elite') || planName.toLowerCase().includes('premium') || planName.toLowerCase().includes('1-on-1')) {
+        planTier = 'VIP Elite';
+        price = '₹5,999';
+      } else if (planName.toLowerCase().includes('strength') || planName.toLowerCase().includes('transform')) {
+        planTier = 'Popular';
+        price = '₹2,999';
+      } else if (planName.toLowerCase().includes('mobility') || planName.toLowerCase().includes('flex') || planName.toLowerCase().includes('group')) {
+        planTier = 'Starter';
+        price = '₹1,999';
+      }
+
+      const subRecord = {
+        id: existingIdx !== -1 ? subs[existingIdx].id : `sub_${client.id || Date.now()}`,
+        clientId: client.id,
+        clientName: client.name,
+        clientEmail: client.email,
+        clientPhone: client.phone || '',
+        planName: client.plan,
+        planTier,
+        price,
+        billingCycle: 'Monthly',
+        assignedCoach: client.assignedCoach,
+        assignedCoachId: client.assignedCoachId || '',
+        startDate: client.createdAt ? new Date(client.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        expiryDate: client.renewalDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        status: client.subscriptionStatus || 'Active',
+        updatedAt: new Date().toISOString(),
+      };
+
+      if (existingIdx !== -1) {
+        subs[existingIdx] = { ...subs[existingIdx], ...subRecord };
+      } else {
+        subs.unshift(subRecord);
+      }
+
+      localStorage.setItem('wellwigen_admin_subscriptions', JSON.stringify(subs));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('wellwigen_subscriptions_updated'));
+      }
+    } catch (err) {
+      console.warn('syncClientToMembership notice:', err);
+    }
+  },
+
+  async syncConvertedInquiriesFromBackend() {
+    try {
+      const res = await axios.get(`${API_BASE}/inquiries?status=Converted`);
+      const converted = res.data?.data || [];
+      if (Array.isArray(converted) && converted.length > 0) {
+        converted.forEach((inq) => {
+          this.addClient({
+            name: inq.fullName,
+            email: inq.email,
+            phone: inq.phone,
+            goal: inq.fitnessGoal || 'General Fitness',
+            plan: inq.plan || 'Online Group Classes Monthly',
+            program: inq.program || 'Fitness Program',
+            assignedCoach: (inq.assignedCoach && inq.assignedCoach !== 'Unassigned') ? inq.assignedCoach : '',
+            assignedCoachId: inq.assignedCoachId || '',
+            source: 'inquiry_converted',
+          });
+        });
+      }
+    } catch (err) {
+      // offline / mock fallback
     }
   },
 
@@ -567,6 +656,7 @@ export const trainerApi = {
       if (idx !== -1) {
         clients[idx] = { ...clients[idx], ...updatedData, updatedAt: new Date().toISOString() };
         localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(clients));
+        this.syncClientToMembership(clients[idx]);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new Event('wellwigen_clients_updated'));
         }
@@ -1133,3 +1223,11 @@ export const trainerApi = {
 };
 
 export default trainerApi;
+
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    trainerApi.syncConvertedInquiriesFromBackend();
+  }, 300);
+}
+
+

@@ -67,13 +67,7 @@ const StatCard = ({ label, value, trend, subtext, trendIcon: TrendIcon = Trendin
 // --- Sub Views ---
 
 const ClientsView = () => {
-  const [clients, setClients] = useState([
-    { id: 1, name: 'Neha Srivastava', goal: 'Weight Loss', streak: '14d', progress: '-3.2 kg', initials: 'NS', color: 'bg-purple-100 text-purple-700', phone: '+91 98765 43210', email: 'neha.s@example.com', joined: 'Oct 1, 2026', nextSession: 'Tomorrow, 7:30 AM' },
-    { id: 2, name: 'Rajan Khanna', goal: 'Strength', streak: '22d', progress: 'Bench +8 kg', initials: 'RK', color: 'bg-blue-100 text-blue-700', phone: '+91 98765 43211', email: 'rajan.k@example.com', joined: 'Sep 15, 2026', nextSession: 'Today, 9:00 AM' },
-    { id: 3, name: 'Priya Sharma', goal: 'Flexibility', streak: '5d', progress: 'Level 2', initials: 'PS', color: 'bg-pink-100 text-pink-700', phone: '+91 98765 43212', email: 'priya.s@example.com', joined: 'Oct 15, 2026', nextSession: 'Oct 26, 6:00 AM' },
-    { id: 4, name: 'Amit Patel', goal: 'Weight Loss', streak: '1d', progress: '-0.5 kg', initials: 'AP', color: 'bg-emerald-100 text-emerald-700', phone: '+91 98765 43213', email: 'amit.p@example.com', joined: 'Oct 23, 2026', nextSession: 'Today, 11:00 AM' },
-    { id: 5, name: 'Sarah Jones', goal: 'Endurance', streak: '30d', progress: '5k Run', initials: 'SJ', color: 'bg-orange-100 text-orange-700', phone: '+91 98765 43214', email: 'sarah.j@example.com', joined: 'Aug 10, 2026', nextSession: 'Today, 4:30 PM' },
-  ]);
+  const [clients, setClients] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClient, setSelectedClient] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);

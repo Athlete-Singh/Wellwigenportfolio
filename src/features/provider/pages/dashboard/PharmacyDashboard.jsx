@@ -201,47 +201,52 @@ const InventoryView = () => (
   </motion.div>
 );
 
-const PatientsView = () => (
-  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {[
-        { name: 'Suresh Kumar', type: 'Chronic', phone: '+91 98765 00001', refills: 4, lastVisit: '2 days ago', initials: 'SK', color: 'bg-blue-100 text-blue-700' },
-        { name: 'Ravi Mehta', type: 'High Risk', phone: '+91 98765 00002', refills: 12, lastVisit: 'Today', initials: 'RM', color: 'bg-red-100 text-red-700' },
-        { name: 'Anjali Desai', type: 'General', phone: '+91 98765 00003', refills: 1, lastVisit: '1 week ago', initials: 'AD', color: 'bg-purple-100 text-purple-700' },
-        { name: 'Vikram Singh', type: 'Chronic', phone: '+91 98765 00004', refills: 8, lastVisit: 'Yesterday', initials: 'VS', color: 'bg-emerald-100 text-emerald-700' },
-      ].map((patient, i) => (
-        <div key={i} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition">
-          <div className="flex items-start gap-4 mb-4">
-            <div className={`w-12 h-12 rounded-full ${patient.color} flex items-center justify-center font-bold text-lg shrink-0`}>
-              {patient.initials}
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900">{patient.name}</h3>
-              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider inline-block mt-1 ${
-                patient.type === 'High Risk' ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-600'
-              }`}>{patient.type}</span>
-            </div>
-          </div>
-          <div className="space-y-2 mt-4 text-sm">
-            <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-              <span className="text-gray-500 font-medium">Phone</span>
-              <span className="font-semibold text-gray-900">{patient.phone}</span>
-            </div>
-            <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-              <span className="text-gray-500 font-medium">Auto-Refills</span>
-              <span className="font-semibold text-gray-900">{patient.refills} times</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500 font-medium">Last Order</span>
-              <span className="font-semibold text-gray-900">{patient.lastVisit}</span>
-            </div>
-          </div>
-          <button className="w-full mt-4 py-2 bg-gray-50 text-gray-700 font-semibold text-xs rounded-lg hover:bg-gray-100 transition">View History</button>
+const PatientsView = () => {
+  const [patients] = useState([]);
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+      {patients.length === 0 ? (
+        <div className="bg-white border border-gray-200 rounded-xl p-12 text-center text-gray-400">
+          <p className="font-semibold text-gray-600">No patient records registered yet.</p>
+          <p className="text-xs text-gray-400 mt-1">Prescriptions and pharmacy orders will appear here automatically.</p>
         </div>
-      ))}
-    </div>
-  </motion.div>
-);
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {patients.map((patient, i) => (
+            <div key={i} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition">
+              <div className="flex items-start gap-4 mb-4">
+                <div className={`w-12 h-12 rounded-full ${patient.color} flex items-center justify-center font-bold text-lg shrink-0`}>
+                  {patient.initials}
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900">{patient.name}</h3>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider inline-block mt-1 ${
+                    patient.type === 'High Risk' ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-600'
+                  }`}>{patient.type}</span>
+                </div>
+              </div>
+              <div className="space-y-2 mt-4 text-sm">
+                <div className="flex justify-between items-center pb-2 border-b border-gray-50">
+                  <span className="text-gray-500 font-medium">Phone</span>
+                  <span className="font-semibold text-gray-900">{patient.phone}</span>
+                </div>
+                <div className="flex justify-between items-center pb-2 border-b border-gray-50">
+                  <span className="text-gray-500 font-medium">Auto-Refills</span>
+                  <span className="font-semibold text-gray-900">{patient.refills} times</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 font-medium">Last Order</span>
+                  <span className="font-semibold text-gray-900">{patient.lastVisit}</span>
+                </div>
+              </div>
+              <button className="w-full mt-4 py-2 bg-gray-50 text-gray-700 font-semibold text-xs rounded-lg hover:bg-gray-100 transition">View History</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+};
 
 const ReportsView = () => (
   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
