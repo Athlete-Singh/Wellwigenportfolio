@@ -66,16 +66,21 @@ export default function LivePersonalTrainerHero() {
         }}
         className="relative w-full h-[360px] xs:h-[420px] sm:h-[500px] md:h-[580px] lg:h-[650px] xl:h-[700px] flex items-center justify-center overflow-visible"
       >
-        {/* ================= COMPACT VIBRANT ARCHITECTURAL FORMATION ================= */}
-        {/* Background shapes restored to original moderate size (~50-54%), so the large image breaks out dramatically in 3D */}
-        <motion.div
+        {/* ================= COMPACT VIBRANT ARCHITECTURAL FORMATION (Shifted left per user request) ================= */}
+        <div
+          className="absolute inset-0 pointer-events-none"
           style={{
-            x: prefersReducedMotion ? 0 : wallTranslateX,
-            y: prefersReducedMotion ? 0 : wallTranslateY,
-            transformStyle: 'preserve-3d',
+            transform: 'translateX(-54px)',
           }}
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
         >
+          <motion.div
+            style={{
+              x: prefersReducedMotion ? 0 : wallTranslateX,
+              y: prefersReducedMotion ? 0 : wallTranslateY,
+              transformStyle: 'preserve-3d',
+            }}
+            className="w-full h-full flex items-center justify-center pointer-events-none"
+          >
           {/* Radiant Multi-Color Ambient Bloom */}
           <div
             className="absolute top-[16%] sm:top-[18%] w-[68%] sm:w-[62%] lg:w-[58%] xl:w-[54%] h-[66%] sm:h-[62%] lg:h-[58%] xl:h-[56%] rounded-[48px] bg-gradient-to-tr from-teal-400/30 via-emerald-400/20 to-orange-400/15 blur-2xl -z-10"
@@ -228,6 +233,7 @@ export default function LivePersonalTrainerHero() {
             }}
           />
         </motion.div>
+        </div>
 
         {/* ================= ENLARGED 3D BREAK-OUT TRAINER & ATHLETE DUO ================= */}
         {/* Cutout image is significantly enlarged, breaking out dramatically beyond the background box in true 3D */}
