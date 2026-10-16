@@ -36,7 +36,7 @@ export default function LiveAthleteHero() {
         style={{
           position: 'absolute',
           top: 'var(--athlete-top-offset, 52px)',
-          right: 'clamp(-130px, calc((100vw - 1440px) / 2 - 50px), 220px)',
+          right: 'clamp(-150px, calc((100vw - 1440px) / 2 - 75px), 200px)',
           width: 'var(--athlete-width)',
           height: 'var(--athlete-height)',
           maskImage: 'linear-gradient(to bottom, black 84%, transparent 99%)',
@@ -144,7 +144,7 @@ export default function LiveAthleteHero() {
         <div
           className="relative z-10 w-full h-full pointer-events-none select-none"
           style={{
-            transform: 'translate(-40px, 32px)',
+            transform: 'translate(-20px, 32px)',
           }}
         >
           <motion.div
