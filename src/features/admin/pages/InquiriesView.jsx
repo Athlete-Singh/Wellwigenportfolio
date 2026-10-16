@@ -396,14 +396,16 @@ const InquiriesView = ({ onStatusChange, onNavigateToClients }) => {
       const contactedCount = combined.filter((i) => i.status === 'Contacted').length;
       const convertedCount = combined.filter((i) => i.status === 'Converted').length;
 
-      setStats(
-        serverStats || {
-          total,
-          new: newCount,
-          contacted: contactedCount,
-          converted: convertedCount,
-        }
-      );
+      setStats({
+        total: (serverStats && serverStats.total >= total) ? serverStats.total : total,
+        new: newCount,
+        contacted: contactedCount,
+        converted: convertedCount,
+      });
+
+      if (typeof onStatusChange === 'function') {
+        onStatusChange(newCount);
+      }
     } catch (err) {
       console.warn('Inquiries processing notice:', err.message);
     } finally {

@@ -341,12 +341,14 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
     // 1. Immediately persist locally so 0 leads are EVER lost
     try {
       const existingLeads = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
-      existingLeads.unshift(leadRecord);
-      localStorage.setItem('wellwigen_leads', JSON.stringify(existingLeads));
-
-      const existingInquiries = JSON.parse(localStorage.getItem('wellwigen_inquiries') || '[]');
-      existingInquiries.unshift(leadRecord);
-      localStorage.setItem('wellwigen_inquiries', JSON.stringify(existingInquiries));
+      const newKey = `${(leadRecord.email || '').toLowerCase().trim()}_${(leadRecord.phone || '').replace(/\D/g, '')}`;
+      const filteredLeads = existingLeads.filter((l) => {
+        const itemKey = `${(l.email || '').toLowerCase().trim()}_${(l.phone || '').replace(/\D/g, '')}`;
+        return itemKey !== newKey && l._id !== leadRecord._id;
+      });
+      filteredLeads.unshift(leadRecord);
+      localStorage.setItem('wellwigen_leads', JSON.stringify(filteredLeads));
+      localStorage.setItem('wellwigen_inquiries', JSON.stringify(filteredLeads));
 
       window.dispatchEvent(new CustomEvent('wellwigen_lead_submitted', { detail: leadRecord }));
       window.dispatchEvent(new Event('storage'));

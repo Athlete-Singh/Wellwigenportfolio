@@ -683,7 +683,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
         // Fallback to local storage
       }
 
-      // Read locally captured leads
+      // Read locally captured leads and deduplicate by email, phone, and ID
       let cachedRaw = [];
       try {
         const leads1 = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
@@ -691,11 +691,33 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
         cachedRaw = [...leads1, ...leads2];
       } catch (e) {}
 
-      const localMapped = cachedRaw.map((item, idx) => ({
+      // Deduplicate raw local leads first by email and phone
+      const localUnique = [];
+      const seenLocalKeys = new Set();
+      for (const item of cachedRaw) {
+        const emailKey = (item.email || item.emailAddress || '').toLowerCase().trim();
+        const phoneKey = (item.phone || item.phoneNumber || '').replace(/\D/g, '');
+        const key = `${emailKey}_${phoneKey}`;
+        const idKey = String(item._id || item.id || '');
+        if (key && key !== '_') {
+          if (!seenLocalKeys.has(key)) {
+            seenLocalKeys.add(key);
+            if (idKey) seenLocalKeys.add(idKey);
+            localUnique.push(item);
+          }
+        } else if (idKey) {
+          if (!seenLocalKeys.has(idKey)) {
+            seenLocalKeys.add(idKey);
+            localUnique.push(item);
+          }
+        }
+      }
+
+      const localMapped = localUnique.map((item, idx) => ({
         _id: item._id || item.id || `cached_${idx}`,
         fullName: item.fullName || item.name || 'Visitor',
-        email: item.email || '',
-        phone: item.phone || '',
+        email: item.email || item.emailAddress || '',
+        phone: item.phone || item.phoneNumber || '',
         program: item.program || 'General Inquiry',
         plan: item.plan || 'Trial Class',
         fitnessGoal: item.fitnessGoal || '',
@@ -706,25 +728,39 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
         createdAt: item.createdAt || item.timestamp || new Date().toISOString(),
       }));
 
-      // Combine and deduplicate
+      // Combine and deduplicate against server leads
       const combined = [...serverLeads];
+      const seenKeys = new Set(
+        serverLeads.map((s) => `${(s.email || '').toLowerCase().trim()}_${(s.phone || '').replace(/\D/g, '')}`)
+      );
       const seenIds = new Set(serverLeads.map((s) => String(s._id || s.id)));
+
       for (const loc of localMapped) {
-        if (!seenIds.has(String(loc._id))) {
-          seenIds.add(String(loc._id));
+        const locId = String(loc._id);
+        const locKey = `${(loc.email || '').toLowerCase().trim()}_${(loc.phone || '').replace(/\D/g, '')}`;
+        if (!seenIds.has(locId) && (!locKey || locKey === '_' || !seenKeys.has(locKey))) {
+          seenIds.add(locId);
+          if (locKey && locKey !== '_') seenKeys.add(locKey);
           combined.unshift(loc);
         }
       }
 
       setRecentInquiriesList(combined.slice(0, 10));
       setNotifications(combined.slice(0, 10));
-      setNewInquiriesCount(newCount || combined.filter((i) => i.status === 'New').length);
+      const verifiedNewCount = combined.filter((i) => i.status === 'New').length;
+      setNewInquiriesCount(verifiedNewCount);
     } catch (err) {
       console.warn('Dashboard inquiries load notice:', err.message);
     }
   };
 
-  const fetchInquiriesCount = fetchInquiriesData;
+  const fetchInquiriesCount = (overrideCount) => {
+    if (typeof overrideCount === 'number') {
+      setNewInquiriesCount(overrideCount);
+    } else {
+      fetchInquiriesData();
+    }
+  };
 
   // Fetch real trainers from MongoDB
   const fetchTrainersData = async () => {
