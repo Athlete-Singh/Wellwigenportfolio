@@ -161,12 +161,17 @@ export default function AdminLogin() {
       ];
       const masterPassList = [
         'bodyfit@wwg',
+        'bodyfit.wwg',
+        'bodyfit',
         'admin123',
         'admin@123',
         'wellwigen@2026',
+        'wellwigen.2026',
       ];
-      const isMasterUser = masterUserList.includes(normUser);
-      const isMasterPass = masterPassList.includes(trimmedPassword.toLowerCase());
+      const isMasterUser = masterUserList.some((u) => u.toLowerCase() === normUser);
+      const isMasterPass = masterPassList.some(
+        (p) => p.toLowerCase() === trimmedPassword.toLowerCase()
+      );
 
       try {
         const res = await axios.post(
