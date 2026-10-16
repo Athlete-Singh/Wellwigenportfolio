@@ -258,65 +258,74 @@ export default function LiveGroupClassesHero() {
           }}
           className="relative z-10 w-[100%] sm:w-[102%] lg:w-[106%] xl:w-[108%] h-[100%] sm:h-[102%] lg:h-[104%] flex items-end justify-center pointer-events-none"
         >
-          {/* Photorealistic Studio Floor Shadow 1: Diffuse Ambient Shadow */}
+          {/* Positional and Scale Calibration Wrapper */}
           <div
-            className="absolute inset-0 pointer-events-none select-none flex items-end justify-center"
+            className="relative w-full h-full flex items-end justify-center pointer-events-none"
             style={{
-              transform: 'translate(4px, 18px) scale(0.985)',
-              filter: 'blur(22px)',
-              opacity: 0.44,
+              transform: 'translateY(-18px) scale(1.045)',
+              transformOrigin: 'bottom center',
             }}
-            aria-hidden="true"
           >
-            <picture className="w-full h-full block">
-              <source srcSet="/images/group_yoga_athletes_cutout.webp" type="image/webp" />
-              <img
-                src="/images/group_yoga_athletes_cutout.png"
-                alt=""
-                className="w-full h-full object-contain pointer-events-none"
-                style={{ filter: 'brightness(0)' }}
-              />
-            </picture>
-          </div>
-
-          {/* Photorealistic Studio Floor Shadow 2: Directional Contact Shadow */}
-          <div
-            className="absolute inset-0 pointer-events-none select-none flex items-end justify-center"
-            style={{
-              transform: 'translate(2px, 8px) scale(0.995)',
-              filter: 'blur(9px)',
-              opacity: 0.28,
-            }}
-            aria-hidden="true"
-          >
-            <picture className="w-full h-full block">
-              <source srcSet="/images/group_yoga_athletes_cutout.webp" type="image/webp" />
-              <img
-                src="/images/group_yoga_athletes_cutout.png"
-                alt=""
-                className="w-full h-full object-contain pointer-events-none"
-                style={{ filter: 'brightness(0)' }}
-              />
-            </picture>
-          </div>
-
-          {/* Full-Size Cutout (4 Yoga Practitioners on Mats) Breaking Out In 3D */}
-          <picture className="w-full h-full block relative z-10">
-            <source srcSet="/images/group_yoga_athletes_cutout.webp" type="image/webp" />
-            <img
-              src="/images/group_yoga_athletes_cutout.png"
-              alt="Group fitness & yoga class practicing meditation on mats"
-              className="w-full h-full object-contain pointer-events-none"
+            {/* Photorealistic Studio Floor Shadow 1: Diffuse Ambient Shadow */}
+            <div
+              className="absolute inset-0 pointer-events-none select-none flex items-end justify-center"
               style={{
-                filter:
-                  'brightness(1.02) contrast(1.05) drop-shadow(0 6px 14px rgba(15, 23, 42, 0.16)) drop-shadow(0 18px 28px rgba(15, 23, 42, 0.22))',
-                transition: 'filter 0.35s ease-out',
+                transform: 'translate(4px, 18px) scale(0.985)',
+                filter: 'blur(22px)',
+                opacity: 0.44,
               }}
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-            />
-          </picture>
+              aria-hidden="true"
+            >
+              <picture className="w-full h-full block">
+                <source srcSet="/images/group_yoga_athletes_cutout.webp" type="image/webp" />
+                <img
+                  src="/images/group_yoga_athletes_cutout.png"
+                  alt=""
+                  className="w-full h-full object-contain pointer-events-none"
+                  style={{ filter: 'brightness(0)' }}
+                />
+              </picture>
+            </div>
+
+            {/* Photorealistic Studio Floor Shadow 2: Directional Contact Shadow */}
+            <div
+              className="absolute inset-0 pointer-events-none select-none flex items-end justify-center"
+              style={{
+                transform: 'translate(2px, 8px) scale(0.995)',
+                filter: 'blur(9px)',
+                opacity: 0.28,
+              }}
+              aria-hidden="true"
+            >
+              <picture className="w-full h-full block">
+                <source srcSet="/images/group_yoga_athletes_cutout.webp" type="image/webp" />
+                <img
+                  src="/images/group_yoga_athletes_cutout.png"
+                  alt=""
+                  className="w-full h-full object-contain pointer-events-none"
+                  style={{ filter: 'brightness(0)' }}
+                />
+              </picture>
+            </div>
+
+            {/* Full-Size Cutout (4 Yoga Practitioners on Mats) Breaking Out In 3D */}
+            <picture className="w-full h-full block relative z-10">
+              <source srcSet="/images/group_yoga_athletes_cutout.webp" type="image/webp" />
+              <img
+                src="/images/group_yoga_athletes_cutout.png"
+                alt="Group fitness & yoga class practicing meditation on mats"
+                className="w-full h-full object-contain pointer-events-none"
+                style={{
+                  filter:
+                    'brightness(1.02) contrast(1.05) drop-shadow(0 6px 14px rgba(15, 23, 42, 0.16)) drop-shadow(0 18px 28px rgba(15, 23, 42, 0.22))',
+                  transition: 'filter 0.35s ease-out',
+                }}
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </picture>
+          </div>
         </motion.div>
       </motion.div>
     </div>
