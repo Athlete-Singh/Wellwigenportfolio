@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, Send, MessageCircle, AlertCircle, Sparkles, Loader2, Check } from 'lucide-react';
+import { X, CheckCircle2, Send, MessageCircle, AlertCircle, Sparkles, Loader2, Check, RotateCcw } from 'lucide-react';
 import axios from 'axios';
 import { CONTACT_INFO, getWhatsAppUrl } from '../data/fitnessData';
 
@@ -112,13 +112,16 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
   const [honeypot, setHoneypot] = useState('');
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
   const [submittedWaUrl, setSubmittedWaUrl] = useState(null);
+  const [renewCountdown, setRenewCountdown] = useState(null);
+  const [submittedLead, setSubmittedLead] = useState(null);
 
-  // Sync initialData when modal opens
+  // Sync initialData when modal opens & ensure clean renewal for next inquiry
   useEffect(() => {
     if (isOpen) {
       setSuccess(false);
       setErrorMessage('');
       setSubmittedWaUrl(null);
+      setRenewCountdown(null);
 
       const targetProgram = initialData.program || 'Personal Training';
       const availablePlans = getPlansForProgram(targetProgram);
@@ -130,26 +133,77 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
         matchedPlanName = popular ? popular.name : availablePlans[0].name;
       }
 
-      setFormData((prev) => ({
-        ...prev,
+      setFormData({
+        name: '',
+        phone: '',
+        email: '',
+        message: '',
         program: targetProgram,
         plan: matchedPlanName,
-        fitnessGoal: initialData.goal || prev.fitnessGoal || 'General Fitness',
-      }));
+        fitnessGoal: initialData.goal || 'General Fitness',
+        preferredTime: 'Morning (6 AM - 10 AM)',
+      });
 
       // Focus first input automatically
       const timer = setTimeout(() => {
         nameInputRef.current?.focus();
       }, 120);
       return () => clearTimeout(timer);
+    } else {
+      setRenewCountdown(null);
     }
   }, [isOpen, initialData]);
+
+  // Clean reset & renew form for next inquiry
+  const handleRenewForNextInquiry = () => {
+    setRenewCountdown(null);
+    setSuccess(false);
+    setErrorMessage('');
+    setSubmittedWaUrl(null);
+    setFormData((prev) => ({
+      ...prev,
+      name: '',
+      phone: '',
+      email: '',
+      message: '',
+    }));
+    setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 120);
+  };
+
+  const handleClose = () => {
+    setRenewCountdown(null);
+    setSuccess(false);
+    setErrorMessage('');
+    setFormData((prev) => ({
+      ...prev,
+      name: '',
+      phone: '',
+      email: '',
+      message: '',
+    }));
+    onClose();
+  };
+
+  // Auto-renew timer when submission succeeds so form renews automatically for the next inquiry
+  useEffect(() => {
+    if (!success || renewCountdown === null) return;
+    if (renewCountdown <= 0) {
+      handleRenewForNextInquiry();
+      return;
+    }
+    const timer = setTimeout(() => {
+      setRenewCountdown((prev) => (prev !== null && prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [success, renewCountdown]);
 
   // Esc key listener and strictly lock background movement
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose();
+        handleClose();
       }
     };
     if (isOpen) {
@@ -164,7 +218,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
       document.documentElement.style.overflow = '';
       document.body.style.touchAction = '';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -225,10 +279,23 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const currentLeadSnapshot = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      program: formData.program,
+      plan: planDisplay,
+      planObj: selectedPlanObj,
+      preferredTime: formData.preferredTime,
+      fitnessGoal: formData.fitnessGoal,
+    };
+
     // Honeypot anti-spam check
     if (honeypot) {
       console.warn('Bot submission blocked via honeypot');
+      setSubmittedLead(currentLeadSnapshot);
       setSuccess(true);
+      setRenewCountdown(5);
       return;
     }
 
@@ -337,10 +404,14 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
         await axios.post(`${apiUrl}/users/contact`, payload, { timeout: 4000 }).catch(() => {});
       }
 
+      setSubmittedLead(currentLeadSnapshot);
       setSuccess(true);
+      setRenewCountdown(5);
     } catch (err) {
       console.warn('Submission completed with local capture:', err.message);
+      setSubmittedLead(currentLeadSnapshot);
       setSuccess(true);
+      setRenewCountdown(5);
     } finally {
       setLoading(false);
     }
@@ -359,7 +430,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
-            onClick={onClose}
+            onClick={handleClose}
             className="fixed inset-0 bg-slate-950/75 backdrop-blur-md"
           />
 
@@ -395,7 +466,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
               </div>
 
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
                 aria-label="Close modal"
               >
@@ -408,7 +479,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
               {success ? (
                 /* Success State */
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="py-6 text-center flex flex-col items-center"
                 >
@@ -418,34 +489,47 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                   <h4 className="font-heading text-2xl font-black text-slate-900 mb-2">
                     Application Received!
                   </h4>
-                  <p className="text-sm text-slate-600 max-w-sm mb-6 leading-relaxed">
-                    Thank you, <span className="font-bold text-slate-800">{formData.name}</span>! Your inquiry has been sent to our admin team. We've sent a confirmation email to <span className="font-semibold text-slate-700">{formData.email}</span>, and a master coach will contact you via WhatsApp &amp; Phone at <span className="font-semibold text-slate-700">{formData.phone}</span>.
+                  <p className="text-sm text-slate-600 max-w-sm mb-4 leading-relaxed">
+                    Thank you, <span className="font-bold text-slate-800">{submittedLead?.name || formData.name}</span>! Your inquiry has been sent to our admin team. We've sent a confirmation email to <span className="font-semibold text-slate-700">{submittedLead?.email || formData.email}</span>, and a master coach will contact you via WhatsApp &amp; Phone at <span className="font-semibold text-slate-700">{submittedLead?.phone || formData.phone}</span>.
                   </p>
+
+                  {/* Renew Notification Badge */}
+                  <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-900 text-xs font-semibold mb-5 shadow-2xs">
+                    <RotateCcw size={13} className="animate-spin text-teal-600" />
+                    <span>Renewing for next inquiry in {renewCountdown ?? 5}s...</span>
+                    <button
+                      type="button"
+                      onClick={handleRenewForNextInquiry}
+                      className="ml-1 underline font-bold hover:text-teal-950 cursor-pointer"
+                    >
+                      Renew Now
+                    </button>
+                  </div>
 
                   <div className="w-full bg-gradient-to-br from-teal-50/90 to-emerald-50/50 border border-teal-200/80 rounded-2xl p-4 mb-6 text-left text-xs text-teal-950 space-y-2 shadow-sm">
                     <div className="flex items-center justify-between pb-1.5 border-b border-teal-100">
                       <span className="text-slate-500 font-medium">Program &amp; Plan:</span>
                       <span className="font-extrabold text-teal-800 text-sm">
-                        {formData.program} &bull; {selectedPlanObj?.name || formData.plan}
+                        {submittedLead?.program || formData.program} &bull; {submittedLead?.plan || selectedPlanObj?.name || formData.plan}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500 font-medium">Plan Pricing:</span>
                       <span className="font-black text-slate-900 bg-white px-2.5 py-0.5 rounded-full border border-teal-200 shadow-2xs">
-                        {selectedPlanObj?.price} {selectedPlanObj?.period}
+                        {submittedLead?.planObj?.price || selectedPlanObj?.price} {submittedLead?.planObj?.period || selectedPlanObj?.period}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500 font-medium">Preferred Time:</span>
-                      <span className="font-bold text-slate-800">{formData.preferredTime}</span>
+                      <span className="font-bold text-slate-800">{submittedLead?.preferredTime || formData.preferredTime}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500 font-medium">Fitness Goal:</span>
-                      <span className="font-bold text-slate-800">{formData.fitnessGoal}</span>
+                      <span className="font-bold text-slate-800">{submittedLead?.fitnessGoal || formData.fitnessGoal}</span>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 w-full">
+                  <div className="flex flex-col sm:flex-row gap-2.5 w-full">
                     <a
                       href={whatsappUrl}
                       target="_blank"
@@ -453,11 +537,20 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                       className="flex-1 py-3 px-4 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 transition-all"
                     >
                       <MessageCircle size={17} />
-                      <span>Chat on WhatsApp Now</span>
+                      <span>Chat on WhatsApp</span>
                     </a>
                     <button
-                      onClick={onClose}
-                      className="py-3 px-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-colors cursor-pointer"
+                      type="button"
+                      onClick={handleRenewForNextInquiry}
+                      className="py-3 px-5 rounded-full gradient-teal-sky hover:opacity-95 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-teal-500/20 transition-all cursor-pointer"
+                    >
+                      <RotateCcw size={15} />
+                      <span>Renew for Next Inquiry</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClose}
+                      className="py-3 px-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-colors cursor-pointer"
                     >
                       Done
                     </button>
