@@ -12,7 +12,6 @@ import {
   EyeOff,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
   Award,
   Activity,
   Zap,
@@ -447,19 +446,9 @@ export default function AdminLogin() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                    Admin Identifier / Username
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setFormData((prev) => ({ ...prev, identifier: 'Admin@gmail.com' }))}
-                    className="text-[10px] sm:text-[11px] font-bold text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-2 py-0.5 rounded-md border border-teal-200 transition-colors cursor-pointer"
-                    title="Click to fill Admin@gmail.com"
-                  >
-                    Recommended: Admin@gmail.com
-                  </button>
-                </div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                  Admin Username or Email
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <Mail size={16} />
@@ -467,7 +456,7 @@ export default function AdminLogin() {
                   <input
                     type="text"
                     required
-                    placeholder="Admin@gmail.com"
+                    placeholder="Enter admin username or email"
                     value={formData.identifier}
                     onChange={(e) =>
                       setFormData({ ...formData, identifier: e.target.value })
@@ -488,7 +477,7 @@ export default function AdminLogin() {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
-                    placeholder="Enter admin password"
+                    placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
@@ -506,25 +495,15 @@ export default function AdminLogin() {
                 </div>
               </div>
 
-              {/* Security Hint & Auto-Fill */}
+              {/* Security Hint */}
               <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
                 <span className="flex items-center gap-1 text-teal-700 font-semibold">
                   <CheckCircle2 size={13} />
                   <span>24-Hour Active Session</span>
                 </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData({
-                      identifier: 'Admin@gmail.com',
-                      password: 'bodyfit@wwg',
-                    })
-                  }
-                  className="text-teal-700 hover:text-teal-900 font-bold hover:underline cursor-pointer flex items-center gap-1 text-[11px]"
-                >
-                  <Sparkles size={11} className="text-teal-600" />
-                  <span>Quick-Fill Master</span>
-                </button>
+                <span className="text-slate-400 font-medium">
+                  SSL Encrypted
+                </span>
               </div>
 
               <button
