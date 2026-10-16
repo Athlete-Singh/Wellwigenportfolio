@@ -36,7 +36,7 @@ export default function LiveAthleteHero() {
         style={{
           position: 'absolute',
           top: 'var(--athlete-top-offset, 52px)',
-          right: 'clamp(-150px, calc((100vw - 1440px) / 2 - 75px), 200px)',
+          right: 'clamp(-165px, calc((100vw - 1440px) / 2 - 88px), 190px)',
           width: 'var(--athlete-width)',
           height: 'var(--athlete-height)',
           maskImage: 'linear-gradient(to bottom, black 84%, transparent 99%)',
