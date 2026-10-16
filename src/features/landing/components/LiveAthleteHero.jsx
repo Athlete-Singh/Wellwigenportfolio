@@ -43,8 +43,13 @@ export default function LiveAthleteHero() {
           WebkitMaskImage: 'linear-gradient(to bottom, black 84%, transparent 99%)',
         }}
       >
-        {/* Layer 1: Flat Solid Background Shapes (Anchored directly to visual container, shifted left & down per request) */}
-        <div className="absolute inset-0 pointer-events-none select-none z-0">
+        {/* Layer 1: Flat Solid Background Shapes (Shifted left per user request) */}
+        <div
+          className="absolute inset-0 pointer-events-none select-none z-0"
+          style={{
+            transform: 'translateX(-36px)',
+          }}
+        >
           {/* Shape 2: Dark Teal Accent Panel peeking behind main arch */}
           <div
             className="absolute shadow-[0_16px_36px_rgba(15,23,42,0.10)]"
