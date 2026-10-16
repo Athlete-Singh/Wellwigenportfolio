@@ -83,6 +83,7 @@ const SLIDES = [
     subtitle: 'Holistic movement mastery, core balance, and functional bodyweight strength.',
     statNumber: '500+',
     statLabel: 'Daily Sessions',
+    objectPosition: '85% center',
   },
 ];
 
@@ -270,7 +271,10 @@ export default function AdminLogin() {
             <img
               src={current.image}
               alt={current.title}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover"
+              style={{
+                objectPosition: current.objectPosition || 'center center',
+              }}
             />
           </motion.div>
         </AnimatePresence>
