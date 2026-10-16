@@ -511,6 +511,113 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
   // NEW CODE - Top bar profile menu and confirmation modal states
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
+  // Alert and notification checking states
+  const [inquiriesChecked, setInquiriesChecked] = useState(() => {
+    return localStorage.getItem('wellwigen_admin_inquiries_checked') === 'true';
+  });
+  const [trainersChecked, setTrainersChecked] = useState(() => {
+    return localStorage.getItem('wellwigen_admin_trainers_checked') === 'true';
+  });
+  const [notificationsChecked, setNotificationsChecked] = useState(() => {
+    return localStorage.getItem('wellwigen_admin_notifications_checked') === 'true';
+  });
+  const [lastCheckedInquiriesCount, setLastCheckedInquiriesCount] = useState(() => {
+    return parseInt(localStorage.getItem('wellwigen_last_checked_inquiries_count') || '0', 10);
+  });
+  const [lastCheckedTrainersCount, setLastCheckedTrainersCount] = useState(() => {
+    return parseInt(localStorage.getItem('wellwigen_last_checked_trainers_count') || '0', 10);
+  });
+
+  // Handlers for checking sections and notifications
+  const handleOpenInquiriesTab = () => {
+    setActiveTab('Inquiries');
+    setInquiriesChecked(true);
+    setNotificationsChecked(true);
+    setLastCheckedInquiriesCount(newInquiriesCount);
+    try {
+      localStorage.setItem('wellwigen_admin_inquiries_checked', 'true');
+      localStorage.setItem('wellwigen_admin_notifications_checked', 'true');
+      localStorage.setItem('wellwigen_last_checked_inquiries_count', String(newInquiriesCount));
+    } catch (e) {}
+    setIsSidebarOpen(false);
+    setIsNotificationsOpen(false);
+  };
+
+  const handleOpenTrainersTab = () => {
+    setActiveTab('Trainers');
+    setTrainersChecked(true);
+    setNotificationsChecked(true);
+    setLastCheckedTrainersCount(pendingTrainersCount);
+    try {
+      localStorage.setItem('wellwigen_admin_trainers_checked', 'true');
+      localStorage.setItem('wellwigen_admin_notifications_checked', 'true');
+      localStorage.setItem('wellwigen_last_checked_trainers_count', String(pendingTrainersCount));
+    } catch (e) {}
+    setIsSidebarOpen(false);
+    setIsNotificationsOpen(false);
+  };
+
+  // Sync checked state when activeTab changes
+  useEffect(() => {
+    if (activeTab === 'Inquiries') {
+      setInquiriesChecked(true);
+      setNotificationsChecked(true);
+      setLastCheckedInquiriesCount(newInquiriesCount);
+      try {
+        localStorage.setItem('wellwigen_admin_inquiries_checked', 'true');
+        localStorage.setItem('wellwigen_admin_notifications_checked', 'true');
+        localStorage.setItem('wellwigen_last_checked_inquiries_count', String(newInquiriesCount));
+      } catch (e) {}
+    } else if (activeTab === 'Trainers') {
+      setTrainersChecked(true);
+      setNotificationsChecked(true);
+      setLastCheckedTrainersCount(pendingTrainersCount);
+      try {
+        localStorage.setItem('wellwigen_admin_trainers_checked', 'true');
+        localStorage.setItem('wellwigen_admin_notifications_checked', 'true');
+        localStorage.setItem('wellwigen_last_checked_trainers_count', String(pendingTrainersCount));
+      } catch (e) {}
+    }
+  }, [activeTab, newInquiriesCount, pendingTrainersCount]);
+
+  // When new inquiries arrive and admin is not on Inquiries, start blinking permanently again
+  useEffect(() => {
+    if (newInquiriesCount > lastCheckedInquiriesCount) {
+      if (activeTab === 'Inquiries') {
+        setLastCheckedInquiriesCount(newInquiriesCount);
+        try {
+          localStorage.setItem('wellwigen_last_checked_inquiries_count', String(newInquiriesCount));
+        } catch (e) {}
+      } else {
+        setInquiriesChecked(false);
+        setNotificationsChecked(false);
+        try {
+          localStorage.setItem('wellwigen_admin_inquiries_checked', 'false');
+          localStorage.setItem('wellwigen_admin_notifications_checked', 'false');
+        } catch (e) {}
+      }
+    }
+  }, [newInquiriesCount, activeTab, lastCheckedInquiriesCount]);
+
+  // When new trainer applications arrive and admin is not on Trainers, start blinking permanently again
+  useEffect(() => {
+    if (pendingTrainersCount > lastCheckedTrainersCount) {
+      if (activeTab === 'Trainers') {
+        setLastCheckedTrainersCount(pendingTrainersCount);
+        try {
+          localStorage.setItem('wellwigen_last_checked_trainers_count', String(pendingTrainersCount));
+        } catch (e) {}
+      } else {
+        setTrainersChecked(false);
+        setNotificationsChecked(false);
+        try {
+          localStorage.setItem('wellwigen_admin_trainers_checked', 'false');
+          localStorage.setItem('wellwigen_admin_notifications_checked', 'false');
+        } catch (e) {}
+      }
+    }
+  }, [pendingTrainersCount, activeTab, lastCheckedTrainersCount]);
+
   // Auto-dismiss dropdowns on outside click anywhere on screen
   const notificationsRef = useRef(null);
   const profileMenuRef = useRef(null);
@@ -2191,13 +2298,13 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
         {/* NEW CODE - Wellwigen Core Admin (Dashboard, Trainers, Classes & Schedule, Clients, Subscriptions, Inquiries, Settings) */}
         <nav className="flex-1 px-4 space-y-1.5 mt-4 overflow-y-auto">
           <AdminNavItem icon={<LayoutDashboard size={18} />} label="Dashboard" active={activeTab === 'Dashboard'} onClick={() => { setActiveTab('Dashboard'); setIsSidebarOpen(false); }} />
-          <AdminNavItem icon={<Dumbbell size={18} />} label="Trainers" badge={pendingTrainersCount} active={activeTab === 'Trainers'} onClick={() => { setActiveTab('Trainers'); setIsSidebarOpen(false); }} />
+          <AdminNavItem icon={<Dumbbell size={18} />} label="Trainers" badge={trainersChecked ? 0 : pendingTrainersCount} active={activeTab === 'Trainers'} onClick={handleOpenTrainersTab} />
           {/* [DISABLED FOR FUTURE USE] Classes & Schedule Admin Nav Option
           <AdminNavItem icon={<Calendar size={18} />} label="Classes & Schedule" active={activeTab === 'Classes'} onClick={() => { setActiveTab('Classes'); setIsSidebarOpen(false); }} />
           */}
           <AdminNavItem icon={<Users size={18} />} label="Clients" active={activeTab === 'Clients'} onClick={() => { setActiveTab('Clients'); setIsSidebarOpen(false); }} />
           <AdminNavItem icon={<Ticket size={18} />} label="Memberships" active={activeTab === 'Subscriptions'} onClick={() => { setActiveTab('Subscriptions'); setIsSidebarOpen(false); }} />
-          <AdminNavItem icon={<Inbox size={18} />} label="Inquiries" badge={newInquiriesCount} active={activeTab === 'Inquiries'} onClick={() => { setActiveTab('Inquiries'); setIsSidebarOpen(false); }} />
+          <AdminNavItem icon={<Inbox size={18} />} label="Inquiries" badge={inquiriesChecked ? 0 : newInquiriesCount} active={activeTab === 'Inquiries'} onClick={handleOpenInquiriesTab} />
           <AdminNavItem icon={<Settings size={18} />} label="Settings" active={activeTab === 'Settings'} onClick={() => { setActiveTab('Settings'); setIsSidebarOpen(false); }} />
 
           {/* [DISABLED FOR FUTURE USE] Sidebar Appointments Item
@@ -2307,13 +2414,24 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
               {/* Corner Bell Button with Live Notification Badge */}
               <div className="relative" ref={notificationsRef}>
                 {(() => {
-                  const totalAlertsCount = (newInquiriesCount || 0) + (pendingTrainersCount || 0);
+                  const displayInquiries = inquiriesChecked ? 0 : (newInquiriesCount || 0);
+                  const displayTrainers = trainersChecked ? 0 : (pendingTrainersCount || 0);
+                  const totalAlertsCount = displayInquiries + displayTrainers;
+                  const isBlinking = !notificationsChecked && totalAlertsCount > 0;
+
                   return (
                     <>
                       <button 
                         onClick={() => {
-                          setIsNotificationsOpen(!isNotificationsOpen);
+                          const nextOpen = !isNotificationsOpen;
+                          setIsNotificationsOpen(nextOpen);
                           setIsMessagesOpen(false);
+                          if (nextOpen) {
+                            setNotificationsChecked(true);
+                            try {
+                              localStorage.setItem('wellwigen_admin_notifications_checked', 'true');
+                            } catch (e) {}
+                          }
                         }}
                         className={`p-2.5 rounded-xl transition-all relative ${
                           isNotificationsOpen 
@@ -2325,7 +2443,9 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                         <Bell size={19} />
                         {totalAlertsCount > 0 && (
                           <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] px-1 items-center justify-center">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F26B38] opacity-75"></span>
+                            {isBlinking && (
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F26B38] opacity-75"></span>
+                            )}
                             <span className="relative inline-flex rounded-full h-4 min-w-[16px] px-1 bg-gradient-to-r from-[#F26B38] to-[#E05B28] text-[10px] font-black text-white items-center justify-center shadow-sm">
                               {totalAlertsCount}
                             </span>
@@ -2355,14 +2475,14 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                                     <p className="text-[11px] text-slate-500 font-medium">
                                       {totalAlertsCount > 0 ? (
                                         <span>
-                                          {pendingTrainersCount > 0 && (
+                                          {displayTrainers > 0 && (
                                             <span className="text-amber-700 font-bold">
-                                              {pendingTrainersCount} coach{pendingTrainersCount > 1 ? 'es' : ''} awaiting approval
+                                              {displayTrainers} coach{displayTrainers > 1 ? 'es' : ''} awaiting approval
                                             </span>
                                           )}
-                                          {pendingTrainersCount > 0 && newInquiriesCount > 0 && ' • '}
-                                          {newInquiriesCount > 0 && (
-                                            <span>{newInquiriesCount} new leads</span>
+                                          {displayTrainers > 0 && displayInquiries > 0 && ' • '}
+                                          {displayInquiries > 0 && (
+                                            <span>{displayInquiries} new leads</span>
                                           )}
                                         </span>
                                       ) : (
@@ -2393,10 +2513,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                                       {pendingTrainersList.map((trn) => (
                                         <div
                                           key={trn._id || trn.id}
-                                          onClick={() => {
-                                            setActiveTab('Trainers');
-                                            setIsNotificationsOpen(false);
-                                          }}
+                                          onClick={handleOpenTrainersTab}
                                           className="p-2.5 rounded-xl bg-white border border-amber-200/90 shadow-2xs hover:border-teal-400 hover:shadow-xs transition-all cursor-pointer flex items-center justify-between gap-3 group"
                                         >
                                           <div className="flex items-center gap-2.5 min-w-0">
@@ -2434,10 +2551,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                                   notifications.map((item) => (
                                     <div
                                       key={item._id}
-                                      onClick={() => {
-                                        setActiveTab('Inquiries');
-                                        setIsNotificationsOpen(false);
-                                      }}
+                                      onClick={handleOpenInquiriesTab}
                                       className="p-3.5 hover:bg-teal-50/40 transition-colors cursor-pointer group flex items-start gap-3"
                                     >
                                       <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-sky-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
@@ -2489,10 +2603,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                               <div className="p-3 bg-slate-50/80 border-t border-slate-100 flex items-center gap-2">
                                 {pendingTrainersCount > 0 && (
                                   <button
-                                    onClick={() => {
-                                      setActiveTab('Trainers');
-                                      setIsNotificationsOpen(false);
-                                    }}
+                                    onClick={handleOpenTrainersTab}
                                     className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
                                   >
                                     <Dumbbell size={13} />
@@ -2500,10 +2611,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                                   </button>
                                 )}
                                 <button
-                                  onClick={() => {
-                                    setActiveTab('Inquiries');
-                                    setIsNotificationsOpen(false);
-                                  }}
+                                  onClick={handleOpenInquiriesTab}
                                   className="flex-1 py-2 bg-white border border-slate-200 hover:border-teal-300 hover:bg-teal-50/50 text-slate-800 hover:text-teal-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
                                 >
                                   <span>Inquiries ({newInquiriesCount})</span>
