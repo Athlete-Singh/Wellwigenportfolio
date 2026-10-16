@@ -651,13 +651,14 @@ function App() {
         </Routes>
         </React.Suspense>
       </ErrorBoundary>
-      {/* OLD CODE (commented by AI) */}
-      {/* {location.pathname !== '/' && <FloatingContact />} */}
-      {/* OLD CODE (commented by AI)
-      {location.pathname !== '/' && !location.pathname.startsWith('/admin') && (
-      */}
-      {/* NEW CODE - Hide floating contact in admin and trainer portal */}
-      {location.pathname !== '/' && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/trainer') && (
+      {/* Hide floating contact in admin, trainer portal, and marketing pages that already render FloatingWhatsApp */}
+      {location.pathname !== '/' &&
+        location.pathname !== '/personal-training' &&
+        location.pathname !== '/group-classes' &&
+        location.pathname !== '/pricing' &&
+        location.pathname !== '/schedule' &&
+        !location.pathname.startsWith('/admin') &&
+        !location.pathname.startsWith('/trainer') && (
         <React.Suspense fallback={null}>
           <FloatingContact />
         </React.Suspense>
