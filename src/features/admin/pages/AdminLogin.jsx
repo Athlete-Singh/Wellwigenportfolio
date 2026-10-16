@@ -12,10 +12,7 @@ import {
   EyeOff,
   ChevronLeft,
   ChevronRight,
-  Award,
-  Activity,
-  Zap,
-  CheckCircle2
+  CheckCircle2,
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -171,18 +168,25 @@ export default function AdminLogin() {
       const isMasterPass = masterPassList.includes(trimmedPassword.toLowerCase());
 
       try {
-        const res = await axios.post(`${API_BASE}/admin/login`, {
-          email: trimmedIdentifier,
-          username: trimmedIdentifier,
-          identifier: trimmedIdentifier,
-          password: trimmedPassword,
-        }, { timeout: 7000 });
+        const res = await axios.post(
+          `${API_BASE}/admin/login`,
+          {
+            email: trimmedIdentifier,
+            username: trimmedIdentifier,
+            identifier: trimmedIdentifier,
+            password: trimmedPassword,
+          },
+          { timeout: 7000 }
+        );
 
         if (res.data?.success && res.data?.token) {
           const expiryTime = Date.now() + 24 * 60 * 60 * 1000;
           localStorage.setItem('adminToken', res.data.token);
           localStorage.setItem('adminTokenExpiry', String(expiryTime));
-          localStorage.setItem('wellwigen_admin_user', JSON.stringify(res.data.admin || { username: trimmedIdentifier, role: 'admin' }));
+          localStorage.setItem(
+            'wellwigen_admin_user',
+            JSON.stringify(res.data.admin || { username: trimmedIdentifier, role: 'admin' })
+          );
           toast.success('Admin authentication successful! (24h session active)');
           const destination = from && from !== '/admin/login' ? from : '/admin';
           navigate(destination, { replace: true });
@@ -197,7 +201,10 @@ export default function AdminLogin() {
           const expiryTime = Date.now() + 24 * 60 * 60 * 1000;
           localStorage.setItem('adminToken', fallbackToken);
           localStorage.setItem('adminTokenExpiry', String(expiryTime));
-          localStorage.setItem('wellwigen_admin_user', JSON.stringify({ username: trimmedIdentifier, role: 'admin' }));
+          localStorage.setItem(
+            'wellwigen_admin_user',
+            JSON.stringify({ username: trimmedIdentifier, role: 'admin' })
+          );
           toast.success('🎉 Master Administrator Authenticated! (24h Live Session Active)');
           const destination = from && from !== '/admin/login' ? from : '/admin';
           navigate(destination, { replace: true });
@@ -216,7 +223,10 @@ export default function AdminLogin() {
         const expiryTime = Date.now() + 24 * 60 * 60 * 1000;
         localStorage.setItem('adminToken', fallbackToken);
         localStorage.setItem('adminTokenExpiry', String(expiryTime));
-        localStorage.setItem('wellwigen_admin_user', JSON.stringify({ username: trimmedIdentifier, role: 'admin' }));
+        localStorage.setItem(
+          'wellwigen_admin_user',
+          JSON.stringify({ username: trimmedIdentifier, role: 'admin' })
+        );
         toast.success('🎉 Master Administrator Authenticated! (24h Live Session Active)');
         const destination = from && from !== '/admin/login' ? from : '/admin';
         navigate(destination, { replace: true });
@@ -239,29 +249,43 @@ export default function AdminLogin() {
   return (
     <div
       data-panel="admin"
-      className="min-h-screen bg-gradient-to-br from-[#E6F4F1] via-[#F0F8F6] to-[#E8F8F5] text-slate-800 font-sans flex flex-col justify-between p-3 sm:p-5 lg:p-6 antialiased relative overflow-hidden"
+      className="min-h-screen bg-white flex flex-col lg:flex-row relative overflow-hidden select-none"
     >
-      {/* Ambient background glowing orbs with subtle pulse */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-teal-400/25 to-emerald-300/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-gradient-to-tr from-sky-400/20 to-teal-300/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      {/* ================= LEFT COLUMN: FULL-HEIGHT SLIDING SHOWCASE (Format inspired by /login) ================= */}
+      <div
+        className="relative w-full lg:w-1/2 xl:w-5/12 min-h-[440px] sm:min-h-[520px] lg:min-h-screen bg-slate-950 flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-hidden text-white"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* Animated Slide Background Image with Crossfade & Ken Burns Zoom */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSlide}
+            initial={{ opacity: 0, scale: 1.06 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0"
+          >
+            <img
+              src={current.image}
+              alt={current.title}
+              className="w-full h-full object-cover object-center"
+            />
+          </motion.div>
+        </AnimatePresence>
 
-      {/* TOP HEADER: PROFESSIONAL, COLORFUL & ANIMATED */}
-      <header className="max-w-7xl mx-auto w-full relative z-20 pt-1 pb-2">
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="relative bg-white/85 hover:bg-white/95 backdrop-blur-xl border border-teal-500/25 rounded-2xl sm:rounded-3xl shadow-[0_8px_32px_rgba(0,121,107,0.12)] px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between transition-all duration-300 overflow-hidden"
-        >
-          {/* Animated top gradient highlight beam */}
-          <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-teal-500 via-emerald-400 to-sky-400 animate-pulse" />
+        {/* Ambient Rich Overlays for High Legibility & Premium Atmosphere */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/45 to-slate-950/70 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-transparent to-slate-950/30 z-0 pointer-events-none" />
 
-          {/* Left: Brand Logo & Interactive Badge */}
+        {/* TOP: Brand Logo & Interactive Admin Badge */}
+        <div className="relative z-10 flex items-center justify-between w-full">
           <Link to="/" className="flex items-center gap-3 group cursor-pointer select-none">
             {/* Glowing Logo Icon */}
             <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-400 rounded-2xl blur-xs opacity-60 group-hover:opacity-100 transition duration-300" />
-              <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-teal-700/30 group-hover:scale-105 transition-transform duration-200">
+              <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-400 rounded-2xl blur-xs opacity-70 group-hover:opacity-100 transition duration-300" />
+              <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-teal-700/30 group-hover:scale-105 transition-transform duration-200">
                 <span className="font-heading font-black text-xl sm:text-2xl tracking-tight">W</span>
               </div>
             </div>
@@ -269,271 +293,242 @@ export default function AdminLogin() {
             {/* Brand Title + Admin Gateway Badge */}
             <div className="flex flex-col text-left">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-heading font-black text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-teal-950 via-teal-700 to-emerald-800 bg-clip-text text-transparent leading-none">
+                <span className="font-heading font-extrabold text-xl sm:text-2xl tracking-tight text-white leading-none">
                   WELLWIGEN
                 </span>
-                
-                {/* Colorful Animated Live Badge */}
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-teal-500/15 via-emerald-500/20 to-sky-500/15 border border-teal-500/35 text-teal-900 font-extrabold text-[10px] tracking-wider uppercase shadow-2xs">
+
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-500/20 border border-teal-400/40 text-teal-300 font-extrabold text-[10px] tracking-wider uppercase backdrop-blur-md shadow-2xs">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                   </span>
                   <span>Admin Gateway</span>
                 </div>
               </div>
 
-              <span className="hidden min-[400px]:inline-block text-[8px] sm:text-[9px] font-extrabold tracking-[0.22em] text-teal-700 uppercase mt-1 whitespace-nowrap">
+              <span className="text-[8px] sm:text-[9px] font-extrabold tracking-[0.22em] text-teal-300/80 uppercase mt-1 whitespace-nowrap">
                 STRONGER BODY. BETTER YOU.
               </span>
             </div>
           </Link>
 
-          {/* Center Security Indicator (Visible on Tablet & Desktop) */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50/70 border border-teal-200/80 text-[11px] font-bold text-teal-900 shadow-2xs">
+          {/* Top Right Slide Counter */}
+          <div className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white/95 text-xs font-mono font-bold shadow-sm">
+            0{activeSlide + 1} / 0{SLIDES.length}
+          </div>
+        </div>
+
+        {/* BOTTOM: Slide Title, Subtitle, and Slide Controls (Like /login left format) */}
+        <div className="relative z-10 mt-auto pt-10">
+          {/* Slide Tag */}
+          <div className="mb-2.5">
+            <span className="inline-block text-[11px] font-extrabold uppercase tracking-widest text-teal-300 bg-teal-950/80 border border-teal-400/30 px-3 py-1 rounded-full backdrop-blur-md">
+              {current.tag}
+            </span>
+          </div>
+
+          {/* Main Slide Title with Vibrant Gradient */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSlide}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+            >
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-3 tracking-tight">
+                {current.title.split(' ')[0]}{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-300 to-teal-200">
+                  {current.title.split(' ').slice(1).join(' ')}
+                </span>
+              </h2>
+              <p className="text-slate-300 text-sm sm:text-base font-medium max-w-lg leading-relaxed mb-6 drop-shadow-sm">
+                {current.subtitle}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Slider Controls: Progress bars + Prev/Next buttons */}
+          <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/15">
+            {/* Progress Indicators (all 8 slides) */}
+            <div className="flex items-center gap-1.5 flex-1">
+              {SLIDES.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setActiveSlide(idx)}
+                  className="h-1.5 rounded-full transition-all duration-300 cursor-pointer relative overflow-hidden"
+                  style={{
+                    width: activeSlide === idx ? '32px' : '10px',
+                    backgroundColor: activeSlide === idx ? '#2DD4BF' : 'rgba(255,255,255,0.3)',
+                  }}
+                  title={`Slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* Prev / Next Chevrons */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={prevSlide}
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20"
+                title="Previous Slide"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                type="button"
+                onClick={nextSlide}
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20"
+                title="Next Slide"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ================= RIGHT COLUMN: CLEAN & SPACIOUS LOGIN FORM ================= */}
+      <div className="w-full lg:w-1/2 xl:w-7/12 min-h-screen bg-white flex flex-col justify-between p-6 sm:p-10 lg:p-16 relative">
+        {/* Top Header Bar on Right: Security Indicator + Back to Home */}
+        <div className="flex items-center justify-between w-full pb-6 border-b border-slate-100">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50/80 border border-teal-200/80 text-[11px] font-bold text-teal-900 shadow-2xs">
             <ShieldCheck size={14} className="text-teal-600" />
-            <span>256-Bit SSL Console</span>
-            <span className="text-teal-300">&bull;</span>
+            <span className="hidden sm:inline">256-Bit SSL Console</span>
+            <span className="hidden sm:inline text-teal-300">&bull;</span>
             <span className="text-emerald-700 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Operational v2.4
             </span>
           </div>
 
-          {/* Right: Colorful Animated Back Button */}
           <Link
             to="/"
-            className="group px-3.5 sm:px-4 py-2 rounded-xl sm:rounded-full bg-gradient-to-r from-slate-50 via-teal-50/40 to-emerald-50/30 hover:from-teal-600 hover:to-emerald-600 text-slate-700 hover:text-white border-2 border-teal-500/30 hover:border-transparent font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow-xs hover:shadow-lg hover:shadow-teal-600/25 transition-all duration-200 cursor-pointer"
+            className="group px-3.5 sm:px-4 py-2 rounded-xl bg-slate-50 hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-200 hover:border-teal-300 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-2xs"
           >
-            <ArrowLeft size={15} className="text-teal-600 group-hover:text-white group-hover:-translate-x-1 transition-all duration-200" />
-            <span className="whitespace-nowrap">Back to Home</span>
+            <ArrowLeft
+              size={15}
+              className="group-hover:-translate-x-1 transition-transform duration-200 text-teal-600"
+            />
+            <span>Back to Home</span>
           </Link>
-        </motion.div>
-      </header>
+        </div>
 
-      {/* Main Split Layout: Sliding Showcase on Left + Login Form on Right */}
-      <main className="max-w-7xl w-full mx-auto my-auto py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-        
-        {/* ================= LEFT COLUMN: SLIDING SHOWCASE ================= */}
-        <div
-          className="lg:col-span-7 h-[520px] sm:h-[580px] lg:h-[620px] w-full rounded-3xl overflow-hidden relative border-2 border-teal-500/35 shadow-2xl shadow-teal-950/20 group select-none bg-slate-950"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          {/* Animated Slide Image with Ken Burns Zoom & Crossfade */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeSlide}
-              initial={{ opacity: 0, scale: 1.08 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0"
+        {/* Center Form Section (Generous spacing, modern SaaS format) */}
+        <div className="max-w-md w-full mx-auto my-auto py-8">
+          {/* Header & Badges */}
+          <div className="mb-8">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200/80 text-[11px] font-extrabold tracking-wide uppercase shadow-2xs mb-4">
+              <ShieldCheck size={14} className="text-teal-600" />
+              <span>Authorized Administrator Portal</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2.5">
+              Welcome Back
+            </h1>
+            <p className="text-slate-500 text-sm sm:text-base font-medium">
+              Sign in with master credentials to access system management.
+            </p>
+          </div>
+
+          {/* Error Alert */}
+          {error && (
+            <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-center gap-3 animate-shake">
+              <AlertCircle size={18} className="text-rose-600 shrink-0" />
+              <span className="font-semibold">{error}</span>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                Admin Username or Email
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Mail size={18} />
+                </div>
+                <input
+                  type="text"
+                  required
+                  placeholder="aditya.singh@wellwigen.com"
+                  value={formData.identifier}
+                  onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
+                  className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium placeholder-slate-400 shadow-2xs"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock size={18} />
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium placeholder-slate-400 shadow-2xs"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* 24-Hour Active Session & SSL Encrypted */}
+            <div className="flex items-center justify-between text-xs text-slate-500 pt-0.5">
+              <span className="flex items-center gap-1.5 text-teal-700 font-semibold">
+                <CheckCircle2 size={15} className="text-teal-600" />
+                <span>24-Hour Active Session</span>
+              </span>
+              <span className="text-slate-400 font-medium flex items-center gap-1">
+                <Lock size={12} />
+                <span>SSL Encrypted</span>
+              </span>
+            </div>
+
+            {/* Submit Action Button: Premium Dark Slate with Teal Hover */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 px-6 rounded-xl bg-slate-900 hover:bg-teal-700 active:bg-slate-950 disabled:bg-slate-400 text-white font-extrabold text-sm tracking-wide shadow-lg shadow-slate-900/15 hover:shadow-teal-700/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer mt-3"
             >
-              <img
-                src={current.image}
-                alt={current.title}
-                className="w-full h-full object-cover object-center"
-              />
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span className="uppercase tracking-wider">Authenticate &amp; Enter Console</span>
+                  <ArrowRight size={17} />
+                </>
+              )}
+            </button>
+          </form>
 
-              {/* Subtle bottom vignette so navigation controls remain readable */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Top Right Slide Counter */}
-          <div className="absolute top-5 right-5 z-20 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-white/90 text-xs font-mono font-bold">
-            0{activeSlide + 1} / 0{SLIDES.length}
-          </div>
-
-          {/* Bottom Slide Content & Overlay */}
-          <div className="absolute bottom-6 left-6 right-6 z-20 space-y-4">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSlide}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.4, ease: 'easeOut' }}
-              >
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight drop-shadow-lg">
-                  {current.title}
-                </h2>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Slider Navigation Bar: Progress Bars + Controls */}
-            <div className="pt-2 flex items-center justify-between gap-4 border-t border-white/15">
-              {/* Progress Indicators (all 8 slides) */}
-              <div className="flex items-center gap-1.5 flex-1">
-                {SLIDES.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setActiveSlide(idx)}
-                    className="h-1.5 rounded-full transition-all cursor-pointer relative overflow-hidden"
-                    style={{
-                      width: activeSlide === idx ? '28px' : '10px',
-                      backgroundColor: activeSlide === idx ? '#009688' : 'rgba(255,255,255,0.3)',
-                    }}
-                    title={`Slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
-
-              {/* Prev / Next Arrows */}
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={prevSlide}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/15"
-                  title="Previous Slide"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={nextSlide}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/15"
-                  title="Next Slide"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
+          {/* Institutional Encryption Notice */}
+          <div className="mt-8 pt-5 border-t border-slate-100 text-center text-xs text-slate-400 font-medium">
+            Institutional SHA-256 Encryption &bull; Wellwigen System Control
           </div>
         </div>
 
-        {/* ================= RIGHT COLUMN: LOGIN FORM CARD ================= */}
-        <div className="lg:col-span-5 w-full">
-          <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-teal-500/35 shadow-2xl shadow-teal-900/10 p-6 sm:p-9 space-y-6">
-            
-            {/* Brand Logo & Header from Home Page */}
-            <div className="text-center space-y-3">
-              <Link to="/" className="inline-flex items-center gap-3 group cursor-pointer">
-                <div className="w-12 h-12 rounded-2xl gradient-teal-sky flex items-center justify-center text-white shadow-lg shadow-teal-500/30 group-hover:scale-105 transition-transform duration-200">
-                  <span className="font-heading font-black text-2xl">W</span>
-                </div>
-                <div className="flex flex-col text-left">
-                  <span className="font-heading font-extrabold text-2xl tracking-tight text-slate-900 leading-none group-hover:text-teal-600 transition-colors">
-                    WELLWIGEN
-                  </span>
-                  <span className="text-[9px] font-bold tracking-[0.2em] text-teal-700 uppercase mt-1 whitespace-nowrap">
-                    STRONGER BODY. BETTER YOU.
-                  </span>
-                </div>
-              </Link>
-
-              <div className="pt-1">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200/80 text-[11px] font-bold tracking-wide uppercase shadow-2xs">
-                  <ShieldCheck size={14} className="text-teal-600" />
-                  <span>Authorized Administrator Portal</span>
-                </div>
-                <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1.5">
-                  Sign in with master credentials to access system management.
-                </p>
-              </div>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2.5 animate-shake">
-                <AlertCircle size={16} className="text-rose-600 shrink-0" />
-                <span className="font-semibold">{error}</span>
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Admin Username or Email
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Mail size={16} />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Enter admin username or email"
-                    value={formData.identifier}
-                    onChange={(e) =>
-                      setFormData({ ...formData, identifier: e.target.value })
-                    }
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Lock size={16} />
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    className="w-full pl-10 pr-11 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all font-medium"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Security Hint */}
-              <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
-                <span className="flex items-center gap-1 text-teal-700 font-semibold">
-                  <CheckCircle2 size={13} />
-                  <span>24-Hour Active Session</span>
-                </span>
-                <span className="text-slate-400 font-medium">
-                  SSL Encrypted
-                </span>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 px-4 rounded-xl bg-[#009688] hover:bg-[#00796B] disabled:bg-teal-400 text-white font-extrabold text-sm shadow-md shadow-teal-600/25 hover:shadow-teal-600/35 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
-              >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <span>Authenticate &amp; Enter Console</span>
-                    <ArrowRight size={16} />
-                  </>
-                )}
-              </button>
-            </form>
-
-            <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-400">
-              Institutional SHA-256 Encryption &bull; Wellwigen System Control
-            </div>
-          </div>
+        {/* Bottom Footer on Right */}
+        <div className="pt-6 border-t border-slate-100 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>&copy; {new Date().getFullYear()} Wellwigen Health &amp; Fitness Ecosystem</span>
+          <span className="text-slate-400 font-medium">Administrator Gateway</span>
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="text-center text-xs text-slate-400 py-3 relative z-10">
-        &copy; {new Date().getFullYear()} Wellwigen Health &amp; Fitness Ecosystem &bull; Administrator Gateway
-      </footer>
+      </div>
     </div>
   );
 }
-
