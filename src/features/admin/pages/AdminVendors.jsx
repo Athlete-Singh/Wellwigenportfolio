@@ -35,8 +35,7 @@ export default function AdminVendors() {
       const res = await axios.get(`${API}/vendor/all`);
       setVendors(res.data.vendors || []);
     } catch (err) {
-      console.error(err);
-      toast.error("Network error: Could not sync vendor database");
+      console.warn("Could not sync vendor database (passive notice):", err.message);
     } finally {
       setLoading(false);
     }

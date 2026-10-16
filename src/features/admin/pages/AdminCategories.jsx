@@ -34,7 +34,7 @@ const AdminCategories = () => {
       const res = await axios.get(`${API}/category`);
       setCategories(res.data);
     } catch (err) {
-      toast.error("Error fetching categories");
+      console.warn("Could not fetch categories (passive notice):", err.message);
     } finally {
       setLoading(false);
     }

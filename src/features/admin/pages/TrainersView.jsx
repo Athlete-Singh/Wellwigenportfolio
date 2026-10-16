@@ -143,8 +143,7 @@ export default function TrainersView({ onStatusChange }) {
         }
       }
     } catch (err) {
-      console.error('Error fetching admin trainers:', err);
-      toast.error('Failed to load trainer applications');
+      console.warn('Error fetching admin trainers (passive notice):', err.message);
     } finally {
       setLoading(false);
     }

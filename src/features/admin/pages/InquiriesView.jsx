@@ -61,7 +61,15 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { trainerApi } from '../../../services/trainerApi';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const getApiUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && !envUrl.includes('localhost')) return envUrl;
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:' && window.location.hostname !== 'localhost') {
+    return '/api';
+  }
+  return envUrl || 'http://localhost:8000/api';
+};
+const API_URL = getApiUrl();
 
 // Status badge styling
 const STATUS_CONFIG = {
@@ -335,9 +343,6 @@ const InquiriesView = ({ onStatusChange, onNavigateToClients }) => {
           setStats({ total: mapped.length, new: mapped.length, contacted: 0, converted: 0 });
         }
       } catch (cacheErr) {}
-
-      // Deduplicate toast ID so React StrictMode dev mode never displays duplicate stacked popups
-      toast.error('Could not connect to backend. Please check backend server.', { id: 'inquiries-fetch-error' });
     } finally {
       setLoading(false);
     }
