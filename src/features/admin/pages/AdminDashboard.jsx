@@ -559,25 +559,61 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
   // Fetch real inquiries from MongoDB
   const fetchInquiriesData = async () => {
     try {
-      const res = await axios.get(`${API_URL}/inquiries?limit=6`);
-      if (res.data?.success) {
-        if (res.data.stats) {
-          setNewInquiriesCount(res.data.stats.new || 0);
+      let serverLeads = [];
+      let newCount = 0;
+
+      try {
+        const res = await axios.get(`${API_URL}/inquiries?limit=20`);
+        if (res.data?.success) {
+          if (res.data.stats) {
+            newCount = res.data.stats.new || 0;
+          }
+          if (Array.isArray(res.data.data)) {
+            serverLeads = res.data.data;
+          }
         }
-        if (Array.isArray(res.data.data)) {
-          setRecentInquiriesList(res.data.data);
-          setNotifications(res.data.data);
+      } catch (networkErr) {
+        // Fallback to local storage
+      }
+
+      // Read locally captured leads
+      let cachedRaw = [];
+      try {
+        const leads1 = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
+        const leads2 = JSON.parse(localStorage.getItem('wellwigen_inquiries') || '[]');
+        cachedRaw = [...leads1, ...leads2];
+      } catch (e) {}
+
+      const localMapped = cachedRaw.map((item, idx) => ({
+        _id: item._id || item.id || `cached_${idx}`,
+        fullName: item.fullName || item.name || 'Visitor',
+        email: item.email || '',
+        phone: item.phone || '',
+        program: item.program || 'General Inquiry',
+        plan: item.plan || 'Trial Class',
+        fitnessGoal: item.fitnessGoal || '',
+        preferredTiming: item.preferredTiming || item.preferredTime || '',
+        message: item.message || '',
+        status: item.status || 'New',
+        adminNotes: item.adminNotes || '',
+        createdAt: item.createdAt || item.timestamp || new Date().toISOString(),
+      }));
+
+      // Combine and deduplicate
+      const combined = [...serverLeads];
+      const seenIds = new Set(serverLeads.map((s) => String(s._id || s.id)));
+      for (const loc of localMapped) {
+        if (!seenIds.has(String(loc._id))) {
+          seenIds.add(String(loc._id));
+          combined.unshift(loc);
         }
       }
+
+      setRecentInquiriesList(combined.slice(0, 10));
+      setNotifications(combined.slice(0, 10));
+      setNewInquiriesCount(newCount || combined.filter((i) => i.status === 'New').length);
     } catch (err) {
-      const saved = localStorage.getItem('wellwigen_inquiries');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setRecentInquiriesList(parsed.slice(0, 6));
-          setNewInquiriesCount(parsed.filter((i) => i.status === 'New').length);
-        } catch (e) {}
-      }
+      console.warn('Dashboard inquiries load notice:', err.message);
     }
   };
 

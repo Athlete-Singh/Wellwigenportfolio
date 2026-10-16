@@ -243,7 +243,50 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
     setErrorMessage('');
     setLastSubmitTime(now);
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+    const getApiUrl = () => {
+      const envUrl = import.meta.env.VITE_API_URL;
+      if (envUrl && !envUrl.includes('localhost')) return envUrl;
+      if (typeof window !== 'undefined' && window.location.protocol === 'https:' && window.location.hostname !== 'localhost') {
+        return '/api';
+      }
+      return envUrl || 'http://localhost:8000/api';
+    };
+    const apiUrl = getApiUrl();
+
+    const timestamp = new Date().toISOString();
+    const leadRecord = {
+      _id: `lead_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      fullName: formData.name,
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      program: formData.program,
+      plan: planDisplay,
+      fitnessGoal: formData.fitnessGoal,
+      preferredTiming: formData.preferredTime,
+      preferredTime: formData.preferredTime,
+      message: formData.message || '',
+      status: 'New',
+      createdAt: timestamp,
+      timestamp,
+    };
+
+    // 1. Immediately persist locally so 0 leads are EVER lost
+    try {
+      const existingLeads = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
+      existingLeads.unshift(leadRecord);
+      localStorage.setItem('wellwigen_leads', JSON.stringify(existingLeads));
+
+      const existingInquiries = JSON.parse(localStorage.getItem('wellwigen_inquiries') || '[]');
+      existingInquiries.unshift(leadRecord);
+      localStorage.setItem('wellwigen_inquiries', JSON.stringify(existingInquiries));
+
+      window.dispatchEvent(new CustomEvent('wellwigen_lead_submitted', { detail: leadRecord }));
+      window.dispatchEvent(new Event('storage'));
+      console.log('✅ [LEAD] Saved locally to admin inquiry store:', leadRecord.fullName);
+    } catch (storeErr) {
+      console.warn('Local storage write notice:', storeErr);
+    }
 
     const payload = {
       name: formData.name,
@@ -258,31 +301,36 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
       message: `Enquired Plan: ${planDisplay}\nGoal: ${formData.fitnessGoal}\nPreferred Time: ${formData.preferredTime}\nNotes: ${formData.message || 'None'}`,
     };
 
-    try {
-      // 1. Submit to Inquiries lead endpoint (Admin Inquiries Box + Email Alert + WhatsApp Link)
-      const inquiryPayload = {
-        fullName: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        program: formData.program,
-        plan: planDisplay,
-        fitnessGoal: formData.fitnessGoal,
-        preferredTiming: formData.preferredTime,
-        message: formData.message
-          ? `Plan: ${planDisplay}\n${formData.message}`
-          : `Enquired Plan: ${planDisplay} | Goal: ${formData.fitnessGoal}`,
-      };
+    const inquiryPayload = {
+      fullName: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      program: formData.program,
+      plan: planDisplay,
+      fitnessGoal: formData.fitnessGoal,
+      preferredTiming: formData.preferredTime,
+      message: formData.message
+        ? `Plan: ${planDisplay}\n${formData.message}`
+        : `Enquired Plan: ${planDisplay} | Goal: ${formData.fitnessGoal}`,
+    };
 
+    try {
+      // 2. Submit to Inquiries lead endpoint (Admin Inquiries Box + Email Alert + WhatsApp Link)
       try {
-        const inqRes = await axios.post(`${apiUrl}/inquiries`, inquiryPayload, { timeout: 6000 });
-        if (inqRes.data && inqRes.data.whatsappUrl) {
-          setSubmittedWaUrl(inqRes.data.whatsappUrl);
+        const inqRes = await axios.post(`${apiUrl}/inquiries`, inquiryPayload, { timeout: 7000 });
+        if (inqRes.data) {
+          if (inqRes.data.whatsappUrl) {
+            setSubmittedWaUrl(inqRes.data.whatsappUrl);
+          }
+          if (inqRes.data.inquiry?._id || inqRes.data.inquiry?.id) {
+            leadRecord._id = inqRes.data.inquiry._id || inqRes.data.inquiry.id;
+          }
         }
       } catch (inquiryErr) {
-        console.warn('Inquiry endpoint save warning (non-blocking):', inquiryErr);
+        console.warn('Inquiry endpoint save warning (non-blocking, saved locally):', inquiryErr.message);
       }
 
-      // 2. Existing contact endpoint call (keeps backup sync)
+      // 3. Backup contact endpoint call
       try {
         await axios.post(`${apiUrl}/user/contact`, payload, { timeout: 6000 });
       } catch (contactErr) {
@@ -291,10 +339,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
 
       setSuccess(true);
     } catch (err) {
-      console.info('Saving lead locally for offline fallback:', payload);
-      const existingLeads = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
-      existingLeads.push({ ...payload, timestamp: new Date().toISOString() });
-      localStorage.setItem('wellwigen_leads', JSON.stringify(existingLeads));
+      console.warn('Submission completed with local capture:', err.message);
       setSuccess(true);
     } finally {
       setLoading(false);

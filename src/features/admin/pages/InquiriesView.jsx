@@ -302,47 +302,110 @@ const InquiriesView = ({ onStatusChange, onNavigateToClients }) => {
   }, []);
 
   // Fetch inquiries from backend
+  // Fetch inquiries from backend and merge with locally captured leads
   const fetchInquiries = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}/inquiries`, {
-        params: {
-          search: searchTerm,
-          status: statusFilter,
-          program: programFilter,
-          sortOrder,
-        },
-      });
+      let serverLeads = [];
+      let serverStats = null;
 
-      if (res.data.success) {
-        setInquiries(res.data.data || []);
-        if (res.data.stats) {
-          setStats(res.data.stats);
+      try {
+        const res = await axios.get(`${API_URL}/inquiries`, {
+          params: {
+            search: searchTerm,
+            status: statusFilter,
+            program: programFilter,
+            sortOrder,
+          },
+          timeout: 7000,
+        });
+
+        if (res.data?.success) {
+          serverLeads = Array.isArray(res.data.data) ? res.data.data : [];
+          serverStats = res.data.stats || null;
+        }
+      } catch (networkErr) {
+        console.warn('Backend inquiry fetch notice (using merged cache):', networkErr.message);
+      }
+
+      // Read locally captured leads (so 0 leads are lost even if backend cold-started)
+      let cachedRaw = [];
+      try {
+        const leads1 = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
+        const leads2 = JSON.parse(localStorage.getItem('wellwigen_inquiries') || '[]');
+        cachedRaw = [...leads1, ...leads2];
+      } catch (cacheErr) {}
+
+      const localMapped = cachedRaw.map((item, idx) => ({
+        _id: item._id || item.id || `cached_${idx}`,
+        fullName: item.fullName || item.name || 'Visitor',
+        email: item.email || '',
+        phone: item.phone || '',
+        program: item.program || 'General Inquiry',
+        plan: item.plan || 'Trial Class',
+        fitnessGoal: item.fitnessGoal || '',
+        preferredTiming: item.preferredTiming || item.preferredTime || '',
+        message: item.message || '',
+        status: item.status || 'New',
+        adminNotes: item.adminNotes || '',
+        createdAt: item.createdAt || item.timestamp || new Date().toISOString(),
+      }));
+
+      // Deduplicate and merge: prioritize server leads, append any unique local leads
+      const combined = [...serverLeads];
+      const seenKeys = new Set(
+        serverLeads.map((s) => `${(s.email || '').toLowerCase()}_${(s.phone || '').replace(/\D/g, '')}`)
+      );
+      const seenIds = new Set(serverLeads.map((s) => String(s._id || s.id)));
+
+      for (const loc of localMapped) {
+        const locId = String(loc._id);
+        const locKey = `${(loc.email || '').toLowerCase()}_${(loc.phone || '').replace(/\D/g, '')}`;
+        if (!seenIds.has(locId) && (!locKey || locKey === '_' || !seenKeys.has(locKey))) {
+          seenIds.add(locId);
+          if (locKey && locKey !== '_') seenKeys.add(locKey);
+          combined.unshift(loc);
         }
       }
-    } catch (err) {
-      console.warn('Backend inquiry fetch notice:', err.message);
-      // Graceful offline fallback from local storage cache
-      try {
-        const cachedLeads = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
-        if (cachedLeads.length > 0) {
-          const mapped = cachedLeads.map((item, idx) => ({
-            _id: `cached_${idx}`,
-            fullName: item.name || item.fullName || 'Visitor',
-            email: item.email || '',
-            phone: item.phone || '',
-            program: item.program || 'General Inquiry',
-            plan: item.plan || 'Trial',
-            fitnessGoal: item.fitnessGoal || '',
-            preferredTiming: item.preferredTime || '',
-            message: item.message || '',
-            status: 'New',
-            createdAt: item.timestamp || new Date().toISOString(),
-          }));
-          setInquiries(mapped);
-          setStats({ total: mapped.length, new: mapped.length, contacted: 0, converted: 0 });
+
+      // Apply in-memory search and filter if filtering offline leads
+      let finalInquiries = combined;
+      if (searchTerm && searchTerm.trim()) {
+        const q = searchTerm.toLowerCase().trim();
+        finalInquiries = finalInquiries.filter(
+          (i) =>
+            i.fullName?.toLowerCase().includes(q) ||
+            i.email?.toLowerCase().includes(q) ||
+            i.phone?.includes(q) ||
+            i.program?.toLowerCase().includes(q) ||
+            i.plan?.toLowerCase().includes(q)
+        );
+      }
+      if (statusFilter && statusFilter !== 'All') {
+        finalInquiries = finalInquiries.filter((i) => i.status === statusFilter);
+      }
+      if (programFilter && programFilter !== 'All') {
+        finalInquiries = finalInquiries.filter((i) => i.program === programFilter);
+      }
+
+      setInquiries(finalInquiries);
+
+      // Compute stats
+      const total = combined.length;
+      const newCount = combined.filter((i) => i.status === 'New').length;
+      const contactedCount = combined.filter((i) => i.status === 'Contacted').length;
+      const convertedCount = combined.filter((i) => i.status === 'Converted').length;
+
+      setStats(
+        serverStats || {
+          total,
+          new: newCount,
+          contacted: contactedCount,
+          converted: convertedCount,
         }
-      } catch (cacheErr) {}
+      );
+    } catch (err) {
+      console.warn('Inquiries processing notice:', err.message);
     } finally {
       setLoading(false);
     }
@@ -351,6 +414,21 @@ const InquiriesView = ({ onStatusChange, onNavigateToClients }) => {
   useEffect(() => {
     fetchInquiries();
   }, [statusFilter, programFilter, sortOrder]);
+
+  // Real-time listener: refresh inquiries immediately when a lead is submitted in any tab
+  useEffect(() => {
+    const handleLeadEvent = () => {
+      console.log('⚡ Real-time lead event detected! Refreshing inquiries box...');
+      fetchInquiries();
+    };
+
+    window.addEventListener('wellwigen_lead_submitted', handleLeadEvent);
+    window.addEventListener('storage', handleLeadEvent);
+    return () => {
+      window.removeEventListener('wellwigen_lead_submitted', handleLeadEvent);
+      window.removeEventListener('storage', handleLeadEvent);
+    };
+  }, []);
 
   // Handle Search on Enter or debounced
   const handleSearchSubmit = (e) => {
