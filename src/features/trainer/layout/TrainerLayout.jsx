@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -25,7 +25,10 @@ import {
   Video,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
+import socket from '../../../config/socket';
 import { trainerApi } from '../../../services/trainerApi';
+import ErrorBoundary from '../../../components/ErrorBoundary';
 
 export default function TrainerLayout({ children }) {
   const location = useLocation();
@@ -36,6 +39,26 @@ export default function TrainerLayout({ children }) {
   // Interactive Notifications State
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState(() => trainerApi.getNotifications());
+
+  // Auto-dismiss notification dropdown when clicking anywhere else on screen
+  const notificationsRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setIsNotificationsOpen(false);
+      }
+    };
+
+    if (isNotificationsOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('touchstart', handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, [isNotificationsOpen]);
 
   useEffect(() => {
     const handleProfileUpdate = () => {
@@ -49,10 +72,42 @@ export default function TrainerLayout({ children }) {
     window.addEventListener('storage', handleProfileUpdate);
     window.addEventListener('trainerNotificationsUpdated', handleNotificationsUpdate);
 
+    // Initial background sync for any newly assigned trainees/groups
+    trainerApi.syncTrainerAssignmentNotifications();
+
+    // Real-time socket event when cron or server dispatches an assignment
+    const handleSocketNotification = (data) => {
+      if (!data) return;
+      const current = trainerApi.getCurrentTrainer();
+      if (
+        !data.coachName ||
+        !current?.name ||
+        data.coachName.toLowerCase() === current.name.toLowerCase()
+      ) {
+        trainerApi.addNotification({
+          title: data.title || '🎯 New Client Assigned!',
+          message: data.message || `You have been assigned to ${data.targetName || 'a trainee'}`,
+          type: 'client',
+          link: data.link || '/trainer/dashboard',
+        });
+        toast.success(`🎯 ${data.title || 'New Client Assigned!'}`, {
+          duration: 5000,
+          icon: '🏋️‍♂️',
+        });
+      }
+    };
+
+    if (socket) {
+      socket.on('trainerNotification', handleSocketNotification);
+    }
+
     return () => {
       window.removeEventListener('trainerProfileUpdated', handleProfileUpdate);
       window.removeEventListener('storage', handleProfileUpdate);
       window.removeEventListener('trainerNotificationsUpdated', handleNotificationsUpdate);
+      if (socket) {
+        socket.off('trainerNotification', handleSocketNotification);
+      }
     };
   }, []);
 
@@ -89,7 +144,9 @@ export default function TrainerLayout({ children }) {
     /* [DISABLED FOR FUTURE USE] Trainer Clients navigation
     { name: 'Clients', icon: Users, route: '/trainer/clients' },
     */
+    /* [DISABLED FOR FUTURE USE] Trainer Availability navigation
     { name: 'Availability', icon: Calendar, route: '/trainer/availability' },
+    */
     { name: 'Public Profile', icon: User, route: '/trainer/profile' },
     { name: 'Settings', icon: Settings, route: '/trainer/settings' },
   ];
@@ -98,7 +155,7 @@ export default function TrainerLayout({ children }) {
   const isOnboarding = trainer.status === 'onboarding';
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-800 flex flex-col lg:flex-row antialiased">
+    <div data-panel="trainer" className="min-h-screen bg-transparent font-sans text-slate-800 flex flex-col lg:flex-row antialiased">
       {/* Mobile Drawer Overlay */}
       <AnimatePresence>
         {mobileSidebarOpen && (
@@ -114,7 +171,7 @@ export default function TrainerLayout({ children }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200/90 flex flex-col transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white/90 backdrop-blur-md border-r-2 border-teal-500/30 flex flex-col transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shadow-lg shadow-teal-500/5 ${
           mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -199,11 +256,11 @@ export default function TrainerLayout({ children }) {
         </nav>
 
         {/* Bottom Actions & Website Link */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50/60 space-y-2">
+        <div className="p-4 border-t border-teal-500/20 bg-white/80 space-y-2">
           {/* Back to Website link */}
           <Link
             to="/"
-            className="flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-teal-700 hover:bg-white border border-transparent hover:border-slate-200 transition-all"
+            className="flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-teal-700 hover:bg-white border border-transparent hover:border-teal-500/30 transition-all shadow-xs"
           >
             <div className="flex items-center gap-2.5">
               <ArrowLeft size={15} className="text-slate-400" />
@@ -213,7 +270,7 @@ export default function TrainerLayout({ children }) {
           </Link>
 
           {/* Trainer Card */}
-          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-xs">
+          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-white/95 border-2 border-teal-500/30 shadow-xs shadow-teal-500/5">
             <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
               {trainer.photoUrl ? (
                 <img src={trainer.photoUrl} alt={trainer.name} className="w-full h-full object-cover" />
@@ -241,9 +298,9 @@ export default function TrainerLayout({ children }) {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-transparent">
         {/* Top Header */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b-2 border-teal-500/30 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs shadow-teal-500/5">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileSidebarOpen(true)}
@@ -317,7 +374,7 @@ export default function TrainerLayout({ children }) {
             */}
 
             {/* NEW CODE - Interactive Notification Bell with Popover Dropdown */}
-            <div className="relative">
+            <div className="relative" ref={notificationsRef}>
               <button
                 type="button"
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
@@ -341,10 +398,6 @@ export default function TrainerLayout({ children }) {
               <AnimatePresence>
                 {isNotificationsOpen && (
                   <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setIsNotificationsOpen(false)}
-                    />
                     <motion.div
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -459,18 +512,36 @@ export default function TrainerLayout({ children }) {
               to="/trainer/profile"
               className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-sky-500 text-white flex items-center justify-center font-bold text-xs shadow-xs hover:ring-2 hover:ring-teal-500/20 transition-all overflow-hidden"
             >
-              {trainer.photoUrl ? (
-                <img src={trainer.photoUrl} alt={trainer.name} className="w-full h-full object-cover" />
+              {trainer?.photoUrl || trainer?.avatar ? (
+                <img src={trainer.photoUrl || trainer.avatar} alt={trainer.name || 'Coach'} className="w-full h-full object-cover" />
               ) : (
-                trainer.name?.substring(0, 2).toUpperCase() || 'TR'
+                (typeof trainer?.name === 'string' && trainer.name.trim()) ? trainer.name.trim().substring(0, 2).toUpperCase() : 'TR'
               )}
             </Link>
           </div>
         </header>
 
-        {/* Page View Body */}
-        <main className="p-4 sm:p-8 flex-1">
+        {/* Page View Body with Smooth Sliding Section Transition (matching Admin Panel) */}
+        <main className="p-4 sm:p-8 flex-1 overflow-x-hidden">
+          {/* OLD CODE (commented by AI)
           {children || <Outlet />}
+          */}
+
+          {/* NEW CODE - Wellwigen Smooth Sliding Section Transition (exact admin panel transition) */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 16, x: -6 }}
+              animate={{ opacity: 1, y: 0, x: 0 }}
+              exit={{ opacity: 0, y: -16, x: 6 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full"
+            >
+              <ErrorBoundary>
+                {children || <Outlet />}
+              </ErrorBoundary>
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

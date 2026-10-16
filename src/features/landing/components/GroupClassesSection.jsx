@@ -23,6 +23,15 @@ import {
   GROUP_PLANS,
   WHY_GROUP_CLASSES_TILES,
 } from '../data/fitnessData';
+// NEW CODE - 3D Live Group Classes Hero with studio background & breakout yoga athletes
+import LiveGroupClassesHero from './LiveGroupClassesHero';
+// NEW CODE - Distinct, impressive section dividers for Group Classes page
+import {
+  GCArenaAngleDropDivider,
+  GCLightWaveDivider,
+  GCVelocityPulseDivider,
+  GCCommunityCrestDivider,
+} from './SectionDividers';
 
 export default function GroupClassesSection({ onOpenLeadModal }) {
   const currentDayIndex = new Date().getDay(); // 0 is Sun, 1 is Mon, etc.
@@ -74,21 +83,34 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
         <div className="w-px h-16 bg-teal-500/50" />
       </div>
 
-      {/* ================= LIGHT HERO (PICTURE 2 EXACT) ================= */}
-      <div data-nav-theme="light" className="relative pt-24 pb-16 bg-white hero-white-screen">
+      {/* ================= LIGHT HERO (VIBRANT CALM BASE LIKE HOME & PT) ================= */}
+      <div data-nav-theme="light" data-home-bg="mint" className="relative pt-14 sm:pt-18 lg:pt-24 pb-16 bg-[#F2FAF8] overflow-hidden">
+        {/* Colorful background ambient glow orbs */}
+        <div className="absolute top-1/4 -right-12 w-96 h-96 bg-teal-200/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-12 left-1/3 w-80 h-80 bg-emerald-100/50 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-orange-200/25 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Floating playful colorful particles across section */}
+        <div className="hidden lg:block absolute inset-0 pointer-events-none select-none z-0" aria-hidden="true">
+          <div className="bg-drift-1 absolute w-2.5 h-2.5 rounded-full bg-[#FF6B35]/60 top-32 left-12 shadow-sm" />
+          <div className="bg-drift-2 absolute w-3 h-3 rounded-full bg-teal-400/60 top-64 left-1/4 shadow-sm" />
+          <div className="bg-drift-1 absolute w-2 h-2 rounded-full bg-[#FF6B35]/70 top-44 right-1/3 shadow-sm" />
+          <div className="bg-drift-2 absolute w-2.5 h-2.5 rounded-full bg-cyan-400/60 bottom-24 left-1/3 shadow-sm" />
+        </div>
+
         <div className="absolute top-10 left-10 text-[18vw] watermark-text-light opacity-30 z-0">
           ENERGY
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-12 gap-12 items-center mb-16">
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-16">
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="lg:col-span-6 space-y-6"
+              className="order-2 lg:order-1 lg:col-span-5 space-y-6 -mt-10 xs:-mt-14 sm:-mt-18 lg:mt-0 relative z-20"
             >
               {/* OLD CODE (commented by AI) - Awkward pill badge removed per user request */}
               {/*
@@ -109,7 +131,7 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
 
               {/* Subtext */}
               <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
-                Join our live, expert-led group classes and be part of a supportive fitness community. Different styles. Same goal &mdash; a healthier, stronger you.
+                Live, expert-led group classes for a healthier, stronger you.
               </p>
 
               {/* CTA Buttons */}
@@ -149,34 +171,26 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
               </div>
             </motion.div>
 
+            {/* NEW CODE - 3D Live Group Classes Hero: FIRST ON MOBILE (< lg) */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-6 relative"
+              className="order-1 lg:order-2 lg:col-span-7 relative flex items-center justify-center -mt-6 sm:-mt-8 lg:mt-0 z-10"
             >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-900 aspect-[4/3] bg-slate-900 group">
-                <div className="corner-bracket-tl z-20" />
-                <div className="corner-bracket-br z-20" />
-
-                <img
-                  src="/images/group_running_hero.jpg"
-                  alt="Energetic group running outdoors together smiling and staying motivated"
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent pointer-events-none" />
-              </div>
+              <LiveGroupClassesHero />
             </motion.div>
 
           </div>
         </div>
       </div>
 
+      {/* NEW CODE - GC Border Format 1: Arena Angle Drop Divider (Hero to Weekly Challenge) */}
+      <GCArenaAngleDropDivider />
+
       {/* ================= DARK BAND: YOUR WEEKLY CHALLENGE (7 DAYS) ================= */}
-      <div data-nav-theme="dark" id="weekly-schedule-anchor" className="relative py-28 bg-[#0E1420] text-white overflow-hidden scroll-mt-20">
+      <div data-nav-theme="dark" id="weekly-schedule-anchor" className="relative py-24 sm:py-28 bg-[#0E1420] text-white overflow-hidden scroll-mt-20">
         <div className="absolute inset-0 bg-blueprint-grid opacity-30 pointer-events-none" />
         <div className="absolute inset-0 bg-noise opacity-40 pointer-events-none" />
 
@@ -353,8 +367,11 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
         </div>
       </div>
 
+      {/* NEW CODE - GC Border Format 2: Light Wave Horizon Divider (Weekly Schedule to Membership Tiers) */}
+      <GCLightWaveDivider />
+
       {/* ================= LIGHT SECTION: CHOOSE YOUR PLAN (4 PLAN CARDS) ================= */}
-      <div data-nav-theme="light" className="relative py-28 bg-transparent overflow-hidden">
+      <div data-nav-theme="light" className="relative py-20 sm:py-24 bg-transparent overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           <div className="text-center max-w-2xl mx-auto mb-14 relative">
@@ -498,10 +515,13 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
         </div>
       </div>
 
+      {/* NEW CODE - GC Border Format 3: Velocity Pulse Ribbon (Preceding Trial Offer) */}
+      <GCVelocityPulseDivider />
+
       {/* ================= DARK TRIAL BAND (JUST RS 99 FOR 1 CLASS) ================= */}
       <div
         data-nav-theme="dark"
-        className="relative mt-24 sm:mt-28 lg:mt-32 bg-gradient-to-r from-[#0E1420] via-[#0B3B3C] to-[#111B2E] text-white border-y border-[#2A3547] overflow-visible reveal-item"
+        className="relative mt-8 sm:mt-12 bg-gradient-to-r from-[#0E1420] via-[#0B3B3C] to-[#111B2E] text-white border-y border-[#2A3547] overflow-visible reveal-item"
       >
         <div className="absolute inset-0 bg-blueprint-grid opacity-25 pointer-events-none" />
 
@@ -604,8 +624,11 @@ export default function GroupClassesSection({ onOpenLeadModal }) {
         </div>
       </div>
 
+      {/* NEW CODE - GC Border Format 4: Community Crest Divider (Trial Offer to Why Choose Us) */}
+      <GCCommunityCrestDivider />
+
       {/* ================= LIGHT SECTION: WHY CHOOSE WELLWIGEN GROUP CLASSES? ================= */}
-      <div data-nav-theme="light" className="relative py-24 bg-transparent overflow-hidden">
+      <div data-nav-theme="light" className="relative py-20 sm:py-24 bg-transparent overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           <div className="text-center max-w-2xl mx-auto mb-14">

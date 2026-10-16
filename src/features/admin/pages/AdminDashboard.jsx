@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 // OLD CODE (commented by AI)
 /*
@@ -339,16 +339,16 @@ const MetricCard = ({ title, value, unit, icon, trend, trendValue, highlight = f
 );
 */
 
-// NEW CODE - Modern SaaS Metric Card (Clear type scale, 8px grid, soft shadows, 1px light border, brand teal/orange)
+// NEW CODE - Modern SaaS Metric Card (Clear type scale, 8px grid, soft shadows, attractive visible colored border, brand teal/orange)
 const MetricCard = ({ title, value, unit, icon, trend, trendValue, highlight = false, onClick }) => (
   <div 
     onClick={onClick}
-    className={`p-5 bg-white border rounded-2xl shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between min-h-[142px] w-full ${
-      onClick ? 'cursor-pointer hover:border-teal-400' : ''
+    className={`p-5 bg-white/95 backdrop-blur-md border-2 rounded-2xl shadow-xs hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between min-h-[142px] w-full ${
+      onClick ? 'cursor-pointer hover:border-teal-500' : ''
     } ${
       highlight 
-        ? 'border-teal-200 bg-gradient-to-br from-white via-teal-50/25 to-sky-50/20 ring-1 ring-teal-500/10' 
-        : 'border-slate-200/80 hover:border-slate-300'
+        ? 'border-teal-500 bg-gradient-to-br from-white via-teal-50/40 to-sky-50/30 ring-2 ring-teal-500/20 shadow-teal-500/10' 
+        : 'border-teal-500/30 hover:border-teal-500 shadow-teal-500/5'
     }`}
   >
     <div className="flex items-center justify-between gap-2 mb-3">
@@ -385,7 +385,7 @@ const MetricCard = ({ title, value, unit, icon, trend, trendValue, highlight = f
 
 // Skeleton loader for Metric Cards
 const SkeletonMetricCard = () => (
-  <div className="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-xs flex flex-col justify-between min-h-[142px] w-full animate-pulse">
+  <div className="p-5 bg-white/90 backdrop-blur-md border-2 border-teal-500/20 rounded-2xl shadow-xs flex flex-col justify-between min-h-[142px] w-full animate-pulse">
     <div className="flex items-center justify-between mb-3">
       <div className="w-10 h-10 rounded-xl bg-slate-100" />
       <div className="w-16 h-5 rounded-full bg-slate-100" />
@@ -510,6 +510,31 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   // NEW CODE - Top bar profile menu and confirmation modal states
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+  // Auto-dismiss dropdowns on outside click anywhere on screen
+  const notificationsRef = useRef(null);
+  const profileMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setIsNotificationsOpen(false);
+      }
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    if (isNotificationsOpen || isProfileMenuOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('touchstart', handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, [isNotificationsOpen, isProfileMenuOpen]);
+
   const [rejectModalTrainer, setRejectModalTrainer] = useState(null);
   const [rejectReasonText, setRejectReasonText] = useState('');
   const [isRejectingLoading, setIsRejectingLoading] = useState(false);
@@ -600,12 +625,10 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
           const num = parseInt(String(s.price).replace(/[^0-9]/g, ''), 10);
           if (!isNaN(num)) total += num;
         });
-        if (total > 0) {
-          setRevenueTotal(`₹${total.toLocaleString('en-IN')}`);
-        }
+        setRevenueTotal(total > 0 ? `₹${total.toLocaleString('en-IN')}` : '₹0');
       } else {
-        setActiveSubsCount(2);
-        setRevenueTotal('₹35,989');
+        setActiveSubsCount(0);
+        setRevenueTotal('₹0');
       }
     } catch (e) {
       setActiveSubsCount(0);
@@ -618,13 +641,31 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
     fetchTrainersData();
     fetchClientsData();
     fetchSubscriptionsData();
+
+    // Live update listeners for trainer application submission
+    const handleTrainerSubmitted = (e) => {
+      fetchTrainersData();
+      const coachName = e?.detail?.name || 'A coach';
+      toast.success(`🚨 New Coach Application: "${coachName}" submitted onboarding and is awaiting your approval!`, {
+        duration: 6500,
+        id: 'new-coach-alert-' + Date.now(),
+      });
+    };
+
+    window.addEventListener('wellwigen_trainer_application_submitted', handleTrainerSubmitted);
+    window.addEventListener('storage', fetchTrainersData);
+
     const interval = setInterval(() => {
       fetchInquiriesData();
       fetchTrainersData();
       fetchClientsData();
       fetchSubscriptionsData();
     }, 15000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('wellwigen_trainer_application_submitted', handleTrainerSubmitted);
+      window.removeEventListener('storage', fetchTrainersData);
+    };
   }, []);
 
   // Quick Approve Trainer
@@ -942,13 +983,14 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
     switch (activeTab) {
       // NEW CODE - Wellwigen Inquiries feature
       case 'Inquiries':
-        return <InquiriesView onStatusChange={fetchInquiriesCount} />;
+        return <InquiriesView onStatusChange={fetchInquiriesCount} onNavigateToClients={() => setActiveTab('Clients')} />;
       // NEW CODE - Wellwigen Trainers feature
       case 'Trainers':
-        return <TrainersView onStatusChange={setPendingTrainersCount} onNavigateToClasses={() => setActiveTab('Classes')} />;
-      // NEW CODE - Wellwigen Classes & Trainer Scheduling feature
+        return <TrainersView onStatusChange={setPendingTrainersCount} />;
+      /* [DISABLED FOR FUTURE USE] Admin Classes & Trainer Scheduling feature
       case 'Classes':
         return <AdminClassesView onNavigateToTrainers={() => setActiveTab('Trainers')} />;
+      */
       // NEW CODE - Wellwigen Clients feature
       case 'Clients':
         return <ClientsView />;
@@ -1414,8 +1456,8 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
               </p>
             </div>
 
-            {/* ================= STAT CARDS GRID (FIXED BALANCED LAYOUT) ================= */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            {/* ================= STAT CARDS GRID (BALANCED 5-COLUMN LAYOUT) ================= */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               <MetricCard 
                 title="Total Trainers" 
                 value={allTrainers.length} 
@@ -1445,7 +1487,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                 onClick={() => setActiveTab('Clients')}
               />
               <MetricCard 
-                title="Active Subscriptions" 
+                title="Active Memberships" 
                 value={activeSubsCount} 
                 unit="Members" 
                 icon={<CheckCircle2 size={18} />} 
@@ -1463,6 +1505,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                 highlight={newInquiriesCount > 0}
                 onClick={() => setActiveTab('Inquiries')}
               />
+              {/* [DISABLED PER REQUEST] Revenue Metric Card
               <MetricCard 
                 title="Revenue" 
                 value={revenueTotal} 
@@ -1472,6 +1515,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                 trendValue="LIVE" 
                 onClick={() => setActiveTab('Subscriptions')}
               />
+              */}
             </div>
 
             {/* ================= PENDING TRAINER APPROVALS TABLE ================= */}
@@ -2034,7 +2078,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
 
 
   return (
-    <div className="flex h-screen bg-[#f9fafb] font-sans text-slate-900 overflow-hidden">
+    <div data-panel="admin" className="flex h-screen bg-transparent font-sans text-slate-900 overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -2050,7 +2094,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
 
       {/* Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-[#f8f9fa] border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0
+        fixed inset-y-0 left-0 z-50 w-64 bg-white/90 backdrop-blur-md border-r-2 border-teal-500/30 flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 shadow-lg shadow-teal-500/5
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* OLD CODE (commented by AI) */}
@@ -2112,9 +2156,11 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
         <nav className="flex-1 px-4 space-y-1.5 mt-4 overflow-y-auto">
           <AdminNavItem icon={<LayoutDashboard size={18} />} label="Dashboard" active={activeTab === 'Dashboard'} onClick={() => { setActiveTab('Dashboard'); setIsSidebarOpen(false); }} />
           <AdminNavItem icon={<Dumbbell size={18} />} label="Trainers" badge={pendingTrainersCount} active={activeTab === 'Trainers'} onClick={() => { setActiveTab('Trainers'); setIsSidebarOpen(false); }} />
+          {/* [DISABLED FOR FUTURE USE] Classes & Schedule Admin Nav Option
           <AdminNavItem icon={<Calendar size={18} />} label="Classes & Schedule" active={activeTab === 'Classes'} onClick={() => { setActiveTab('Classes'); setIsSidebarOpen(false); }} />
+          */}
           <AdminNavItem icon={<Users size={18} />} label="Clients" active={activeTab === 'Clients'} onClick={() => { setActiveTab('Clients'); setIsSidebarOpen(false); }} />
-          <AdminNavItem icon={<Ticket size={18} />} label="Subscriptions" active={activeTab === 'Subscriptions'} onClick={() => { setActiveTab('Subscriptions'); setIsSidebarOpen(false); }} />
+          <AdminNavItem icon={<Ticket size={18} />} label="Memberships" active={activeTab === 'Subscriptions'} onClick={() => { setActiveTab('Subscriptions'); setIsSidebarOpen(false); }} />
           <AdminNavItem icon={<Inbox size={18} />} label="Inquiries" badge={newInquiriesCount} active={activeTab === 'Inquiries'} onClick={() => { setActiveTab('Inquiries'); setIsSidebarOpen(false); }} />
           <AdminNavItem icon={<Settings size={18} />} label="Settings" active={activeTab === 'Settings'} onClick={() => { setActiveTab('Settings'); setIsSidebarOpen(false); }} />
 
@@ -2135,23 +2181,25 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
           */}
         </nav>
 
-        <div className="p-4 border-t border-gray-200 bg-[#f8f9fa] space-y-3">
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-gray-100 shadow-sm group hover:border-blue-200 transition-all">
+        <div className="p-4 border-t border-teal-500/20 bg-white/80 space-y-3">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-teal-500/30 shadow-xs group hover:border-teal-500 transition-all">
             <div className="w-10 h-10 rounded bg-slate-900 flex items-center justify-center text-white font-bold text-xs">
               {user?.name?.substring(0, 2).toUpperCase() || 'AD'}
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-gray-900 leading-none mb-1">{user?.name || 'System Admin'}</span>
-              <span className="text-[10px] text-blue-600 font-bold uppercase tracking-widest">{user?.role || 'Superuser'}</span>
+              <span className="text-[10px] text-teal-600 font-bold uppercase tracking-widest">{user?.role || 'Superuser'}</span>
             </div>
           </div>
           <button 
             onClick={() => {
+              localStorage.removeItem('adminToken');
+              localStorage.removeItem('wellwigen_admin_user');
               logout();
-              toast.success("Logged out successfully");
-              navigate('/login');
+              toast.success("Admin signed out successfully");
+              navigate('/admin/login', { replace: true });
             }}
-            className="w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 bg-white border border-teal-500/30 text-slate-600 rounded-xl text-xs font-bold hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
           >
             <XCircle size={14} />
             Sign Out
@@ -2160,9 +2208,9 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F8FAFC]">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-transparent">
         {/* Header / Top Bar */}
-        <div className="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 flex items-center justify-between px-4 lg:px-8 shrink-0">
+        <div className="h-16 bg-white/90 backdrop-blur-md border-b-2 border-teal-500/30 sticky top-0 z-30 flex items-center justify-between px-4 lg:px-8 shrink-0 shadow-xs shadow-teal-500/5">
           <div className="flex items-center gap-4">
             <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-500">
               <Menu size={24} />
@@ -2203,141 +2251,236 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
           </div>
           */}
 
-          {/* NEW CODE - Interactive Corner Notifications & Live Alerts */}
-          <div className="flex items-center gap-4">
+          {/* Top Bar Actions */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Go to Website Option */}
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-600 text-teal-800 hover:text-white border border-teal-500/35 hover:border-teal-600 text-xs font-bold transition-all duration-200 shadow-2xs hover:shadow-sm hover:shadow-teal-600/20 group cursor-pointer"
+              title="Open Public Website (Opens in new tab)"
+            >
+              <Globe size={15} className="text-teal-600 group-hover:text-white transition-colors shrink-0" />
+              <span className="hidden sm:inline">Go to Website</span>
+              <span className="sm:hidden text-[11px]">Website</span>
+              <ExternalLink size={12} className="text-teal-500 group-hover:text-white/80 transition-colors shrink-0" />
+            </a>
+
             <div className="flex items-center gap-2 relative">
               {/* Corner Bell Button with Live Notification Badge */}
-              <div className="relative">
-                <button 
-                  onClick={() => {
-                    setIsNotificationsOpen(!isNotificationsOpen);
-                    setIsMessagesOpen(false);
-                  }}
-                  className={`p-2.5 rounded-xl transition-all relative ${
-                    isNotificationsOpen 
-                      ? 'bg-teal-50 text-teal-700 ring-2 ring-teal-500/20' 
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                  title="Notifications & New Leads"
-                >
-                  <Bell size={19} />
-                  {newInquiriesCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] px-1 items-center justify-center">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F26B38] opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-4 min-w-[16px] px-1 bg-gradient-to-r from-[#F26B38] to-[#E05B28] text-[10px] font-black text-white items-center justify-center shadow-sm">
-                        {newInquiriesCount}
-                      </span>
-                    </span>
-                  )}
-                </button>
-
-                {/* Smooth Slide-down Notifications Dropdown */}
-                <AnimatePresence>
-                  {isNotificationsOpen && (
+              <div className="relative" ref={notificationsRef}>
+                {(() => {
+                  const totalAlertsCount = (newInquiriesCount || 0) + (pendingTrainersCount || 0);
+                  return (
                     <>
-                      <div 
-                        className="fixed inset-0 z-40" 
-                        onClick={() => setIsNotificationsOpen(false)} 
-                      />
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute right-0 top-full mt-3 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden ring-1 ring-black/5"
+                      <button 
+                        onClick={() => {
+                          setIsNotificationsOpen(!isNotificationsOpen);
+                          setIsMessagesOpen(false);
+                        }}
+                        className={`p-2.5 rounded-xl transition-all relative ${
+                          isNotificationsOpen 
+                            ? 'bg-teal-50 text-teal-700 ring-2 ring-teal-500/20' 
+                            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                        }`}
+                        title="Notifications & New Leads"
                       >
-                        {/* Dropdown Header */}
-                        <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-teal-50/60 via-sky-50/30 to-white">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-600 flex items-center justify-center font-bold text-xs">
-                              <Bell size={15} />
-                            </div>
-                            <div>
-                              <h4 className="text-sm font-bold text-slate-900 leading-tight">Notifications</h4>
-                              <p className="text-[11px] text-slate-500 font-medium">
-                                {newInquiriesCount > 0 ? `${newInquiriesCount} new leads requiring follow-up` : 'All caught up'}
-                              </p>
-                            </div>
-                          </div>
-                          {newInquiriesCount > 0 && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#F26B38] text-white">
-                              {newInquiriesCount} NEW
+                        <Bell size={19} />
+                        {totalAlertsCount > 0 && (
+                          <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] px-1 items-center justify-center">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F26B38] opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-4 min-w-[16px] px-1 bg-gradient-to-r from-[#F26B38] to-[#E05B28] text-[10px] font-black text-white items-center justify-center shadow-sm">
+                              {totalAlertsCount}
                             </span>
-                          )}
-                        </div>
+                          </span>
+                        )}
+                      </button>
 
-                        {/* Notifications List */}
-                        <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
-                          {notifications.length > 0 ? (
-                            notifications.map((item) => (
-                              <div
-                                key={item._id}
-                                onClick={() => {
-                                  setActiveTab('Inquiries');
-                                  setIsNotificationsOpen(false);
-                                }}
-                                className="p-3.5 hover:bg-teal-50/40 transition-colors cursor-pointer group flex items-start gap-3"
-                              >
-                                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-sky-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
-                                  {item.fullName ? item.fullName.charAt(0).toUpperCase() : 'W'}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between mb-0.5">
-                                    <span className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors truncate">
-                                      {item.fullName}
-                                    </span>
-                                    <span className="text-[10px] text-slate-400 shrink-0 ml-2">
-                                      {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
+                      {/* Smooth Slide-down Notifications Dropdown */}
+                      <AnimatePresence>
+                        {isNotificationsOpen && (
+                          <>
+                            <motion.div
+                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                              className="absolute right-0 top-full mt-3 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden ring-1 ring-black/5"
+                            >
+                              {/* Dropdown Header */}
+                              <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-teal-50/60 via-sky-50/30 to-white">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-600 flex items-center justify-center font-bold text-xs">
+                                    <Bell size={15} />
                                   </div>
-                                  <p className="text-[11px] text-slate-600 truncate font-medium">
-                                    {item.program} • <span className="text-teal-600 font-semibold">{item.plan || 'Trial'}</span>
-                                  </p>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider ${
-                                      item.status === 'New' 
-                                        ? 'bg-amber-50 text-amber-600 border border-amber-200/60' 
-                                        : 'bg-sky-50 text-sky-600'
-                                    }`}>
-                                      {item.status}
-                                    </span>
-                                    {item.fitnessGoal && (
-                                      <span className="text-[10px] text-slate-400 truncate">
-                                        Goal: {item.fitnessGoal}
+                                  <div>
+                                    <h4 className="text-sm font-bold text-slate-900 leading-tight">Notifications</h4>
+                                    <p className="text-[11px] text-slate-500 font-medium">
+                                      {totalAlertsCount > 0 ? (
+                                        <span>
+                                          {pendingTrainersCount > 0 && (
+                                            <span className="text-amber-700 font-bold">
+                                              {pendingTrainersCount} coach{pendingTrainersCount > 1 ? 'es' : ''} awaiting approval
+                                            </span>
+                                          )}
+                                          {pendingTrainersCount > 0 && newInquiriesCount > 0 && ' • '}
+                                          {newInquiriesCount > 0 && (
+                                            <span>{newInquiriesCount} new leads</span>
+                                          )}
+                                        </span>
+                                      ) : (
+                                        'All caught up'
+                                      )}
+                                    </p>
+                                  </div>
+                                </div>
+                                {totalAlertsCount > 0 && (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#F26B38] text-white">
+                                    {totalAlertsCount} NEW
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Notifications List */}
+                              <div className="max-h-96 overflow-y-auto divide-y divide-slate-50">
+                                {/* COACH APPLICATIONS SECTION */}
+                                {pendingTrainersList.length > 0 && (
+                                  <div className="bg-amber-50/50 p-3 border-b border-amber-100">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                                        <Dumbbell size={13} className="text-amber-600 shrink-0" />
+                                        <span>Coach Applications Awaiting Approval ({pendingTrainersList.length})</span>
                                       </span>
-                                    )}
+                                    </div>
+                                    <div className="space-y-2">
+                                      {pendingTrainersList.map((trn) => (
+                                        <div
+                                          key={trn._id || trn.id}
+                                          onClick={() => {
+                                            setActiveTab('Trainers');
+                                            setIsNotificationsOpen(false);
+                                          }}
+                                          className="p-2.5 rounded-xl bg-white border border-amber-200/90 shadow-2xs hover:border-teal-400 hover:shadow-xs transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                                        >
+                                          <div className="flex items-center gap-2.5 min-w-0">
+                                            {trn.photoUrl ? (
+                                              <img src={trn.photoUrl} alt="" className="w-9 h-9 rounded-xl object-cover border border-amber-200 shrink-0" />
+                                            ) : (
+                                              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                                                {trn.name ? trn.name.charAt(0).toUpperCase() : 'C'}
+                                              </div>
+                                            )}
+                                            <div className="min-w-0">
+                                              <p className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors truncate">
+                                                {trn.name}
+                                              </p>
+                                              <p className="text-[10px] text-slate-500 truncate">
+                                                {trn.specialization || 'Strength & Conditioning'} • {trn.experience || '3-5 Yrs'}
+                                              </p>
+                                              <p className="text-[9px] font-mono font-semibold text-teal-700 mt-0.5">
+                                                ID: {trn.applicationId || 'Submitted'}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <span className="px-2 py-1 rounded-lg text-[10px] font-extrabold bg-amber-500 hover:bg-amber-600 text-white shadow-2xs shrink-0 flex items-center gap-1 transition-colors">
+                                            <span>Review</span>
+                                            <ChevronRight size={11} />
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
                                   </div>
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="py-10 text-center px-4">
-                              <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
-                                <CheckCircle2 size={18} />
-                              </div>
-                              <p className="text-xs font-semibold text-slate-600">No pending notifications</p>
-                              <p className="text-[11px] text-slate-400 mt-0.5">New customer leads will appear here instantly.</p>
-                            </div>
-                          )}
-                        </div>
+                                )}
 
-                        {/* Dropdown Footer */}
-                        <div className="p-3 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between">
-                          <button
-                            onClick={() => {
-                              setActiveTab('Inquiries');
-                              setIsNotificationsOpen(false);
-                            }}
-                            className="w-full py-2 bg-white border border-slate-200 hover:border-teal-300 hover:bg-teal-50/50 text-slate-800 hover:text-teal-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
-                          >
-                            <span>Open Inquiries Panel</span>
-                            <ChevronRight size={13} />
-                          </button>
-                        </div>
-                      </motion.div>
+                                {/* CUSTOMER LEADS & INQUIRIES SECTION */}
+                                {notifications.length > 0 && (
+                                  notifications.map((item) => (
+                                    <div
+                                      key={item._id}
+                                      onClick={() => {
+                                        setActiveTab('Inquiries');
+                                        setIsNotificationsOpen(false);
+                                      }}
+                                      className="p-3.5 hover:bg-teal-50/40 transition-colors cursor-pointer group flex items-start gap-3"
+                                    >
+                                      <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-sky-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
+                                        {item.fullName ? item.fullName.charAt(0).toUpperCase() : 'W'}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-0.5">
+                                          <span className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors truncate">
+                                            {item.fullName}
+                                          </span>
+                                          <span className="text-[10px] text-slate-400 shrink-0 ml-2">
+                                            {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                          </span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-600 truncate font-medium">
+                                          {item.program} • <span className="text-teal-600 font-semibold">{item.plan || 'Trial'}</span>
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                          <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider ${
+                                            item.status === 'New' 
+                                              ? 'bg-amber-50 text-amber-600 border border-amber-200/60' 
+                                              : 'bg-sky-50 text-sky-600'
+                                          }`}>
+                                            {item.status}
+                                          </span>
+                                          {item.fitnessGoal && (
+                                            <span className="text-[10px] text-slate-400 truncate">
+                                              Goal: {item.fitnessGoal}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))
+                                )}
+
+                                {pendingTrainersList.length === 0 && notifications.length === 0 && (
+                                  <div className="py-10 text-center px-4">
+                                    <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
+                                      <CheckCircle2 size={18} />
+                                    </div>
+                                    <p className="text-xs font-semibold text-slate-600">No pending notifications</p>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">New coach applications and customer leads will appear here instantly.</p>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Dropdown Footer */}
+                              <div className="p-3 bg-slate-50/80 border-t border-slate-100 flex items-center gap-2">
+                                {pendingTrainersCount > 0 && (
+                                  <button
+                                    onClick={() => {
+                                      setActiveTab('Trainers');
+                                      setIsNotificationsOpen(false);
+                                    }}
+                                    className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                                  >
+                                    <Dumbbell size={13} />
+                                    <span>Review Coaches ({pendingTrainersCount})</span>
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => {
+                                    setActiveTab('Inquiries');
+                                    setIsNotificationsOpen(false);
+                                  }}
+                                  className="flex-1 py-2 bg-white border border-slate-200 hover:border-teal-300 hover:bg-teal-50/50 text-slate-800 hover:text-teal-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                                >
+                                  <span>Inquiries ({newInquiriesCount})</span>
+                                  <ChevronRight size={13} />
+                                </button>
+                              </div>
+                            </motion.div>
+                          </>
+                        )}
+                      </AnimatePresence>
                     </>
-                  )}
-                </AnimatePresence>
+                  );
+                })()}
               </div>
 
               {/* Message Square Button */}
@@ -2353,7 +2496,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
               <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />
 
               {/* Top Bar Admin Profile Menu */}
-              <div className="relative">
+              <div className="relative" ref={profileMenuRef}>
                 <button
                   onClick={() => {
                     setIsProfileMenuOpen(!isProfileMenuOpen);
@@ -2381,7 +2524,6 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                 <AnimatePresence>
                   {isProfileMenuOpen && (
                     <>
-                      <div className="fixed inset-0 z-40" onClick={() => setIsProfileMenuOpen(false)} />
                       <motion.div
                         initial={{ opacity: 0, y: 8, scale: 0.96 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -2422,9 +2564,11 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                         <div className="pt-1 mt-1 border-t border-slate-100">
                           <button
                             onClick={() => {
+                              localStorage.removeItem('adminToken');
+                              localStorage.removeItem('wellwigen_admin_user');
                               logout();
-                              toast.success("Logged out successfully");
-                              navigate('/login');
+                              toast.success("Admin signed out successfully");
+                              navigate('/admin/login', { replace: true });
                             }}
                             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                           >
@@ -2476,7 +2620,7 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 26 }}
                     transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                    className="w-full lg:w-96 bg-white border-l border-slate-200 overflow-y-auto p-8 shrink-0 transition-all duration-300"
+                    className="w-full lg:w-96 bg-white/95 backdrop-blur-md border-l-2 border-teal-500/30 overflow-y-auto p-8 shrink-0 transition-all duration-300 shadow-xl shadow-teal-500/5"
                   >
                     {panel}
                   </motion.div>

@@ -14,10 +14,14 @@ const Login = () => {
     setError("");
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/admin/login`, {
+      const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+      const res = await fetch(`${apiBase}/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          identifier: formData.username,
+        }),
       });
 
       const data = await res.json();

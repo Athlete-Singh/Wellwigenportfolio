@@ -80,9 +80,9 @@ export default function TrainerIntro() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans antialiased">
+    <div data-panel="trainer" className="min-h-screen bg-transparent text-slate-800 font-sans antialiased">
       {/* Top Navigation */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b-2 border-teal-500/30 shadow-xs shadow-teal-500/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-sky-500 shadow-md shadow-teal-500/20 flex items-center justify-center text-white font-black text-base shrink-0 group-hover:scale-105 transition-transform">
@@ -129,7 +129,7 @@ export default function TrainerIntro() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-28 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-[#f8fafc]">
+      <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-28 overflow-hidden bg-transparent">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold mb-6 shadow-xs">
             <Sparkles size={14} className="text-teal-600" />
@@ -201,7 +201,7 @@ export default function TrainerIntro() {
             return (
               <div
                 key={i}
-                className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-4"
+                className="bg-white/95 backdrop-blur-md p-7 rounded-2xl border-2 border-teal-500/30 hover:border-teal-500 shadow-xs hover:shadow-lg transition-all space-y-4 shadow-teal-500/5"
               >
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-tr ${b.color} text-white flex items-center justify-center shadow-md`}>
                   <Icon size={22} />
@@ -215,7 +215,7 @@ export default function TrainerIntro() {
       </section>
 
       {/* 4-Step Process */}
-      <section className="py-20 bg-white border-y border-slate-200/80">
+      <section className="py-20 bg-white/85 backdrop-blur-md border-y-2 border-teal-500/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-xs font-black text-teal-600 uppercase tracking-widest mb-2">Simple Onboarding</p>

@@ -9,6 +9,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Instagram, Twitter, Facebook, Linkedin, ArrowUp } from 'lucide-react';
 import { CONTACT_INFO } from '../data/fitnessData';
+// NEW CODE - Distinct Border Format 7: Stepped Stadium Arch & Neon Fiber-Optic Laser Divider
+import { SteppedStadiumArchDivider } from './SectionDividers';
 
 export default function Footer({ onNavigateSection, onOpenLegalModal }) {
   const scrollToTop = () => {
@@ -21,16 +23,10 @@ export default function Footer({ onNavigateSection, onOpenLegalModal }) {
 
   // NEW CODE - mobile fix: pb-28 on mobile (~110px padding) so floating WhatsApp button never covers footer content
   return (
-    <footer data-nav-theme="dark" className="bg-[#092B28] text-slate-300 pt-20 pb-28 sm:pb-12 border-t border-teal-800/40 relative overflow-hidden">
-      {/* Top Slanted / Wave Divider from Final CTA (#0E1420) to Footer (#092B28) */}
-      <div className="absolute top-0 left-0 right-0 overflow-hidden leading-none pointer-events-none -mt-px">
-        <svg
-          viewBox="0 0 1200 60"
-          preserveAspectRatio="none"
-          className="relative block w-full h-8 sm:h-12 text-[#0E1420] fill-current"
-        >
-          <path d="M0,0 L600,35 L1200,0 L1200,0 L0,0 Z" />
-        </svg>
+    <footer data-nav-theme="dark" className="bg-[#092B28] text-slate-300 pt-20 sm:pt-24 lg:pt-28 pb-28 sm:pb-12 relative overflow-hidden">
+      {/* NEW CODE - Distinct Border Format 7: Stepped Stadium Arch & Neon Fiber-Optic Laser Divider */}
+      <div className="absolute top-0 inset-x-0">
+        <SteppedStadiumArchDivider />
       </div>
 
       {/* Dynamic Glow Line Accent */}

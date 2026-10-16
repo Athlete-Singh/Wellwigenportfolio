@@ -50,10 +50,16 @@ import {
   ExternalLink,
   ChevronDown,
   ArrowUpDown,
-  FileText
+  FileText,
+  UserPlus,
+  ShieldCheck,
+  Check,
+  Users,
+  Dumbbell
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { trainerApi } from '../../../services/trainerApi';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -135,7 +141,99 @@ Team Wellwigen`,
   },
 ];
 
-const InquiriesView = () => {
+// Subscription Plans matching website catalog for converting leads
+const CONVERT_PLANS = [
+  // 1-on-1 Personal Training Plans
+  {
+    id: 'pt_trial',
+    name: '1-on-1 Trial Class',
+    category: '1-on-1 Personal Training',
+    program: 'Personal Training',
+    price: 299,
+    cycle: 'monthly',
+    sessions: 1,
+    badge: 'Trial',
+    desc: '1 live 1-on-1 coaching session',
+  },
+  {
+    id: 'pt_starter',
+    name: 'Starter (3 Sessions/Week)',
+    category: '1-on-1 Personal Training',
+    program: 'Personal Training',
+    price: 3999,
+    cycle: 'monthly',
+    sessions: 12,
+    desc: '3 live coaching sessions weekly',
+  },
+  {
+    id: 'pt_transformation',
+    name: 'Transformation (5 Sessions/Week)',
+    category: '1-on-1 Personal Training',
+    program: 'Personal Training',
+    price: 5999,
+    cycle: 'monthly',
+    sessions: 20,
+    badge: 'Most Popular',
+    desc: '5 live coaching sessions weekly',
+  },
+  {
+    id: 'pt_premium',
+    name: 'Premium 1:1 (Custom Schedule)',
+    category: '1-on-1 Personal Training',
+    program: 'Personal Training',
+    price: 8999,
+    cycle: 'monthly',
+    sessions: 30,
+    desc: 'Custom schedule & unlimited guidance',
+  },
+
+  // Live Group Classes Plans
+  {
+    id: 'gc_trial',
+    name: 'Group Classes Trial Class',
+    category: 'Live Group Classes',
+    program: 'Group Classes (Live Online)',
+    price: 99,
+    cycle: 'monthly',
+    sessions: 1,
+    desc: '1 class access of your choice',
+  },
+  {
+    id: 'gc_monthly',
+    name: 'Group Classes Monthly Plan',
+    category: 'Live Group Classes',
+    program: 'Group Classes (Live Online)',
+    price: 1999,
+    cycle: 'monthly',
+    sessions: 24,
+    badge: 'Most Popular',
+    desc: '6 live classes per week',
+  },
+  {
+    id: 'gc_quarterly',
+    name: 'Group Classes Quarterly Plan',
+    category: 'Live Group Classes',
+    program: 'Group Classes (Live Online)',
+    price: 4999,
+    cycle: 'quarterly',
+    sessions: 72,
+    badge: 'Best Value',
+    desc: 'All 6 weekly classes (3 months)',
+  },
+  {
+    id: 'gc_annual',
+    name: 'Group Classes Annual Plan',
+    category: 'Live Group Classes',
+    program: 'Group Classes (Live Online)',
+    price: 14999,
+    cycle: 'annual',
+    sessions: 288,
+    badge: 'Save More',
+    desc: 'Unlimited live classes (1 full year)',
+  },
+];
+
+const InquiriesView = ({ onStatusChange, onNavigateToClients }) => {
   const [inquiries, setInquiries] = useState([]);
   const [stats, setStats] = useState({ total: 0, new: 0, contacted: 0, converted: 0 });
   const [loading, setLoading] = useState(true);
@@ -154,6 +252,46 @@ const InquiriesView = () => {
   const [adminNotes, setAdminNotes] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const [convertModalInquiry, setConvertModalInquiry] = useState(null);
+  const [selectedPlanId, setSelectedPlanId] = useState('pt_transformation');
+  const [convertPlanName, setConvertPlanName] = useState('Transformation (5 Sessions/Week)');
+  const [convertPrice, setConvertPrice] = useState(5999);
+  const [convertBillingCycle, setConvertBillingCycle] = useState('monthly');
+  const [convertCoach, setConvertCoach] = useState('');
+  const [convertCoachId, setConvertCoachId] = useState('');
+  const [convertSessions, setConvertSessions] = useState(20);
+  const [convertNotes, setConvertNotes] = useState('');
+  const [isConverting, setIsConverting] = useState(false);
+  const [coachesList, setCoachesList] = useState([]);
+
+  // Sliding Plan Menu State
+  const [isPlanMenuOpen, setIsPlanMenuOpen] = useState(false);
+  const [planMenuFilter, setPlanMenuFilter] = useState('All Plans');
+  const [customInquiredPlan, setCustomInquiredPlan] = useState(null);
+
+  // Combines client's specific inquired plan at the top with all catalog plans
+  const availablePlans = useMemo(() => {
+    if (customInquiredPlan) {
+      // Put client's inquired plan at the top of the menu
+      return [customInquiredPlan, ...CONVERT_PLANS];
+    }
+    return CONVERT_PLANS;
+  }, [customInquiredPlan]);
+
+  const selectedPlan = useMemo(
+    () => availablePlans.find((p) => p.id === selectedPlanId) || availablePlans[0],
+    [availablePlans, selectedPlanId]
+  );
+
+  // Load coaches roster for assignment
+  useEffect(() => {
+    trainerApi.getApprovedTrainers().then((res) => {
+      setCoachesList(Array.isArray(res) ? res : []);
+    }).catch(() => {
+      setCoachesList([]);
+    });
+  }, []);
 
   // Fetch inquiries from backend
   const fetchInquiries = async () => {
@@ -175,8 +313,31 @@ const InquiriesView = () => {
         }
       }
     } catch (err) {
-      console.error('Failed to fetch inquiries:', err);
-      toast.error('Could not load inquiries. Make sure backend is running.');
+      console.warn('Backend inquiry fetch notice:', err.message);
+      // Graceful offline fallback from local storage cache
+      try {
+        const cachedLeads = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
+        if (cachedLeads.length > 0) {
+          const mapped = cachedLeads.map((item, idx) => ({
+            _id: `cached_${idx}`,
+            fullName: item.name || item.fullName || 'Visitor',
+            email: item.email || '',
+            phone: item.phone || '',
+            program: item.program || 'General Inquiry',
+            plan: item.plan || 'Trial',
+            fitnessGoal: item.fitnessGoal || '',
+            preferredTiming: item.preferredTime || '',
+            message: item.message || '',
+            status: 'New',
+            createdAt: item.timestamp || new Date().toISOString(),
+          }));
+          setInquiries(mapped);
+          setStats({ total: mapped.length, new: mapped.length, contacted: 0, converted: 0 });
+        }
+      } catch (cacheErr) {}
+
+      // Deduplicate toast ID so React StrictMode dev mode never displays duplicate stacked popups
+      toast.error('Could not connect to backend. Please check backend server.', { id: 'inquiries-fetch-error' });
     } finally {
       setLoading(false);
     }
@@ -266,20 +427,232 @@ const InquiriesView = () => {
     }
   };
 
+  // Helper to accurately match or store the plan that client sent the inquiry for
+  const findPlanForInquiry = (inq) => {
+    if (!inq) return { matched: CONVERT_PLANS[2], isCustom: false };
+
+    const rawPlan = (inq.plan || '').toLowerCase().trim();
+    const rawProg = (inq.program || '').toLowerCase().trim();
+    const isGroup = rawProg.includes('group') || rawPlan.includes('group');
+
+    // 1. Direct name match in CONVERT_PLANS
+    const direct = CONVERT_PLANS.find(
+      (p) => p.name.toLowerCase() === rawPlan || p.id.toLowerCase() === rawPlan
+    );
+    if (direct) return { matched: direct, isCustom: false };
+
+    // 2. Keyword matching for Group Classes
+    if (isGroup) {
+      if (rawPlan.includes('trial') || rawPlan.includes('demo') || rawPlan.includes('single')) {
+        return { matched: CONVERT_PLANS.find((p) => p.id === 'gc_trial'), isCustom: false };
+      }
+      if (rawPlan.includes('quarter') || rawPlan.includes('3 month') || rawPlan.includes('90')) {
+        return { matched: CONVERT_PLANS.find((p) => p.id === 'gc_quarterly'), isCustom: false };
+      }
+      if (rawPlan.includes('annual') || rawPlan.includes('year') || rawPlan.includes('365')) {
+        return { matched: CONVERT_PLANS.find((p) => p.id === 'gc_annual'), isCustom: false };
+      }
+      if (rawPlan.includes('month') || rawPlan.includes('pass') || rawPlan.includes('group')) {
+        return { matched: CONVERT_PLANS.find((p) => p.id === 'gc_monthly'), isCustom: false };
+      }
+    } else {
+      // 3. Keyword matching for 1-on-1 Personal Training
+      if (rawPlan.includes('trial') || rawPlan.includes('demo') || rawPlan.includes('single')) {
+        return { matched: CONVERT_PLANS.find((p) => p.id === 'pt_trial'), isCustom: false };
+      }
+      if (rawPlan.includes('starter') || rawPlan.includes('3 session') || rawPlan.includes('3x')) {
+        return { matched: CONVERT_PLANS.find((p) => p.id === 'pt_starter'), isCustom: false };
+      }
+      if (rawPlan.includes('transform') || rawPlan.includes('5 session') || rawPlan.includes('5x')) {
+        return { matched: CONVERT_PLANS.find((p) => p.id === 'pt_transformation'), isCustom: false };
+      }
+      if (rawPlan.includes('premium') || rawPlan.includes('elite') || rawPlan.includes('custom') || rawPlan.includes('1:1')) {
+        return { matched: CONVERT_PLANS.find((p) => p.id === 'pt_premium'), isCustom: false };
+      }
+    }
+
+    // 4. If client inquired for a custom or specific plan string that isn't in standard 8:
+    if (inq.plan && inq.plan.trim()) {
+      const customPlan = {
+        id: `inquiry_client_plan_${inq._id || 'custom'}`,
+        name: inq.plan.trim(),
+        category: inq.program || (isGroup ? 'Live Group Classes' : '1-on-1 Personal Training'),
+        program: inq.program || (isGroup ? 'Group Classes (Live Online)' : 'Personal Training'),
+        price: isGroup ? 1999 : 5999,
+        cycle: 'monthly',
+        sessions: isGroup ? 24 : 20,
+        badge: 'Client Inquired',
+        desc: `Inquired plan from lead submission`,
+        isClientInquiry: true,
+      };
+      return { matched: customPlan, isCustom: true };
+    }
+
+    // Fallback based on program
+    return {
+      matched: isGroup
+        ? CONVERT_PLANS.find((p) => p.id === 'gc_monthly')
+        : CONVERT_PLANS.find((p) => p.id === 'pt_transformation'),
+      isCustom: false,
+    };
+  };
+
+  // Open Convert to Subscribed Client Modal
+  const handleOpenConvertModal = (inq) => {
+    setConvertModalInquiry(inq);
+    setIsPlanMenuOpen(false);
+    setPlanMenuFilter('All Plans');
+
+    // Automatically store the plan that client sent the inquiry for
+    const { matched, isCustom } = findPlanForInquiry(inq);
+    if (isCustom) {
+      setCustomInquiredPlan(matched);
+    } else {
+      setCustomInquiredPlan(null);
+    }
+
+    setSelectedPlanId(matched.id);
+    setConvertPlanName(matched.name);
+    setConvertPrice(matched.price);
+    setConvertBillingCycle(matched.cycle);
+    setConvertSessions(matched.sessions);
+    setConvertCoach('');
+    setConvertCoachId('');
+    setConvertNotes(inq.plan ? `Client inquired for: ${inq.plan}` : '');
+  };
+
+  const handlePlanSelect = (planId) => {
+    setSelectedPlanId(planId);
+    const found = availablePlans.find((p) => p.id === planId);
+    if (found) {
+      setConvertPlanName(found.name);
+      setConvertPrice(found.price);
+      setConvertBillingCycle(found.cycle);
+      setConvertSessions(found.sessions);
+    }
+  };
+
+  // Confirm and Convert to Subscribed Client
+  const handleConfirmConvertToClient = async () => {
+    if (!convertModalInquiry) return;
+    try {
+      setIsConverting(true);
+      const payload = {
+        plan: convertPlanName,
+        program: convertModalInquiry.program,
+        price: Number(convertPrice) || 1999,
+        billingCycle: convertBillingCycle,
+        assignedCoach: convertCoach,
+        assignedCoachId: convertCoachId,
+        totalSessions: Number(convertSessions) || 12,
+        adminNotes: convertNotes,
+      };
+
+      // 1. Call Backend API
+      let backendClient = null;
+      try {
+        const res = await axios.post(`${API_URL}/inquiries/${convertModalInquiry._id}/convert-to-client`, payload);
+        if (res.data?.success) {
+          backendClient = res.data.client;
+        }
+      } catch (apiErr) {
+        console.warn('Backend convert API notice:', apiErr.message);
+      }
+
+      // 2. Add client into trainerApi Client store so it immediately shows up in Clients tab
+      const clientData = {
+        id: backendClient?.id || `cli_${Date.now()}`,
+        name: convertModalInquiry.fullName,
+        email: convertModalInquiry.email,
+        phone: convertModalInquiry.phone,
+        goal: convertModalInquiry.fitnessGoal || 'General Fitness',
+        plan: convertPlanName,
+        program: convertModalInquiry.program,
+        sessionsCompleted: 0,
+        totalSessions: Number(convertSessions) || 12,
+        nextSession: 'Session 1: Initial Assessment',
+        status: 'Active',
+        subscriptionStatus: 'Active',
+        renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        assignedCoach: convertCoach,
+        assignedCoachId: convertCoachId,
+      };
+
+      trainerApi.addClient(clientData);
+
+      if (convertCoach && convertCoach !== 'Unassigned') {
+        trainerApi.assignCoachToTarget({
+          assignmentType: 'client',
+          targetId: clientData.id,
+          targetName: clientData.name,
+          targetEmail: clientData.email,
+          targetPhone: clientData.phone,
+          targetGoal: clientData.goal,
+          plan: clientData.plan,
+          totalSessions: clientData.totalSessions,
+          coachName: convertCoach,
+          coachId: convertCoachId,
+          adminNotes: convertNotes || `Converted from Inquiry`,
+        });
+      }
+      setInquiries((prev) =>
+        prev.map((item) =>
+          item._id === convertModalInquiry._id ? { ...item, status: 'Converted' } : item
+        )
+      );
+
+      if (selectedInquiry?._id === convertModalInquiry._id) {
+        setSelectedInquiry((prev) => ({ ...prev, status: 'Converted' }));
+      }
+
+      toast.success(`🎉 ${convertModalInquiry.fullName} successfully enrolled as Active Client!`);
+      setConvertModalInquiry(null);
+      fetchInquiries();
+      if (onStatusChange) onStatusChange();
+    } catch (err) {
+      toast.error('Failed to convert inquiry to client: ' + (err.message || 'Server error'));
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
   // Delete Inquiry
   const handleDeleteInquiry = async () => {
     if (!selectedInquiry) return;
+    const targetId = selectedInquiry._id || selectedInquiry.id;
+    if (!targetId) {
+      toast.error('Inquiry identifier not found');
+      return;
+    }
+
     try {
       setIsDeleting(true);
-      const res = await axios.delete(`${API_URL}/inquiries/${selectedInquiry._id}`);
-      if (res.data.success) {
-        toast.success('Inquiry deleted');
-        setInquiries((prev) => prev.filter((item) => item._id !== selectedInquiry._id));
+      const res = await axios.delete(`${API_URL}/inquiries/${targetId}`);
+      if (res.data?.success) {
+        toast.success('Inquiry record deleted successfully');
+        setInquiries((prev) =>
+          prev.filter((item) => (item._id || item.id) !== targetId && item._id !== targetId)
+        );
+
+        // Also clean from localStorage cache if present
+        try {
+          const cachedLeads = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
+          const updatedCache = cachedLeads.filter(
+            (c) => (c._id || c.id) !== targetId && c.email !== selectedInquiry.email
+          );
+          localStorage.setItem('wellwigen_leads', JSON.stringify(updatedCache));
+        } catch (_cacheErr) {
+          // ignore cache parsing error
+        }
+
         setSelectedInquiry(null);
         fetchInquiries();
+      } else {
+        toast.error(res.data?.message || 'Failed to delete inquiry');
       }
     } catch (err) {
-      toast.error('Failed to delete inquiry');
+      console.error('Delete inquiry error:', err);
+      toast.error(err.response?.data?.message || 'Failed to delete inquiry');
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -577,7 +950,7 @@ const InquiriesView = () => {
                 <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
                   <th className="px-5 py-3.5">Visitor</th>
                   <th className="px-5 py-3.5">Contact</th>
-                  <th className="px-5 py-3.5">Program & Plan</th>
+                  <th className="px-5 py-3.5 min-w-[230px]">Program & Plan</th>
                   <th className="px-5 py-3.5">Fitness Goal</th>
                   <th className="px-5 py-3.5">Timing</th>
                   <th className="px-5 py-3.5">Date</th>
@@ -619,9 +992,48 @@ const InquiriesView = () => {
                       </td>
 
                       {/* Program & Plan */}
-                      <td className="px-5 py-4">
-                        <div className="font-bold text-slate-800">{inq.program}</div>
-                        <div className="text-[11px] text-teal-700 font-medium">{inq.plan || 'Trial'}</div>
+                      <td className="px-5 py-4 min-w-[230px]">
+                        {(() => {
+                          const rawProg = inq.program || 'Fitness Program';
+                          const isGroup = rawProg.toLowerCase().includes('group');
+                          const isPersonal = rawProg.toLowerCase().includes('personal');
+
+                          const planName = inq.plan || 'Trial Class';
+                          const isTrial = planName.toLowerCase().includes('trial');
+
+                          return (
+                            <div className="flex flex-col gap-1.5 items-start">
+                              {/* Program Header */}
+                              <div className="flex items-center gap-1.5">
+                                <span
+                                  className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
+                                    isGroup
+                                      ? 'bg-violet-100/80 text-violet-700'
+                                      : isPersonal
+                                      ? 'bg-teal-100/80 text-teal-700'
+                                      : 'bg-slate-100 text-slate-700'
+                                  }`}
+                                >
+                                  {isGroup ? <Users size={11} /> : <Dumbbell size={11} />}
+                                </span>
+                                <span className="font-extrabold text-slate-900 text-xs tracking-tight">
+                                  {rawProg}
+                                </span>
+                              </div>
+
+                              {/* Plan Badge */}
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[10.5px] font-semibold tracking-wide bg-gradient-to-r from-teal-50/90 via-emerald-50/70 to-teal-50/90 text-teal-900 border border-teal-200/80 shadow-2xs">
+                                <Sparkles
+                                  size={10}
+                                  className={isTrial ? 'text-amber-500 shrink-0' : 'text-teal-600 shrink-0'}
+                                />
+                                <span className="font-medium whitespace-nowrap" title={planName}>
+                                  {planName}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </td>
 
                       {/* Goal */}
@@ -654,15 +1066,54 @@ const InquiriesView = () => {
 
                       {/* Action */}
                       <td className="px-4 py-4 text-right whitespace-nowrap">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenDrawer(inq);
-                          }}
-                          className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 transition-all text-xs"
-                        >
-                          View
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          {inq.status === 'Converted' ? (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (onNavigateToClients) onNavigateToClients();
+                              }}
+                              className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-[11px] inline-flex items-center gap-1 transition-all"
+                              title="Subscribed Client - Click to View in Clients Section"
+                            >
+                              <ShieldCheck size={13} className="text-emerald-600" />
+                              <span>Client</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenConvertModal(inq);
+                              }}
+                              className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 text-purple-700 border border-purple-200/90 font-bold text-[11px] inline-flex items-center gap-1 transition-all shadow-xs"
+                              title="Customer subscribed? Add to Clients section"
+                            >
+                              <UserPlus size={12} className="text-purple-600" />
+                              <span>+ Client</span>
+                            </button>
+                          )}
+                          <a
+                            href={`https://wa.me/${getCleanWhatsAppPhone(inq.phone)}?text=${encodeURIComponent(
+                              `Hi ${inq.fullName}! This is Wellwigen Coaching. We received your inquiry regarding ${inq.program} (${inq.plan || 'Trial Class'}). Are you ready to get started?`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-all inline-flex items-center justify-center"
+                            title={`Chat with ${inq.fullName} on WhatsApp`}
+                          >
+                            <MessageCircle size={14} />
+                          </a>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDrawer(inq);
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 transition-all text-xs"
+                          >
+                            View
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -768,6 +1219,49 @@ const InquiriesView = () => {
                 </button>
               </div>
 
+              {/* Convert to Subscribed Client Action Card */}
+              {selectedInquiry.status === 'Converted' ? (
+                <div className="p-4 bg-emerald-50 border border-emerald-200/90 rounded-2xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
+                      <ShieldCheck size={20} />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-xs text-emerald-950">Enrolled Subscribed Client</h5>
+                      <p className="text-[11px] text-emerald-700">Client profile is active in Clients section.</p>
+                    </div>
+                  </div>
+                  {onNavigateToClients && (
+                    <button
+                      onClick={onNavigateToClients}
+                      className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                    >
+                      <span>View in Clients</span>
+                      <ExternalLink size={12} />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 bg-gradient-to-r from-purple-50/80 via-indigo-50/50 to-white rounded-2xl border border-purple-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold shrink-0">
+                      <UserPlus size={19} />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-xs text-purple-950">Client bought a subscription?</h5>
+                      <p className="text-[11px] text-purple-700/80">Add {selectedInquiry.fullName} to your Clients section.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleOpenConvertModal(selectedInquiry)}
+                    className="py-2 px-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-purple-500/20 flex items-center justify-center gap-1.5 shrink-0"
+                  >
+                    <UserPlus size={14} />
+                    <span>Add to Clients</span>
+                  </button>
+                </div>
+              )}
+
               {/* Status Selector */}
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2 block">
@@ -807,12 +1301,24 @@ const InquiriesView = () => {
                     </span>
                   </div>
                   <div className="p-3 bg-white border border-slate-200 rounded-xl">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Program</span>
-                    <span className="font-bold text-teal-800">{selectedInquiry.program}</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Program</span>
+                    <span className="font-extrabold text-slate-900 inline-flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-md bg-violet-100/70 text-violet-700 inline-flex items-center justify-center shrink-0">
+                        {selectedInquiry.program?.toLowerCase().includes('group') ? (
+                          <Users size={11} />
+                        ) : (
+                          <Dumbbell size={11} />
+                        )}
+                      </span>
+                      {selectedInquiry.program}
+                    </span>
                   </div>
                   <div className="p-3 bg-white border border-slate-200 rounded-xl">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Chosen Plan</span>
-                    <span className="font-bold text-slate-900">{selectedInquiry.plan || 'Not specified'}</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Chosen Plan</span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-gradient-to-r from-teal-50 to-emerald-50 text-teal-900 border border-teal-200/90 shadow-2xs">
+                      <Sparkles size={11} className="text-teal-600" />
+                      {selectedInquiry.plan || 'Not specified'}
+                    </span>
                   </div>
                   <div className="p-3 bg-white border border-slate-200 rounded-xl">
                     <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Goal</span>
@@ -972,6 +1478,360 @@ const InquiriesView = () => {
         </div>
       )}
     </AnimatePresence>
+
+      {/* ================= CONVERT TO SUBSCRIBED CLIENT MODAL ================= */}
+      <AnimatePresence>
+        {convertModalInquiry && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isConverting && setConvertModalInquiry(null)}
+              className="fixed inset-0 bg-slate-900/70 backdrop-blur-xs"
+            />
+
+            {/* Modal Body */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-10 flex flex-col my-auto"
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-purple-50 via-indigo-50/50 to-white flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-md shadow-purple-500/25">
+                    <UserPlus size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-black text-xl text-slate-900 leading-tight">
+                      Enroll as Subscribed Client
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Adds this customer to your Active Clients directory.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => !isConverting && setConvertModalInquiry(null)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Form Content */}
+              <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                {/* Client Info Banner */}
+                <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between text-xs">
+                  <div>
+                    <span className="font-bold text-slate-900 text-sm block">
+                      {convertModalInquiry.fullName}
+                    </span>
+                    <span className="text-slate-500 text-[11px]">
+                      {convertModalInquiry.phone} &bull; {convertModalInquiry.email}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 font-bold text-[10px] inline-block">
+                      {convertModalInquiry.program || 'Fitness Program'}
+                    </span>
+                    {convertModalInquiry.plan && (
+                      <span className="text-[10px] text-purple-700 font-semibold block mt-0.5">
+                        Inquired: <strong>{convertModalInquiry.plan}</strong>
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Plan Selection - Sliding Menu Box */}
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold text-slate-700">
+                      Select Purchased Subscription Plan *
+                    </label>
+                    <span className="text-[10px] font-semibold text-purple-600 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-100">
+                      {selectedPlan?.category || 'All Plans'}
+                    </span>
+                  </div>
+
+                  {/* The Sliding Menu Box Trigger */}
+                  <div
+                    onClick={() => setIsPlanMenuOpen((prev) => !prev)}
+                    className={`p-3 rounded-2xl border cursor-pointer transition-all flex items-center justify-between bg-white shadow-xs hover:border-purple-300 ${
+                      isPlanMenuOpen
+                        ? 'border-purple-500 ring-4 ring-purple-500/10'
+                        : 'border-slate-200 hover:shadow-sm'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs shadow-purple-500/30">
+                        {selectedPlan?.category?.includes('Group') ? (
+                          <Users size={16} />
+                        ) : (
+                          <Dumbbell size={16} />
+                        )}
+                      </div>
+                      <div className="text-left">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-black text-slate-900">
+                            {selectedPlan?.name || 'Choose Subscription Plan'}
+                          </span>
+                          {selectedPlan?.isClientInquiry ? (
+                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                              Client Inquired Plan
+                            </span>
+                          ) : selectedPlan?.badge ? (
+                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
+                              {selectedPlan.badge}
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+                          <span>{selectedPlan?.sessions} sessions</span>
+                          <span>&bull;</span>
+                          <span className="capitalize">{selectedPlan?.cycle} billing</span>
+                          {selectedPlan?.desc && (
+                            <>
+                              <span>&bull;</span>
+                              <span className="text-slate-400 truncate max-w-[200px]">{selectedPlan.desc}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="font-black text-base text-purple-700 tracking-tight">
+                        ₹{(selectedPlan?.price || 0).toLocaleString('en-IN')}
+                      </span>
+                      <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+                        <ChevronDown
+                          size={16}
+                          className={`transition-transform duration-200 ${
+                            isPlanMenuOpen ? 'rotate-180 text-purple-600' : ''
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sliding Menu Down Box */}
+                  <AnimatePresence>
+                    {isPlanMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, y: -4 }}
+                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -4 }}
+                        transition={{ duration: 0.22, ease: 'easeOut' }}
+                        className="mt-2 bg-white rounded-2xl border border-purple-200/90 shadow-2xl shadow-purple-950/15 overflow-hidden z-30"
+                      >
+                        {/* Sliding Menu Filter Tabs */}
+                        <div className="p-2 bg-slate-50/90 border-b border-slate-100 flex items-center gap-1.5 text-[11px]">
+                          {['All Plans', '1-on-1 Personal Training', 'Live Group Classes'].map((tab) => {
+                            const isTabActive = planMenuFilter === tab;
+                            return (
+                              <button
+                                key={tab}
+                                type="button"
+                                onClick={() => setPlanMenuFilter(tab)}
+                                className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                                  isTabActive
+                                    ? 'bg-purple-600 text-white shadow-xs shadow-purple-600/30'
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                                }`}
+                              >
+                                {tab}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Plans List inside Sliding Menu */}
+                        <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 p-1.5 space-y-1">
+                          {availablePlans.filter((p) => {
+                            if (planMenuFilter === 'All Plans') return true;
+                            return p.category === planMenuFilter;
+                          }).map((plan) => {
+                            const isSelected = selectedPlanId === plan.id;
+                            return (
+                              <div
+                                key={plan.id}
+                                onClick={() => {
+                                  handlePlanSelect(plan.id);
+                                  setIsPlanMenuOpen(false);
+                                }}
+                                className={`p-2.5 rounded-xl cursor-pointer transition-all flex items-center justify-between ${
+                                  isSelected
+                                    ? 'bg-purple-50 border border-purple-300'
+                                    : 'hover:bg-slate-50 border border-transparent'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <div
+                                    className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                                      isSelected
+                                        ? 'border-purple-600 bg-purple-600 text-white'
+                                        : 'border-slate-300'
+                                    }`}
+                                  >
+                                    {isSelected && <Check size={10} strokeWidth={3} />}
+                                  </div>
+
+                                  <div>
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-xs font-bold text-slate-900">
+                                        {plan.name}
+                                      </span>
+                                      {plan.badge && (
+                                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-200">
+                                          {plan.badge}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="text-[10px] text-slate-500">
+                                      <span className="text-purple-700 font-semibold">{plan.category}</span>
+                                      {' '}&bull; {plan.sessions} sessions &bull; {plan.cycle} billing
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <span className="font-black text-sm text-purple-700 shrink-0 ml-2">
+                                  ₹{plan.price.toLocaleString('en-IN')}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Coach Assignment & Sessions */}
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Assign Master Coach (Optional)
+                    </label>
+                    <select
+                      value={convertCoach}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setConvertCoach(val);
+                        const c = coachesList.find((item) => item.name === val);
+                        setConvertCoachId(c ? (c.id || c._id || '') : '');
+                      }}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:border-purple-500"
+                    >
+                      <option value="">
+                        {coachesList.length === 0 ? 'No Coaches Available (Unassigned)' : 'Unassigned (Assign Later)'}
+                      </option>
+                      {coachesList.map((coach) => (
+                        <option key={coach.id || coach._id || coach.name} value={coach.name}>
+                          {coach.name} ({coach.specialization || 'Coach'})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Included Sessions Count
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={200}
+                      value={convertSessions}
+                      onChange={(e) => setConvertSessions(e.target.value)}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Price and Billing Cycle */}
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Price Paid (₹) *
+                    </label>
+                    <input
+                      type="number"
+                      value={convertPrice}
+                      onChange={(e) => setConvertPrice(e.target.value)}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Billing Cycle
+                    </label>
+                    <select
+                      value={convertBillingCycle}
+                      onChange={(e) => setConvertBillingCycle(e.target.value)}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:border-purple-500"
+                    >
+                      <option value="monthly">Monthly (30 Days)</option>
+                      <option value="quarterly">Quarterly (90 Days)</option>
+                      <option value="annual">Annual (365 Days)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Onboarding / Payment Notes (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Paid via UPI, preferred evening batch 6 PM"
+                    value={convertNotes}
+                    onChange={(e) => setConvertNotes(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/70 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  disabled={isConverting}
+                  onClick={() => setConvertModalInquiry(null)}
+                  className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isConverting}
+                  onClick={handleConfirmConvertToClient}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-purple-500/25 transition-all disabled:opacity-50"
+                >
+                  {isConverting ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Enrolling Client...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus size={15} />
+                      <span>Confirm &amp; Add to Clients</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

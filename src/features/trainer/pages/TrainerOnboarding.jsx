@@ -23,10 +23,29 @@ import {
   Clock,
   Eye,
   Trash2,
+  Plus,
+  X,
+  ExternalLink,
+  ChevronDown,
 } from 'lucide-react';
 import { trainerApi } from '../../../services/trainerApi';
 
 const TOTAL_STEPS = 6;
+
+const SPECIALIZATION_OPTIONS = [
+  'Strength & Conditioning',
+  'HIIT & Fat Loss',
+  'Bodybuilding & Hypertrophy',
+  'Functional Fitness & Cross Training',
+  'Mobility & Posture Rehab',
+  'Yoga & Flexibility Flow',
+  'Bodyweight & Calisthenics',
+  'Powerlifting & Olympic Lifting',
+  'Athletic Conditioning & Agility',
+  'Weight Loss & Transformation',
+  'Pre & Post Natal Fitness',
+  'Senior Fitness & Active Aging',
+];
 
 const STEP_TITLES = [
   'Basic Info',
@@ -49,27 +68,33 @@ export default function TrainerOnboarding() {
   const [formData, setFormData] = useState(() => {
     const saved = trainerApi.getOnboardingData();
     const auth = trainerApi.getCurrentTrainer();
+    const isDemo = (val) => val === 'Vikram Rajput' || val === 'trainer@wellwigen.com';
     return {
-      name: saved.name || auth?.name || '',
-      phone: saved.phone || auth?.phone || '',
-      email: saved.email || auth?.email || '',
+      name: isDemo(saved.name || auth?.name) ? '' : (saved.name || auth?.name || ''),
+      phone: isDemo(saved.phone || auth?.phone) ? '' : (saved.phone || auth?.phone || ''),
+      email: isDemo(saved.email || auth?.email) ? '' : (saved.email || auth?.email || ''),
       city: saved.city || '',
-      gender: saved.gender || 'Male',
-      languages: saved.languages || ['English', 'Hindi'],
-      specialization: saved.specialization || 'Strength & Conditioning',
-      experience: saved.experience || '3-5 Years',
-      certifications: saved.certifications || ['ACE Certified Personal Trainer'],
+      gender: saved.gender || '',
+      languages: Array.isArray(saved.languages) ? saved.languages : [],
+      otherLanguage: saved.otherLanguage || '',
+      specialization: saved.specialization || '',
+      otherSpecialization: saved.otherSpecialization || '',
+      experience: saved.experience || '',
+      certifications: Array.isArray(saved.certifications) ? saved.certifications : [],
+      otherCertification: saved.otherCertification || '',
       institution: saved.institution || '',
       photoUrl: saved.photoUrl || '',
       certificateName: saved.certificateName || '',
       certificatePreview: saved.certificatePreview || '',
       services: {
-        personalTraining: saved.services?.personalTraining !== false,
-        groupClasses: saved.services?.groupClasses !== false,
-        oneOnOnePriceMonthly: saved.services?.oneOnOnePriceMonthly || 4999,
-        groupClassSeatPrice: saved.services?.groupClassSeatPrice || 499,
+        personalTraining: saved.services?.personalTraining === true,
+        groupClasses: saved.services?.groupClasses === true,
+        oneOnOnePriceMonthly: saved.services?.oneOnOnePriceMonthly || '',
+        groupClassSeatPrice: saved.services?.groupClassSeatPrice || '',
+        oneOnOneSharePercent: saved.services?.oneOnOneSharePercent !== undefined ? saved.services.oneOnOneSharePercent : '',
+        groupClassSharePercent: saved.services?.groupClassSharePercent !== undefined ? saved.services.groupClassSharePercent : '',
       },
-      timeSlots: saved.timeSlots || ['Morning (06:00 AM - 10:00 AM)', 'Evening (05:00 PM - 09:00 PM)'],
+      timeSlots: Array.isArray(saved.timeSlots) ? saved.timeSlots : [],
       bio: saved.bio || '',
       videoUrl: saved.videoUrl || '',
       instagram: saved.instagram || '',
@@ -78,9 +103,29 @@ export default function TrainerOnboarding() {
     };
   });
 
+  const [customTimeSlot, setCustomTimeSlot] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submittedApp, setSubmittedApp] = useState(null);
+
+  const handleAddCustomSlot = () => {
+    const trimmed = customTimeSlot.trim();
+    if (!trimmed) return;
+    if (!formData.timeSlots.includes(trimmed)) {
+      setFormData((prev) => ({
+        ...prev,
+        timeSlots: [...prev.timeSlots, trimmed],
+      }));
+    }
+    setCustomTimeSlot('');
+  };
+
+  const handleRemoveSlot = (slotToRemove) => {
+    setFormData((prev) => ({
+      ...prev,
+      timeSlots: prev.timeSlots.filter((s) => s !== slotToRemove),
+    }));
+  };
 
   // Sync step change to URL query params
   const goToStep = (newStep) => {
@@ -141,15 +186,24 @@ export default function TrainerOnboarding() {
         setError('Please select at least one language.');
         return;
       }
+      if (formData.languages.includes('Other') && !formData.otherLanguage?.trim()) {
+        setError('Please specify your other language in the box provided.');
+        return;
+      }
     }
 
     if (currentStep === 2) {
-      if (!formData.specialization.trim() || !formData.experience.trim()) {
-        setError('Please select your primary specialization and experience level.');
+      const activeSpec = formData.specialization === 'Other Specialization' ? formData.otherSpecialization : formData.specialization;
+      if (!activeSpec?.trim() || !formData.experience?.trim()) {
+        setError('Please enter or select your primary specialization and years of experience.');
         return;
       }
       if (formData.certifications.length === 0) {
         setError('Please select or specify at least one certification.');
+        return;
+      }
+      if (formData.certifications.includes('Other Certification') && !formData.otherCertification?.trim()) {
+        setError('Please specify your other certification in the box provided.');
         return;
       }
     }
@@ -167,8 +221,16 @@ export default function TrainerOnboarding() {
         setError('Please choose at least one service you provide (1-on-1 or Group Classes).');
         return;
       }
+      if (formData.services.personalTraining && (!formData.services.oneOnOneSharePercent || formData.services.oneOnOneSharePercent <= 0 || formData.services.oneOnOneSharePercent > 100)) {
+        setError('Please enter a valid percentage share (1% - 100%) for 1-on-1 coaching.');
+        return;
+      }
+      if (formData.services.groupClasses && (!formData.services.groupClassSharePercent || formData.services.groupClassSharePercent <= 0 || formData.services.groupClassSharePercent > 100)) {
+        setError('Please enter a valid percentage share (1% - 100%) for group classes.');
+        return;
+      }
       if (formData.timeSlots.length === 0) {
-        setError('Please select your available weekly time slots.');
+        setError('Please select or add at least one available coaching time block.');
         return;
       }
     }
@@ -200,7 +262,17 @@ export default function TrainerOnboarding() {
     try {
       setSubmitting(true);
       setError('');
-      const submitted = await trainerApi.submitOnboardingApplication(formData);
+      const finalPayload = {
+        ...formData,
+        specialization:
+          formData.specialization === 'Other Specialization' && formData.otherSpecialization
+            ? formData.otherSpecialization
+            : formData.specialization,
+        languages: formData.languages.map((l) =>
+          l === 'Other' && formData.otherLanguage ? formData.otherLanguage : l
+        ),
+      };
+      const submitted = await trainerApi.submitOnboardingApplication(finalPayload);
       setSubmittedApp(submitted);
     } catch (err) {
       setError(err.message || 'Submission failed. Please try again.');
@@ -286,7 +358,7 @@ export default function TrainerOnboarding() {
   const progressPercent = Math.round(((currentStep - 1) / (TOTAL_STEPS - 1)) * 100);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans flex flex-col justify-between p-4 sm:p-6 antialiased">
+    <div data-panel="trainer" className="min-h-screen bg-transparent text-slate-800 font-sans flex flex-col justify-between p-4 sm:p-6 antialiased">
       {/* Top Header */}
       <div className="max-w-4xl mx-auto w-full flex items-center justify-between py-2">
         <Link to="/" className="flex items-center gap-2.5 group">
@@ -312,9 +384,9 @@ export default function TrainerOnboarding() {
 
       {/* Main Container */}
       <div className="max-w-3xl w-full mx-auto my-6">
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl shadow-slate-200/50 overflow-hidden">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-teal-500/35 shadow-xl shadow-teal-500/10 overflow-hidden">
           {/* Stepper Progress Bar Header */}
-          <div className="p-6 sm:p-8 bg-slate-50/70 border-b border-slate-200/80">
+          <div className="p-6 sm:p-8 bg-slate-50/70 border-b-2 border-teal-500/20">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <span className="text-[10.5px] font-bold text-teal-700 uppercase tracking-widest bg-teal-50 px-2 py-0.5 rounded border border-teal-200/60">
@@ -384,7 +456,7 @@ export default function TrainerOnboarding() {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Vikram Rajput"
+                      placeholder="e.g. Rahul Sharma"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
@@ -446,6 +518,7 @@ export default function TrainerOnboarding() {
                       onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
                     >
+                      <option value="" disabled>Select Gender</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                       <option value="Non-binary / Other">Non-binary / Other</option>
@@ -458,7 +531,7 @@ export default function TrainerOnboarding() {
                       Languages Spoken (select all that apply)
                     </label>
                     <div className="flex flex-wrap gap-2 pt-1">
-                      {['English', 'Hindi', 'Punjabi', 'Bengali', 'Marathi', 'Gujarati', 'Tamil', 'Telugu'].map((lang) => {
+                      {['English', 'Hindi', 'Punjabi', 'Bengali', 'Marathi', 'Gujarati', 'Tamil', 'Telugu', 'Other'].map((lang) => {
                         const isSelected = formData.languages.includes(lang);
                         return (
                           <button
@@ -481,6 +554,17 @@ export default function TrainerOnboarding() {
                         );
                       })}
                     </div>
+                    {formData.languages.includes('Other') && (
+                      <div className="mt-2.5">
+                        <input
+                          type="text"
+                          placeholder="Please specify other language(s) (e.g. Kannada, Malayalam, Odia, French)"
+                          value={formData.otherLanguage || ''}
+                          onChange={(e) => setFormData({ ...formData, otherLanguage: e.target.value })}
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-teal-300 bg-white text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 font-medium"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -494,35 +578,87 @@ export default function TrainerOnboarding() {
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                       Primary Coaching Specialization *
                     </label>
-                    <select
-                      value={formData.specialization}
-                      onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
-                    >
-                      <option value="Strength & Conditioning">Strength &amp; Conditioning</option>
-                      <option value="HIIT & Fat Loss">HIIT &amp; Fat Loss</option>
-                      <option value="Bodybuilding & Hypertrophy">Bodybuilding &amp; Hypertrophy</option>
-                      <option value="Functional Fitness">Functional Fitness &amp; Cross Training</option>
-                      <option value="Mobility & Rehab">Mobility &amp; Posture Rehab</option>
-                      <option value="Yoga & Flexibility">Yoga &amp; Flexibility Flow</option>
-                      <option value="Calisthenics">Bodyweight &amp; Calisthenics</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        required
+                        value={
+                          SPECIALIZATION_OPTIONS.includes(formData.specialization)
+                            ? formData.specialization
+                            : 'Other Specialization'
+                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === 'Other Specialization') {
+                            setFormData({ ...formData, specialization: 'Other Specialization' });
+                          } else {
+                            setFormData({ ...formData, specialization: val, otherSpecialization: '' });
+                          }
+                        }}
+                        className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium transition-all appearance-none cursor-pointer"
+                      >
+                        <option value="" disabled>Select primary specialization</option>
+                        {SPECIALIZATION_OPTIONS.map((spec) => (
+                          <option key={spec} value={spec}>
+                            {spec}
+                          </option>
+                        ))}
+                        <option value="Other Specialization">Other Specialization (Specify Custom)</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                        <ChevronDown size={18} />
+                      </div>
+                    </div>
+                    {(formData.specialization === 'Other Specialization' ||
+                      (!SPECIALIZATION_OPTIONS.includes(formData.specialization) && formData.specialization)) && (
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          placeholder="Type your custom specialization (e.g. Pilates, Martial Arts, etc.)"
+                          value={formData.otherSpecialization || (SPECIALIZATION_OPTIONS.includes(formData.specialization) ? '' : formData.specialization)}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              otherSpecialization: e.target.value,
+                              specialization: 'Other Specialization',
+                            })
+                          }
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-teal-300 bg-white text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 font-medium"
+                        />
+                      </div>
+                    )}
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Choose your primary specialization from the dropdown menu.
+                    </p>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                       Years of Coaching Experience *
                     </label>
-                    <select
-                      value={formData.experience}
-                      onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
-                    >
-                      <option value="1-2 Years">1-2 Years</option>
-                      <option value="3-5 Years">3-5 Years</option>
-                      <option value="6-8 Years">6-8 Years</option>
-                      <option value="8+ Years">8+ Years</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        required
+                        value={formData.experience}
+                        onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                        className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium transition-all appearance-none cursor-pointer"
+                      >
+                        <option value="" disabled>Select coaching experience</option>
+                        <option value="Less than 1 Year">Less than 1 Year</option>
+                        <option value="1 Year">1 Year</option>
+                        <option value="1 - 2 Years">1 - 2 Years</option>
+                        <option value="3 - 5 Years">3 - 5 Years</option>
+                        <option value="5 - 7 Years">5 - 7 Years</option>
+                        <option value="8 - 10 Years">8 - 10 Years</option>
+                        <option value="10+ Years">10+ Years</option>
+                        <option value="15+ Years">15+ Years</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                        <ChevronDown size={18} />
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Select your coaching experience level from the dropdown.
+                    </p>
                   </div>
                 </div>
 
@@ -540,6 +676,8 @@ export default function TrainerOnboarding() {
                       'REPs India Certified',
                       'Certified Nutrition Coach',
                       'B.P.Ed / M.P.Ed Sports Science',
+                      'K11 School of Fitness Sciences (K11 CPT)',
+                      'Other Certification',
                     ].map((cert) => {
                       const isSelected = formData.certifications.includes(cert);
                       return (
@@ -553,13 +691,13 @@ export default function TrainerOnboarding() {
                           }}
                           className={`p-3 rounded-xl border text-xs font-semibold cursor-pointer flex items-center justify-between transition-all ${
                             isSelected
-                              ? 'bg-teal-50 border-teal-300 text-teal-900'
+                              ? 'bg-teal-50 border-teal-300 text-teal-900 shadow-2xs'
                               : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                           }`}
                         >
                           <span>{cert}</span>
                           <span className={`w-4 h-4 rounded-full border flex items-center justify-center text-[10px] ${
-                            isSelected ? 'bg-teal-600 border-teal-600 text-white' : 'border-slate-300'
+                            isSelected ? 'bg-teal-600 border-teal-600 text-white font-bold' : 'border-slate-300'
                           }`}>
                             {isSelected ? '✓' : ''}
                           </span>
@@ -567,6 +705,22 @@ export default function TrainerOnboarding() {
                       );
                     })}
                   </div>
+
+                  {/* Other Certification Custom Input Box */}
+                  {formData.certifications.includes('Other Certification') && (
+                    <div className="mt-3 p-3.5 bg-teal-50/60 border border-teal-200 rounded-xl space-y-1">
+                      <label className="block text-xs font-bold text-teal-950">
+                        Please specify your Other Certification / Credential *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. ACSM Certified, Gold's Gym Fitness Institute, BFY, FMS, etc."
+                        value={formData.otherCertification || ''}
+                        onChange={(e) => setFormData({ ...formData, otherCertification: e.target.value })}
+                        className="w-full px-3.5 py-2 rounded-lg border border-teal-300 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 shadow-xs"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -752,70 +906,98 @@ export default function TrainerOnboarding() {
                   </div>
                 </div>
 
-                {/* Pricing Inputs */}
+                {/* Pricing Percentage Share Inputs */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                   {formData.services.personalTraining && (
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                        1-on-1 Monthly Coaching Fee (₹)
-                      </label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                          1-on-1 Monthly Fee Share (%) *
+                        </label>
+                        <span className="text-[10px] text-teal-700 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200/60">
+                          Percentage Payout
+                        </span>
+                      </div>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-bold text-slate-400">
-                          ₹
-                        </div>
                         <input
                           type="number"
-                          value={formData.services.oneOnOnePriceMonthly}
-                          onChange={(e) =>
+                          min="1"
+                          max="100"
+                          placeholder="e.g. 70"
+                          value={formData.services.oneOnOneSharePercent ?? ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? '' : Math.min(100, Math.max(0, parseInt(e.target.value, 10) || 0));
                             setFormData({
                               ...formData,
                               services: {
                                 ...formData.services,
-                                oneOnOnePriceMonthly: parseInt(e.target.value, 10) || 0,
+                                oneOnOneSharePercent: val,
                               },
-                            })
-                          }
-                          className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-bold"
+                            });
+                          }}
+                          className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-bold"
                         />
+                        <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none font-bold text-teal-700">
+                          %
+                        </div>
                       </div>
-                      <p className="text-[10.5px] text-slate-400 mt-1">Suggested: ₹3,999 to ₹7,999 / month</p>
+                      <p className="text-[10.5px] text-slate-400 mt-1">
+                        Enter the percentage you want from the monthly client fee.
+                      </p>
                     </div>
                   )}
 
                   {formData.services.groupClasses && (
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                        Group Class Price Per Seat (₹)
-                      </label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                          Group Class Price Per Seat Share (%) *
+                        </label>
+                        <span className="text-[10px] text-teal-700 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200/60">
+                          Percentage Payout
+                        </span>
+                      </div>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-bold text-slate-400">
-                          ₹
-                        </div>
                         <input
                           type="number"
-                          value={formData.services.groupClassSeatPrice}
-                          onChange={(e) =>
+                          min="1"
+                          max="100"
+                          placeholder="e.g. 75"
+                          value={formData.services.groupClassSharePercent ?? ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? '' : Math.min(100, Math.max(0, parseInt(e.target.value, 10) || 0));
                             setFormData({
                               ...formData,
                               services: {
                                 ...formData.services,
-                                groupClassSeatPrice: parseInt(e.target.value, 10) || 0,
+                                groupClassSharePercent: val,
                               },
-                            })
-                          }
-                          className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-bold"
+                            });
+                          }}
+                          className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-bold"
                         />
+                        <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none font-bold text-teal-700">
+                          %
+                        </div>
                       </div>
-                      <p className="text-[10.5px] text-slate-400 mt-1">Suggested: ₹299 to ₹699 / attendee</p>
+                      <p className="text-[10.5px] text-slate-400 mt-1">
+                        Enter the percentage you want from each attendee's seat price.
+                      </p>
                     </div>
                   )}
                 </div>
 
                 {/* Availability Slots */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
-                    Preferred Coaching Time Blocks (Select all that apply) *
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                      Preferred Coaching Time Blocks (Select all that apply) *
+                    </label>
+                    <span className="text-[10px] text-teal-700 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200/60">
+                      Custom Hours Supported
+                    </span>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {[
                       'Early Morning (06:00 AM - 08:00 AM)',
@@ -837,19 +1019,108 @@ export default function TrainerOnboarding() {
                           }}
                           className={`p-3 rounded-xl border text-xs font-semibold cursor-pointer flex items-center justify-between transition-all ${
                             isSelected
-                              ? 'bg-teal-50 border-teal-300 text-teal-900'
+                              ? 'bg-teal-50 border-teal-300 text-teal-900 shadow-2xs'
                               : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                           }`}
                         >
                           <span>{slot}</span>
                           <span className={`w-4 h-4 rounded-full border flex items-center justify-center text-[10px] ${
-                            isSelected ? 'bg-teal-600 border-teal-600 text-white' : 'border-slate-300'
+                            isSelected ? 'bg-teal-600 border-teal-600 text-white font-bold' : 'border-slate-300'
                           }`}>
                             {isSelected ? '✓' : ''}
                           </span>
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* Custom Added Time Slots */}
+                  {formData.timeSlots.filter(
+                    (s) =>
+                      ![
+                        'Early Morning (06:00 AM - 08:00 AM)',
+                        'Morning (08:00 AM - 11:00 AM)',
+                        'Afternoon (12:00 PM - 03:00 PM)',
+                        'Evening (05:00 PM - 08:00 PM)',
+                        'Late Evening (08:00 PM - 10:00 PM)',
+                        'Weekend Specials (Sat & Sun)',
+                      ].includes(s)
+                  ).length > 0 && (
+                    <div className="pt-2">
+                      <p className="text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">
+                        Your Custom Added Shifts:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {formData.timeSlots
+                          .filter(
+                            (s) =>
+                              ![
+                                'Early Morning (06:00 AM - 08:00 AM)',
+                                'Morning (08:00 AM - 11:00 AM)',
+                                'Afternoon (12:00 PM - 03:00 PM)',
+                                'Evening (05:00 PM - 08:00 PM)',
+                                'Late Evening (08:00 PM - 10:00 PM)',
+                                'Weekend Specials (Sat & Sun)',
+                              ].includes(s)
+                          )
+                          .map((slot) => (
+                            <div
+                              key={slot}
+                              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-teal-50 border border-teal-300 text-teal-900 text-xs font-bold shadow-2xs"
+                            >
+                              <Clock size={13} className="text-teal-600 shrink-0" />
+                              <span>{slot}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveSlot(slot)}
+                                className="w-4 h-4 rounded-full bg-teal-200/60 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center text-teal-800 transition-colors ml-1 cursor-pointer"
+                                title="Remove custom timing"
+                              >
+                                <X size={11} />
+                              </button>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Option to Edit/Add Custom Timing Manually */}
+                  <div className="mt-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <Clock size={14} className="text-teal-600" />
+                        Edit &amp; Add Custom Shift Timing Manually
+                      </span>
+                      <span className="text-[10px] text-teal-700 font-semibold">
+                        Custom Hours
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500">
+                      Want specific work timings? Enter your shift timing below:
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="e.g. 06:30 AM - 09:30 AM (Morning Shift)"
+                        value={customTimeSlot}
+                        onChange={(e) => setCustomTimeSlot(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddCustomSlot();
+                          }
+                        }}
+                        className="flex-1 px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddCustomSlot}
+                        className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Plus size={14} />
+                        <span>Add Timing</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -958,7 +1229,12 @@ export default function TrainerOnboarding() {
                       </span>
                       <p className="font-bold text-slate-900 text-base">{formData.name}</p>
                       <p className="text-slate-600">{formData.email} &bull; {formData.phone}</p>
-                      <p className="text-slate-500">{formData.city} &bull; {formData.gender} &bull; {formData.languages.join(', ')}</p>
+                      <p className="text-slate-500">
+                        {formData.city} &bull; {formData.gender} &bull;{' '}
+                        {formData.languages
+                          .map((l) => (l === 'Other' && formData.otherLanguage ? `Other (${formData.otherLanguage})` : l))
+                          .join(', ')}
+                      </p>
                     </div>
                     <button
                       onClick={() => goToStep(1)}
@@ -974,8 +1250,15 @@ export default function TrainerOnboarding() {
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                         Specialization &amp; Certifications
                       </span>
-                      <p className="font-bold text-slate-900">{formData.specialization} ({formData.experience})</p>
-                      <p className="text-slate-600">Certifications: {formData.certifications.join(', ')}</p>
+                      <p className="font-bold text-slate-900">
+                        {formData.specialization === 'Other Specialization' && formData.otherSpecialization
+                          ? formData.otherSpecialization
+                          : formData.specialization}{' '}
+                        ({formData.experience})
+                      </p>
+                      <p className="text-slate-600">
+                        Certifications: {formData.certifications.map((c) => (c === 'Other Certification' && formData.otherCertification ? `Other (${formData.otherCertification})` : c)).join(', ')}
+                      </p>
                       {formData.institution && <p className="text-slate-400">Institute: {formData.institution}</p>}
                     </div>
                     <button
@@ -1020,12 +1303,12 @@ export default function TrainerOnboarding() {
                   <div className="p-4 sm:p-5 flex justify-between items-start">
                     <div className="space-y-1">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Services &amp; Pricing
+                        Services &amp; Coach Share
                       </span>
                       <p className="font-bold text-slate-900">
-                        1-on-1: {formData.services.personalTraining ? `₹${formData.services.oneOnOnePriceMonthly}/mo` : 'Disabled'} &bull; Group Classes: {formData.services.groupClasses ? `₹${formData.services.groupClassSeatPrice}/seat` : 'Disabled'}
+                        1-on-1: {formData.services.personalTraining ? `${formData.services.oneOnOneSharePercent ?? 70}% Coach Share` : 'Disabled'} &bull; Group Classes: {formData.services.groupClasses ? `${formData.services.groupClassSharePercent ?? 75}% Coach Share` : 'Disabled'}
                       </p>
-                      <p className="text-slate-500">{formData.timeSlots.length} active time blocks selected</p>
+                      <p className="text-slate-500">{formData.timeSlots.length} active time blocks: {formData.timeSlots.join(', ')}</p>
                     </div>
                     <button
                       onClick={() => goToStep(4)}
@@ -1063,7 +1346,19 @@ export default function TrainerOnboarding() {
                       className="mt-1 w-4 h-4 text-teal-600 rounded border-slate-300 focus:ring-teal-500"
                     />
                     <span className="text-xs text-slate-700 leading-relaxed font-medium">
-                      I declare that all provided personal credentials and certification documents are authentic. I agree to Wellwigen's Coach Code of Conduct and athlete safety guidelines.
+                      I declare that all provided personal credentials and certification documents are authentic. I agree to Wellwigen's{' '}
+                      <a
+                        href="/trainer/safety-guidelines"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-blue-600 hover:text-blue-800 underline font-bold transition-colors cursor-pointer inline-flex items-center gap-0.5"
+                        title="Open Coach Code of Conduct and Athlete Safety Guidelines in new window"
+                      >
+                        Coach Code of Conduct and athlete safety guidelines
+                        <ExternalLink size={12} className="inline ml-0.5 text-blue-600" />
+                      </a>
+                      .
                     </span>
                   </label>
                 </div>

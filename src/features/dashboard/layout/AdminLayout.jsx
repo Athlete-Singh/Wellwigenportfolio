@@ -4,9 +4,9 @@ import Sidebar from "./Sidebar";
 
 export default function AdminLayout({ children }) {
   return (
-    <div className="flex min-h-screen bg-[#EEF3F4] font-[Inter] overflow-hidden">
+    <div data-panel="admin" className="flex min-h-screen bg-transparent font-[Inter] overflow-hidden">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto bg-transparent">
         {children || <Outlet />}
       </main>
     </div>

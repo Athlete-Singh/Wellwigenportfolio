@@ -52,7 +52,7 @@
   pointer-events: none;
   user-select: none;
   contain: strict;
-  /* Soft radiant light mint background permanently locked (No dark switching glitch) */
+  /* PREVIOUS LIVING ENERGY BACKGROUND RESTORED (as requested by user: "Pichhala background bhi chahiye mujhe... ess background ke upar overlay kar do") */
   background: radial-gradient(circle at 50% 20%, #FAFEFD 0%, #F1FBF8 50%, #E5F6F2 100%) !important;
 }
 

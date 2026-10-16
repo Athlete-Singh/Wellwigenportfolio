@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2, Send, MessageCircle, AlertCircle, Sparkles, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { CONTACT_INFO, getWhatsAppUrl } from '../data/fitnessData';
 
 export default function LeadModal({ isOpen, onClose, initialData = {} }) {
+  const nameInputRef = useRef(null);
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -21,22 +23,30 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const [submittedWaUrl, setSubmittedWaUrl] = useState(null);
 
   // Sync initialData when modal opens
   useEffect(() => {
     if (isOpen) {
       setSuccess(false);
       setErrorMessage('');
+      setSubmittedWaUrl(null);
       setFormData((prev) => ({
         ...prev,
         program: initialData.program || prev.program || 'Personal Training',
         plan: initialData.plan || prev.plan || 'Transformation',
         fitnessGoal: initialData.goal || prev.fitnessGoal || 'General Fitness',
       }));
+
+      // Focus first input automatically
+      const timer = setTimeout(() => {
+        nameInputRef.current?.focus();
+      }, 120);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, initialData]);
 
-  // Esc key listener and focus management
+  // Esc key listener and strictly lock background movement
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -46,16 +56,46 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
     if (isOpen) {
       window.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
     }
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      document.body.style.touchAction = '';
     };
   }, [isOpen, onClose]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Strictly enforce numbers only for phone bracket - no alphabets allowed
+  const handlePhoneChange = (e) => {
+    const raw = e.target.value;
+    // Keep only digits and at most one leading '+'
+    const cleaned = raw.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
+    setFormData((prev) => ({ ...prev, phone: cleaned }));
+  };
+
+  const handlePhoneKeyDown = (e) => {
+    // Allow navigational and editing keys
+    if (
+      ['Backspace', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight', 'Delete', 'Escape'].includes(e.key) ||
+      (e.ctrlKey || e.metaKey)
+    ) {
+      return;
+    }
+    // Allow '+' only at the start if not already entered
+    if (e.key === '+' && (e.currentTarget.selectionStart === 0 && !e.currentTarget.value.includes('+'))) {
+      return;
+    }
+    // Block all alphabet and symbol keys
+    if (!/^\d$/.test(e.key)) {
+      e.preventDefault();
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -94,32 +134,8 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
       message: `Goal: ${formData.fitnessGoal}\nPreferred Time: ${formData.preferredTime}\nNotes: ${formData.message || 'None'}`,
     };
 
-    // OLD CODE (commented by AI)
-    /*
     try {
-      // Primary API endpoint in backend
-      await axios.post(`${apiUrl}/user/contact`, payload, { timeout: 6000 });
-      setSuccess(true);
-    } catch (err) {
-      console.warn('API submission failed or offline, trying alternative endpoint...', err);
-      try {
-        await axios.post(`${apiUrl}/users/contact`, payload, { timeout: 4000 });
-        setSuccess(true);
-      } catch (fallbackErr) {
-        // Even if offline/local dev, gracefully succeed and save locally so lead is NEVER lost
-        console.info('Saving lead locally for offline sync:', payload);
-        const existingLeads = JSON.parse(localStorage.getItem('wellwigen_leads') || '[]');
-        existingLeads.push({ ...payload, timestamp: new Date().toISOString() });
-        localStorage.setItem('wellwigen_leads', JSON.stringify(existingLeads));
-        setSuccess(true);
-      }
-    } finally {
-      setLoading(false);
-    }
-    */
-    // NEW CODE - Wellwigen restyle / Inquiries feature
-    try {
-      // 1. Submit to new Inquiries lead endpoint (Part 1 - Inquiries feature)
+      // 1. Submit to Inquiries lead endpoint (Admin Inquiries Box + Email Alert + WhatsApp Link)
       const inquiryPayload = {
         fullName: formData.name,
         email: formData.email,
@@ -132,12 +148,15 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
       };
 
       try {
-        await axios.post(`${apiUrl}/inquiries`, inquiryPayload, { timeout: 6000 });
+        const inqRes = await axios.post(`${apiUrl}/inquiries`, inquiryPayload, { timeout: 6000 });
+        if (inqRes.data && inqRes.data.whatsappUrl) {
+          setSubmittedWaUrl(inqRes.data.whatsappUrl);
+        }
       } catch (inquiryErr) {
         console.warn('Inquiry endpoint save warning (non-blocking):', inquiryErr);
       }
 
-      // 2. Existing contact endpoint call (keeps existing submit/WhatsApp logic intact)
+      // 2. Existing contact endpoint call (keeps backup sync)
       try {
         await axios.post(`${apiUrl}/user/contact`, payload, { timeout: 6000 });
       } catch (contactErr) {
@@ -156,45 +175,28 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
     }
   };
 
-  const whatsappMessage = `Hi Wellwigen team! My name is ${formData.name || 'there'}. I'm interested in ${formData.program} (${formData.plan}) for ${formData.fitnessGoal}.`;
-  const whatsappUrl = getWhatsAppUrl(whatsappMessage);
+  const defaultWaText = `Hi Wellwigen team! My name is ${formData.name || 'there'}. I want to join ${formData.program} (${formData.plan || 'Trial Class'}). My phone is ${formData.phone || ''} and fitness goal is ${formData.fitnessGoal}.`;
+  const whatsappUrl = submittedWaUrl || getWhatsAppUrl(defaultWaText);
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          {/* OLD CODE (commented by AI)
-          {/* Backdrop */}
-          {/*
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          {/* Backdrop with strong blur and dim so below screen is blurred and all focus is on form */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
             onClick={onClose}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
-          />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 15 }}
-            className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-10 max-h-[92vh] flex flex-col"
-          >
-          */}
-          {/* NEW CODE - smooth animation/performance: 200ms fast pop (scale 0.98 to 1), clean tinted backdrop without heavy blur */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            onClick={onClose}
-            className="fixed inset-0 bg-slate-900/70"
+            className="fixed inset-0 bg-slate-950/75 backdrop-blur-md"
           />
 
           {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
+            initial={{ opacity: 0, scale: 0.98, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 8 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-10 max-h-[92vh] flex flex-col"
           >
@@ -239,7 +241,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                     Application Received!
                   </h4>
                   <p className="text-sm text-slate-600 max-w-sm mb-6 leading-relaxed">
-                    Thank you, <span className="font-bold text-slate-800">{formData.name}</span>. An expert Wellwigen coach will reach out to you within a few hours to set up your schedule.
+                    Thank you, <span className="font-bold text-slate-800">{formData.name}</span>! Your inquiry has been sent to our admin team. We've sent a confirmation email to <span className="font-semibold text-slate-700">{formData.email}</span>, and a master coach will contact you via WhatsApp &amp; Phone at <span className="font-semibold text-slate-700">{formData.phone}</span>.
                   </p>
 
                   <div className="w-full bg-teal-50/80 border border-teal-100 rounded-2xl p-4 mb-6 text-left text-xs text-teal-900 space-y-1">
@@ -297,13 +299,14 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                         Full Name *
                       </label>
                       <input
+                        ref={nameInputRef}
                         type="text"
                         name="name"
                         required
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="e.g. Rahul Sharma"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all font-medium"
                       />
                     </div>
                     <div>
@@ -313,11 +316,14 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                       <input
                         type="tel"
                         name="phone"
+                        inputMode="numeric"
+                        pattern="[0-9+]*"
                         required
                         value={formData.phone}
-                        onChange={handleChange}
+                        onChange={handlePhoneChange}
+                        onKeyDown={handlePhoneKeyDown}
                         placeholder="e.g. +91 9876543210"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all font-medium"
                       />
                     </div>
                   </div>
@@ -335,7 +341,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="e.g. rahul@example.com"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all font-medium"
                       />
                     </div>
                     <div>
@@ -346,7 +352,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                         name="fitnessGoal"
                         value={formData.fitnessGoal}
                         onChange={handleChange}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all bg-white"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all bg-white font-medium"
                       >
                         <option value="Fat Loss & Toning">Fat Loss &amp; Toning</option>
                         <option value="Muscle & Strength">Muscle &amp; Strength</option>
@@ -367,7 +373,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                         name="program"
                         value={formData.program}
                         onChange={handleChange}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all bg-white"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all bg-white font-medium"
                       >
                         <option value="Personal Training">Personal Training (1-on-1)</option>
                         <option value="Group Classes">Group Classes (Live Online)</option>
@@ -383,7 +389,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                         value={formData.plan}
                         onChange={handleChange}
                         placeholder="e.g. Transformation, Trial Class"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all font-medium"
                       />
                     </div>
                   </div>
@@ -397,7 +403,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                       name="preferredTime"
                       value={formData.preferredTime}
                       onChange={handleChange}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all bg-white font-medium"
                     >
                       <option value="Early Morning (6 AM - 8 AM)">Early Morning (6 AM - 8 AM)</option>
                       <option value="Morning (8 AM - 11 AM)">Morning (8 AM - 11 AM)</option>
@@ -418,7 +424,7 @@ export default function LeadModal({ isOpen, onClose, initialData = {} }) {
                       value={formData.message}
                       onChange={handleChange}
                       placeholder="Tell us about your fitness background or any specific goals..."
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all resize-none"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all resize-none font-medium"
                     />
                   </div>
 

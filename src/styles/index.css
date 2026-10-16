@@ -26,7 +26,68 @@
   --color-muted: #64748B;
   --color-dark-text: #F8FAFC;
   --color-dark-muted: #CBD5E1;
+
+  /* Live 3D Athlete Configuration Variables (Home Page Only) */
+  --athlete-scale: 1;                 /* Scale factor for figure height (e.g. 0.95 to 1.1) */
+  --athlete-top-offset: 52px;         /* Vertical offset of hair from top */
+  --athlete-opacity-scrolled: 0.18;   /* Faded opacity on scroll past hero (0.15 - 0.25) */
+  --athlete-parallax-speed: 0.06;     /* Parallax scrolling rate */
+  --athlete-height: calc(77vh * var(--athlete-scale, 1));
+  --athlete-width: calc(var(--athlete-height) * 1.7778);
+  --athlete-gap-center: 72vw;
+  --header-h: 80px;
+
+  /* ================= FLAT SOLID BACKGROUND DESIGN TOKENS (Home Page Only) ================= */
+  --solid-teal: #1FB5A3;                 /* Site primary teal */
+  --solid-teal-dark: #0F766E;            /* ~18% darker solid teal */
+  --solid-teal-light: #5EEAD4;           /* Lighter tint of teal for accent circle */
+  --solid-mint: #F2FAF8;                 /* Very light calm teal-mint tint for section alternation */
+  --solid-navy: #0F172A;                 /* Existing heading navy */
+  --solid-white: #FFFFFF;                /* Flat pure white */
+
+  /* User-tweakable parameters */
+  --hero-arch-width: 500px;              /* Width of main solid-teal arch */
+  --hero-arch-height: 680px;             /* Height of main solid-teal arch */
+  --hero-arch-tilt: -5deg;               /* Tilt angle of main arch (-4 to -6deg) */
+  --hero-arch-radius: 250px;             /* Rounded arch top radius */
+  --hero-circle-size: 320px;             /* Diameter of lighter teal tint circle */
+  --class-band-height: 250px;            /* Full-width solid-teal band height behind class cards */
 }
+
+/* Subtle life animation for background floating circles (transform only, 2-4px, 8-12s loop) */
+@keyframes bgDriftSlow1 {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-4px) translateX(3px); }
+}
+@keyframes bgDriftSlow2 {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(3px) translateX(-4px); }
+}
+.bg-drift-1 {
+  animation: bgDriftSlow1 9s ease-in-out infinite;
+}
+.bg-drift-2 {
+  animation: bgDriftSlow2 11s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-drift-1,
+  .bg-drift-2 {
+    animation: none !important;
+  }
+}
+
+/* OLD CODE (commented by AI) - opaque solid background enforcement
+#home {
+  background-color: var(--solid-mint, #F2FAF8) !important;
+}
+#home [data-home-bg="mint"] {
+  background-color: var(--solid-mint, #F2FAF8) !important;
+}
+#home [data-home-bg="white"] {
+  background-color: var(--solid-white, #FFFFFF) !important;
+}
+*/
+/* NEW CODE - Overlay: Living energy animated background flows through transparent sections while solid teal panels sit on top */
 
 /* ================= GLOBAL ================= */
 html {
@@ -503,15 +564,16 @@ html, body {
   line-height: 0.85;
 }
 
-/* Athletic Corner Brackets for Cards */
+/* Athletic Corner Brackets for Cards (Rounded with colored line) */
 .corner-bracket-tl {
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 14px;
-  height: 14px;
-  border-top: 2px solid rgba(45, 226, 200, 0.6);
-  border-left: 2px solid rgba(45, 226, 200, 0.6);
+  width: 16px;
+  height: 16px;
+  border-top: 2.5px solid #0D9488;
+  border-left: 2.5px solid #0D9488;
+  border-top-left-radius: 8px;
   pointer-events: none;
 }
 
@@ -519,10 +581,11 @@ html, body {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  width: 14px;
-  height: 14px;
-  border-bottom: 2px solid rgba(45, 226, 200, 0.6);
-  border-right: 2px solid rgba(45, 226, 200, 0.6);
+  width: 16px;
+  height: 16px;
+  border-bottom: 2.5px solid #0D9488;
+  border-right: 2.5px solid #0D9488;
+  border-bottom-right-radius: 8px;
   pointer-events: none;
 }
 
@@ -605,4 +668,196 @@ html, body {
 .clip-diagonal {
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
 }
+
+/* ==========================================================================
+   WELLWIGEN - ADMIN & TRAINER PANEL UNIFIED LIVING ENERGY THEME & VIBRANT BORDERS
+   Displays the home Living Energy animated background across Admin & Trainer
+   and adds attractive, visible colored borders on all boxes and containers.
+   ========================================================================== */
+
+/* 1. Make Admin and Trainer Panel Root Containers Transparent so Living Energy Field Flows Through */
+[data-panel="admin"],
+[data-panel="trainer"],
+[data-panel="admin"] > div,
+[data-panel="trainer"] > div,
+[data-panel="admin"] main,
+[data-panel="trainer"] main {
+  background-color: transparent !important;
+}
+
+[data-panel="admin"] .bg-\[\#f9fafb\],
+[data-panel="admin"] .bg-\[\#f8f9fa\],
+[data-panel="admin"] .bg-\[\#F8FAFC\],
+[data-panel="admin"] .bg-\[\#EEF3F4\],
+[data-panel="trainer"] .bg-\[\#f8fafc\],
+[data-panel="trainer"] .bg-slate-50\/60,
+[data-panel="trainer"] .bg-slate-50\/70,
+[data-panel="trainer"] .bg-slate-50\/80 {
+  background-color: transparent !important;
+}
+
+/* 2. Frosted Glass Sidebars with Crisp Colored Teal Border */
+[data-panel="admin"] aside,
+[data-panel="trainer"] aside {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border-right: 2px solid rgba(20, 184, 166, 0.32) !important;
+  box-shadow: 4px 0 24px -4px rgba(20, 184, 166, 0.08) !important;
+}
+
+/* 3. Frosted Glass Top Headers with Crisp Colored Teal Border */
+[data-panel="admin"] header,
+[data-panel="trainer"] header,
+[data-panel="admin"] .sticky.top-0,
+[data-panel="trainer"] .sticky.top-0 {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border-bottom: 2px solid rgba(20, 184, 166, 0.30) !important;
+  box-shadow: 0 4px 20px -4px rgba(20, 184, 166, 0.08) !important;
+}
+
+/* 4. Universal Box & Container Styling with Attractive, Visible Colored Borders */
+[data-panel="admin"] .bg-white.rounded-2xl,
+[data-panel="admin"] .bg-white.rounded-xl,
+[data-panel="admin"] .bg-white.rounded-3xl,
+[data-panel="trainer"] .bg-white.rounded-2xl,
+[data-panel="trainer"] .bg-white.rounded-xl,
+[data-panel="trainer"] .bg-white.rounded-3xl,
+[data-panel="admin"] .bg-white.rounded-lg,
+[data-panel="trainer"] .bg-white.rounded-lg,
+[data-panel="admin"] [class*="rounded-2xl"].border,
+[data-panel="admin"] [class*="rounded-xl"].border,
+[data-panel="admin"] [class*="rounded-3xl"].border,
+[data-panel="trainer"] [class*="rounded-2xl"].border,
+[data-panel="trainer"] [class*="rounded-xl"].border,
+[data-panel="trainer"] [class*="rounded-3xl"].border {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 2px solid rgba(20, 184, 166, 0.35) !important;
+  box-shadow: 0 4px 20px -2px rgba(20, 184, 166, 0.09), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease !important;
+}
+
+/* Hover state for boxes & cards */
+[data-panel="admin"] .bg-white.rounded-2xl:hover,
+[data-panel="admin"] .bg-white.rounded-xl:hover,
+[data-panel="trainer"] .bg-white.rounded-2xl:hover,
+[data-panel="trainer"] .bg-white.rounded-xl:hover,
+[data-panel="admin"] [class*="rounded-2xl"].border:hover,
+[data-panel="admin"] [class*="rounded-xl"].border:hover,
+[data-panel="trainer"] [class*="rounded-2xl"].border:hover,
+[data-panel="trainer"] [class*="rounded-xl"].border:hover {
+  border-color: rgba(20, 184, 166, 0.82) !important;
+  box-shadow: 0 10px 28px -4px rgba(20, 184, 166, 0.22), 0 4px 10px -2px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Modals & Dialogs */
+[data-panel="admin"] [role="dialog"],
+[data-panel="trainer"] [role="dialog"],
+[data-panel="admin"] .fixed .bg-white,
+[data-panel="trainer"] .fixed .bg-white {
+  border: 2px solid rgba(20, 184, 166, 0.42) !important;
+  box-shadow: 0 25px 50px -12px rgba(20, 184, 166, 0.25) !important;
+}
+
+/* 5. Right Slideout Detail Panel in Admin */
+[data-panel="admin"] .lg\:w-96 {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  border-left: 2px solid rgba(20, 184, 166, 0.32) !important;
+  box-shadow: -6px 0 28px -4px rgba(20, 184, 166, 0.10) !important;
+}
+
+/* 6. Tables & Data Grid Wrappers with Colored Borders */
+[data-panel="admin"] .overflow-hidden.border,
+[data-panel="trainer"] .overflow-hidden.border,
+[data-panel="admin"] .border-slate-200,
+[data-panel="trainer"] .border-slate-200,
+[data-panel="admin"] .border-slate-200\/90,
+[data-panel="trainer"] .border-slate-200\/90 {
+  border-color: rgba(20, 184, 166, 0.30) !important;
+}
+
+[data-panel="admin"] th,
+[data-panel="trainer"] th {
+  border-bottom: 2px solid rgba(20, 184, 166, 0.25) !important;
+  background-color: rgba(240, 253, 250, 0.85) !important;
+  color: #0F766E !important;
+}
+
+[data-panel="admin"] tr,
+[data-panel="trainer"] tr {
+  border-bottom: 1px solid rgba(20, 184, 166, 0.14) !important;
+}
+
+/* 7. Distinctive Status Colored Borders */
+/* Amber / Pending Action Boxes */
+[data-panel="admin"] .border-amber-200,
+[data-panel="admin"] .border-amber-400,
+[data-panel="admin"] .border-amber-500,
+[data-panel="trainer"] .border-amber-200,
+[data-panel="trainer"] .border-amber-400,
+[data-panel="trainer"] .border-amber-500 {
+  border: 2px solid rgba(245, 158, 11, 0.55) !important;
+  box-shadow: 0 4px 18px -2px rgba(245, 158, 11, 0.12) !important;
+}
+
+/* Emerald / Approved & Verified Boxes */
+[data-panel="admin"] .border-emerald-200,
+[data-panel="admin"] .border-emerald-400,
+[data-panel="admin"] .border-emerald-500,
+[data-panel="trainer"] .border-emerald-200,
+[data-panel="trainer"] .border-emerald-400,
+[data-panel="trainer"] .border-emerald-500 {
+  border: 2px solid rgba(16, 185, 129, 0.55) !important;
+  box-shadow: 0 4px 18px -2px rgba(16, 185, 129, 0.12) !important;
+}
+
+/* Rose / Rejected & Alert Boxes */
+[data-panel="admin"] .border-rose-200,
+[data-panel="admin"] .border-rose-400,
+[data-panel="admin"] .border-rose-500,
+[data-panel="trainer"] .border-rose-200,
+[data-panel="trainer"] .border-rose-400,
+[data-panel="trainer"] .border-rose-500 {
+  border: 2px solid rgba(244, 63, 94, 0.55) !important;
+  box-shadow: 0 4px 18px -2px rgba(244, 63, 94, 0.12) !important;
+}
+
+/* Sky / Scheduled & Classes Boxes */
+[data-panel="admin"] .border-sky-200,
+[data-panel="admin"] .border-sky-400,
+[data-panel="admin"] .border-sky-500,
+[data-panel="trainer"] .border-sky-200,
+[data-panel="trainer"] .border-sky-400,
+[data-panel="trainer"] .border-sky-500 {
+  border: 2px solid rgba(14, 165, 233, 0.55) !important;
+  box-shadow: 0 4px 18px -2px rgba(14, 165, 233, 0.12) !important;
+}
+
+/* 8. Input Fields and Dropdowns with Colored Brand Borders */
+[data-panel="admin"] input[type="text"],
+[data-panel="admin"] input[type="search"],
+[data-panel="admin"] select,
+[data-panel="trainer"] input[type="text"],
+[data-panel="trainer"] input[type="search"],
+[data-panel="trainer"] select {
+  border: 1.5px solid rgba(20, 184, 166, 0.35) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-panel="admin"] input[type="text"]:focus,
+[data-panel="admin"] input[type="search"]:focus,
+[data-panel="admin"] select:focus,
+[data-panel="trainer"] input[type="text"]:focus,
+[data-panel="trainer"] input[type="search"]:focus,
+[data-panel="trainer"] select:focus {
+  border-color: #0D9488 !important;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.22) !important;
+}
+
 

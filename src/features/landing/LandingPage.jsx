@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HomeSection from './components/HomeSection';
-import PersonalTrainingSection from './components/PersonalTrainingSection';
-import GroupClassesSection from './components/GroupClassesSection';
+// OLD CODE (commented by AI) - Shifted to dedicated PersonalTrainingPage
+// import PersonalTrainingSection from './components/PersonalTrainingSection';
+// OLD CODE (commented by AI) - Shifted to dedicated GroupClassesPage
+// import GroupClassesSection from './components/GroupClassesSection';
 import FinalCTA from './components/FinalCTA';
 import Footer from './components/Footer';
 import LeadModal from './components/LeadModal';
 import LegalModal from './components/LegalModal';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
+// NEW CODE - Live 3D Athlete Context & Full-Body Layer (Home Page Only)
+import { LiveAthleteProvider } from './context/LiveAthleteContext';
+import LiveAthleteBody from './components/LiveAthleteBody';
+// NEW CODE - Distinct, attractive section border divider between Home and FinalCTA
+import { DiagonalSlashDivider } from './components/SectionDividers';
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   const [leadModalOpen, setLeadModalOpen] = useState(false);
   const [leadModalData, setLeadModalData] = useState({});
   const [legalModalOpen, setLegalModalOpen] = useState(false);
@@ -33,7 +42,7 @@ export default function LandingPage() {
 
   // OLD CODE (commented by AI)
   /* Single shared IntersectionObserver was missing; elements relied on varied animation libraries */
-  // NEW CODE - smooth animation/performance: single shared IntersectionObserver for glitch-free pop animations
+  // NEW CODE - smooth animation/performance: single shared IntersectionObserver for glitch-free pop animations without leaks
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const items = document.querySelectorAll('.reveal-item');
@@ -42,6 +51,8 @@ export default function LandingPage() {
       items.forEach((item) => item.classList.add('revealed'));
       return;
     }
+
+    const activeTimers = [];
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -56,7 +67,7 @@ export default function LandingPage() {
             const timer = setTimeout(() => {
               el.classList.remove('animating');
             }, 650);
-            el._animCleanup = timer;
+            activeTimers.push(timer);
           }
         });
       },
@@ -77,9 +88,7 @@ export default function LandingPage() {
     });
 
     return () => {
-      items.forEach((item) => {
-        if (item._animCleanup) clearTimeout(item._animCleanup);
-      });
+      activeTimers.forEach(clearTimeout);
       observer.disconnect();
     };
   }, []);
@@ -103,6 +112,14 @@ export default function LandingPage() {
   };
 
   const handleNavigateSection = (sectionId) => {
+    if (sectionId === 'personal-training' || sectionId === 'pricing') {
+      navigate('/personal-training');
+      return;
+    }
+    if (sectionId === 'group-classes' || sectionId === 'schedule') {
+      navigate('/group-classes');
+      return;
+    }
     const el = document.getElementById(sectionId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -111,8 +128,9 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-800 font-sans selection:bg-teal-500 selection:text-white">
-      {/* Dynamic SEO Tags */}
+    <LiveAthleteProvider>
+      <div className="min-h-screen bg-transparent text-slate-800 font-sans selection:bg-teal-500 selection:text-white relative w-full max-w-full overflow-x-hidden">
+        {/* Dynamic SEO Tags */}
       <Helmet>
         <title>Wellwigen | Online Personal Training &amp; Live Group Fitness Classes</title>
         <meta
@@ -170,11 +188,18 @@ export default function LandingPage() {
         </script>
       </Helmet>
 
-      {/* Sticky Header with Frosted Glass & Progress Bar */}
+      {/* OLD CODE (commented by AI) - fixed background athlete
+      <LiveAthleteBody />
+      */}
+
+      {/* Sticky Header with Frosted Glass & Progress Bar (z-50) */}
       <Navbar onOpenLeadModal={handleOpenLeadModal} />
 
-      {/* Main Single-Scroll Body */}
-      <main>
+      {/* OLD CODE (commented by AI) - z-10 constrained hero children below z-50 navbar
+      <main className="relative z-10">
+      */}
+      {/* NEW CODE - relative without z-index isolation: allows LiveAthleteHero (z-55) to sit on top of Navbar (z-50) */}
+      <main className="relative w-full max-w-full overflow-x-hidden">
         {/* Section 1: Home (id="home") */}
         <HomeSection
           onOpenLeadModal={handleOpenLeadModal}
@@ -193,20 +218,24 @@ export default function LandingPage() {
           onNavigateSection={handleNavigateSection}
         />
         */}
-        {/* NEW CODE - smooth animation/performance: cv-auto content-visibility skips off-screen paint work */}
+        {/* OLD CODE (commented by AI) - Shifted all Personal Training content to dedicated /personal-training page per user request
         <div className="cv-auto">
-          {/* Section 2: Personal Training (id="personal-training") */}
           <PersonalTrainingSection
             onOpenLeadModal={handleOpenLeadModal}
           />
         </div>
+        */}
 
+        {/* OLD CODE (commented by AI) - Shifted all Group Classes content to dedicated /group-classes page per user request
         <div className="cv-auto">
-          {/* Section 3: Group Classes (id="group-classes") */}
           <GroupClassesSection
             onOpenLeadModal={handleOpenLeadModal}
           />
         </div>
+        */}
+
+        {/* NEW CODE - Distinct Border Format 6: Asymmetric Diagonal Slash Divider */}
+        <DiagonalSlashDivider />
 
         <div className="cv-auto">
           {/* Section 4: Final CTA */}
@@ -240,5 +269,6 @@ export default function LandingPage() {
       {/* Floating Interactive Elements */}
       <FloatingWhatsApp />
     </div>
+  </LiveAthleteProvider>
   );
 }

@@ -3,21 +3,26 @@
 @tailwind utilities;
 
 
-/* ================= ROOT FIX ================= */
-#root {
+/* ================= ROOT & VIEWPORT LOCK ================= */
+html, body {
+  margin: 0;
+  padding: 0;
   width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* ================= GLOBAL ================= */
-body {
-  margin: 0;
-  padding: 0;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  position: relative;
   background-color: #ffffff;
   color: #111827;
   font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  position: relative;
+  margin: 0;
+  padding: 0;
 }
 
 /* Smooth scrolling */

@@ -19,307 +19,84 @@ const STORAGE_KEYS = {
   TRAINER_SETTINGS: 'wellwigen_trainer_settings',
 };
 
-// Default pre-seeded demo trainer for instant testing
-const DEMO_TRAINER = {
-  id: 'trn_demo_101',
-  name: 'Vikram Rajput',
-  email: 'trainer@wellwigen.com',
-  phone: '+91 98765 43210',
-  city: 'Mumbai',
-  languages: ['English', 'Hindi'],
-  gender: 'Male',
-  specialization: 'Strength & Conditioning',
-  secondarySpecializations: ['HIIT', 'Functional Training'],
-  experience: '6 Years',
-  certifications: ['ACE Certified Personal Trainer', 'ISSA Strength Coach'],
-  institution: 'American Council on Exercise (ACE)',
-  photoUrl: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=600&q=80',
-  certificateUrl: '',
-  services: {
-    personalTraining: true,
-    groupClasses: true,
-    oneOnOnePriceMonthly: 4999,
-    groupClassSeatPrice: 499,
-  },
-  bio: 'Certified strength and conditioning coach helping professionals build lean muscle, fix posture, and develop sustainable workout habits with evidence-based training.',
-  videoUrl: '',
-  instagram: '@vikram_wellwigen',
-  linkedin: 'linkedin.com/in/vikram-coach',
-  status: 'approved', // 'onboarding' | 'pending' | 'approved'
-  joinedDate: 'Jan 2026',
-  rating: 4.9,
-  reviewsCount: 38,
-};
+// Coaches roster dynamically loaded from database
+export const DEFAULT_COACHES_ROSTER = [];
 
-// Full roster of registered coaches with their weekly availability schedules
-export const DEFAULT_COACHES_ROSTER = [
-  {
-    id: 'trn_aditya',
-    name: 'Aditya',
-    email: 'aditya@wellwigen.com',
-    phone: '+91 98765 43210',
-    specialization: 'Strength & Conditioning',
-    experience: '6 Years',
-    status: 'approved',
-    rating: 4.95,
-    photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    city: 'Mumbai',
-    availability: {
-      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      timeSlots: [
-        { time: '06:00 AM - 07:00 AM', active: true },
-        { time: '07:00 AM - 08:00 AM', active: true },
-        { time: '09:00 AM - 10:00 AM', active: true },
-        { time: '10:30 AM - 11:30 AM', active: true },
-        { time: '05:00 PM - 06:00 PM', active: true },
-        { time: '06:30 PM - 07:30 PM', active: true },
-      ],
-      noticeHours: 12,
-      bufferMinutes: 15,
-    },
-  },
-  {
-    id: 'trn_demo_101',
-    name: 'Vikram Rajput',
-    email: 'trainer@wellwigen.com',
-    phone: '+91 98765 43211',
-    specialization: 'HIIT & Conditioning',
-    experience: '6 Years',
-    status: 'approved',
-    rating: 4.9,
-    photoUrl: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=600&q=80',
-    city: 'Delhi',
-    availability: {
-      days: ['Monday', 'Tuesday', 'Thursday', 'Friday', 'Saturday'], // Off on Wednesday & Sunday
-      timeSlots: [
-        { time: '06:00 AM - 07:00 AM', active: true },
-        { time: '07:00 AM - 08:00 AM', active: true },
-        { time: '08:00 AM - 09:00 AM', active: true },
-        { time: '05:00 PM - 06:00 PM', active: true },
-        { time: '06:30 PM - 07:30 PM', active: true },
-      ],
-      noticeHours: 24,
-      bufferMinutes: 15,
-    },
-  },
-  {
-    id: 'trn_priya_102',
-    name: 'Priya Sharma',
-    email: 'priya@wellwigen.com',
-    phone: '+91 98765 43212',
-    specialization: 'Mobility & Core',
-    experience: '5 Years',
-    status: 'approved',
-    rating: 4.92,
-    photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
-    city: 'Bengaluru',
-    availability: {
-      days: ['Monday', 'Tuesday', 'Wednesday', 'Friday', 'Saturday'], // Off on Thursday & Sunday
-      timeSlots: [
-        { time: '07:00 AM - 08:00 AM', active: true },
-        { time: '08:00 AM - 09:00 AM', active: true },
-        { time: '10:00 AM - 11:00 AM', active: true },
-        { time: '04:00 PM - 05:00 PM', active: true },
-        { time: '06:00 PM - 07:00 PM', active: true },
-      ],
-      noticeHours: 12,
-      bufferMinutes: 20,
-    },
-  },
-  {
-    id: 'trn_rahul_103',
-    name: 'Rahul Verma',
-    email: 'rahul.v@wellwigen.com',
-    phone: '+91 98765 43213',
-    specialization: 'Functional Training',
-    experience: '4 Years',
-    status: 'approved',
-    rating: 4.85,
-    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    city: 'Hyderabad',
-    availability: {
-      days: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], // Off on Monday
-      timeSlots: [
-        { time: '06:00 AM - 07:00 AM', active: true },
-        { time: '07:00 AM - 08:00 AM', active: true },
-        { time: '09:00 AM - 10:00 AM', active: true },
-        { time: '05:00 PM - 06:00 PM', active: true },
-      ],
-      noticeHours: 12,
-      bufferMinutes: 15,
-    },
-  },
-  {
-    id: 'trn_ananya_104',
-    name: 'Ananya Sen',
-    email: 'ananya@wellwigen.com',
-    phone: '+91 98765 43214',
-    specialization: 'Yoga & Flexibility Flow',
-    experience: '7 Years',
-    status: 'approved',
-    rating: 4.98,
-    photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
-    city: 'Pune',
-    availability: {
-      days: ['Monday', 'Wednesday', 'Friday', 'Sunday'], // Off on Tue, Thu, Sat
-      timeSlots: [
-        { time: '06:00 AM - 07:00 AM', active: true },
-        { time: '07:30 AM - 08:30 AM', active: true },
-        { time: '05:30 PM - 06:30 PM', active: true },
-      ],
-      noticeHours: 18,
-      bufferMinutes: 15,
-    },
-  },
-];
-
-// Seed initial mock data into localStorage if empty
+// Production initialization without dummy data
 const initStorage = () => {
   if (typeof window === 'undefined') return;
 
+  // 🧹 Purge legacy dummy data (Arjun Mehra, Simran Kaur, Vikram Rajput, cls_1, etc.)
+  try {
+    const rawClients = localStorage.getItem(STORAGE_KEYS.TRAINER_CLIENTS);
+    if (rawClients) {
+      try {
+        let clientsList = JSON.parse(rawClients);
+        if (Array.isArray(clientsList)) {
+          let modified = false;
+          // Filter out dummy users
+          const filtered = clientsList.filter(
+            (c) => c.name !== 'Arjun Mehra' && c.name !== 'Simran Kaur' && c.id !== 'cli_1'
+          ).map((c) => {
+            let updated = { ...c };
+            if (updated.assignedCoach === 'Vikram Rajput') {
+              updated.assignedCoach = '';
+              updated.assignedCoachId = '';
+              modified = true;
+            }
+            if (updated.assignedCoachId === 'trn_demo_101') {
+              updated.assignedCoachId = '';
+              modified = true;
+            }
+            if (updated.avatar && updated.avatar.includes('1534528741775')) {
+              updated.avatar = '';
+              modified = true;
+            }
+            if (updated.phone && updated.phone.startsWith('+91 98765 1')) {
+              updated.phone = '';
+              modified = true;
+            }
+            if (updated.renewalDate === '2026-05-15') {
+              const createdTime = updated.createdAt ? new Date(updated.createdAt).getTime() : Date.now();
+              updated.renewalDate = new Date(createdTime + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+              modified = true;
+            }
+            return updated;
+          });
+          if (modified || filtered.length !== clientsList.length) {
+            localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(filtered));
+          }
+        }
+      } catch {}
+    }
+    const rawClasses = localStorage.getItem(STORAGE_KEYS.TRAINER_CLASSES);
+    if (rawClasses && (rawClasses.includes('cls_1') || rawClasses.includes('trn_demo_101') || rawClasses.includes('cls_2'))) {
+      localStorage.setItem(STORAGE_KEYS.TRAINER_CLASSES, JSON.stringify([]));
+    }
+    const rawAuth = localStorage.getItem(STORAGE_KEYS.TRAINER_AUTH);
+    if (rawAuth && (rawAuth.includes('trn_demo_101') || rawAuth.includes('Vikram Rajput') || rawAuth.includes('trainer@wellwigen.com'))) {
+      localStorage.removeItem(STORAGE_KEYS.TRAINER_AUTH);
+      localStorage.removeItem(STORAGE_KEYS.TRAINER_ONBOARDING);
+    }
+    const rawOnboarding = localStorage.getItem(STORAGE_KEYS.TRAINER_ONBOARDING);
+    if (rawOnboarding && (rawOnboarding.includes('Vikram Rajput') || rawOnboarding.includes('trainer@wellwigen.com'))) {
+      localStorage.removeItem(STORAGE_KEYS.TRAINER_ONBOARDING);
+    }
+  } catch {}
+
   if (!localStorage.getItem(STORAGE_KEYS.TRAINER_CLASSES)) {
-    /* [DISABLED FOR FUTURE USE] Old initialClasses without Zoom configuration & cover images
-    const initialClasses = [
-      { id: 'cls_1', title: 'Morning High-Intensity MetCon', ... },
-    ];
-    */
-    const initialClasses = [
-      {
-        id: 'cls_1',
-        title: 'Core Power & Spinal Stability',
-        subtitle: 'Live group training.',
-        category: 'Strength & Conditioning',
-        fitnessLevel: 'All Levels',
-        date: '2026-10-14',
-        time: '10:30 AM',
-        formattedDateTime: '2026-10-14 • 10:30 AM',
-        duration: '45 mins',
-        durationMins: 45,
-        capacity: 20,
-        price: 499,
-        recurring: 'One-time Session',
-        isFreeDemo: true,
-        allowedTiers: ['STARTER', 'GOLD', 'PLATINUM'],
-        zoomUrl: 'https://us02web.zoom.us/j/8492019284?pwd=WLLWGN26',
-        meetingId: '849 201 9284',
-        passcode: 'WLLWGN26',
-        coverImage: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
-        status: 'Approved & Live',
-        trainerId: 'trn_aditya',
-        trainerName: 'Aditya',
-        trainerPhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-        trainerSpecialization: 'Strength & Conditioning',
-      },
-      {
-        id: 'cls_2',
-        title: 'Morning High-Intensity MetCon',
-        subtitle: 'Live group training.',
-        category: 'HIIT & Conditioning',
-        fitnessLevel: 'Intermediate',
-        date: '2026-10-15',
-        time: '07:00 AM',
-        formattedDateTime: '2026-10-15 • 07:00 AM',
-        duration: '45 mins',
-        durationMins: 45,
-        capacity: 25,
-        price: 499,
-        recurring: 'Daily (Mon-Fri)',
-        isFreeDemo: true,
-        allowedTiers: ['GOLD', 'PLATINUM'],
-        zoomUrl: 'https://us02web.zoom.us/j/8492019284?pwd=WLLWGN26',
-        meetingId: '849 201 9284',
-        passcode: 'WLLWGN26',
-        coverImage: 'https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?q=80&w=800&auto=format&fit=crop',
-        status: 'Approved & Live',
-        trainerId: 'trn_demo_101',
-        trainerName: 'Vikram Rajput',
-        trainerPhoto: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=600&q=80',
-        trainerSpecialization: 'HIIT & Conditioning',
-      },
-      {
-        id: 'cls_3',
-        title: 'Postural Reset & Mobility Flow',
-        subtitle: 'Live group training.',
-        category: 'Mobility & Core',
-        fitnessLevel: 'All Levels',
-        date: '2026-10-16',
-        time: '08:00 AM',
-        formattedDateTime: '2026-10-16 • 08:00 AM',
-        duration: '40 mins',
-        durationMins: 40,
-        capacity: 20,
-        price: 399,
-        recurring: 'Weekly Recurring',
-        isFreeDemo: false,
-        allowedTiers: ['PLATINUM'],
-        zoomUrl: 'https://us02web.zoom.us/j/8492019284?pwd=WLLWGN26',
-        meetingId: '849 201 9284',
-        passcode: 'WLLWGN26',
-        coverImage: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop',
-        status: 'Approved & Live',
-        trainerId: 'trn_priya_102',
-        trainerName: 'Priya Sharma',
-        trainerPhoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
-        trainerSpecialization: 'Mobility & Core',
-      },
-    ];
-    localStorage.setItem(STORAGE_KEYS.TRAINER_CLASSES, JSON.stringify(initialClasses));
+    localStorage.setItem(STORAGE_KEYS.TRAINER_CLASSES, JSON.stringify([]));
   }
 
   if (!localStorage.getItem(STORAGE_KEYS.TRAINER_CLIENTS)) {
-    const initialClients = [
-      {
-        id: 'cli_1',
-        name: 'Arjun Mehra',
-        email: 'arjun.m@example.com',
-        goal: 'Hypertrophy & Posture Fix',
-        plan: '3-Month 1-on-1 Transformation',
-        sessionsCompleted: 14,
-        totalSessions: 36,
-        nextSession: 'Today at 05:30 PM',
-        status: 'Active',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
-      },
-      {
-        id: 'cli_2',
-        name: 'Simran Kaur',
-        email: 'simran.k@example.com',
-        goal: 'Fat Loss & Stamina',
-        plan: 'Monthly 1-on-1 Coaching',
-        sessionsCompleted: 8,
-        totalSessions: 12,
-        nextSession: 'Tomorrow at 08:00 AM',
-        status: 'Active',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
-      },
-      {
-        id: 'cli_3',
-        name: 'Rohan Sharma',
-        email: 'rohan.s@example.com',
-        goal: 'Marathon Strength Prep',
-        plan: 'Bi-Weekly Check-in Plan',
-        sessionsCompleted: 18,
-        totalSessions: 24,
-        nextSession: 'Thursday at 06:00 PM',
-        status: 'Active',
-        avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80',
-      },
-    ];
-    localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(initialClients));
+    localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify([]));
   }
 
   if (!localStorage.getItem(STORAGE_KEYS.TRAINER_AVAILABILITY)) {
     const initialAvailability = {
       slotsPerDay: 4,
       days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      timeSlots: [
-        { time: '06:00 AM - 07:00 AM', active: true },
-        { time: '07:00 AM - 08:00 AM', active: true },
-        { time: '08:00 AM - 09:00 AM', active: false },
-        { time: '05:00 PM - 06:00 PM', active: true },
-        { time: '06:30 PM - 07:30 PM', active: true },
-        { time: '08:00 PM - 09:00 PM', active: false },
-      ],
+      timeSlots: [],
       noticeHours: 12,
       bufferMinutes: 15,
     };
@@ -367,14 +144,25 @@ export const trainerApi = {
         status: registeredOnboarding.status || 'pending',
       };
     } else {
-      // Default to demo trainer
-      trainer = {
-        ...DEMO_TRAINER,
-        email: normalizedEmail,
-      };
+      // Check backend status before deciding
+      try {
+        const res = await axios.get(
+          `${API_BASE}/trainers/status?email=${encodeURIComponent(normalizedEmail)}`
+        );
+        if (res.data?.success && res.data.trainer) {
+          trainer = res.data.trainer;
+        } else {
+          throw new Error('No registered coach account found with this email. Please register first.');
+        }
+      } catch (err) {
+        throw new Error(err.response?.data?.message || err.message || 'Invalid coach credentials.');
+      }
     }
 
     localStorage.setItem(STORAGE_KEYS.TRAINER_AUTH, JSON.stringify(trainer));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('trainerAuthChanged'));
+    }
     return trainer;
   },
 
@@ -409,6 +197,9 @@ export const trainerApi = {
 
     // Save auth and seed onboarding step 1
     localStorage.setItem(STORAGE_KEYS.TRAINER_AUTH, JSON.stringify(newTrainer));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('trainerAuthChanged'));
+    }
     this.saveOnboardingData({
       ...newTrainer,
       step: 1,
@@ -425,6 +216,9 @@ export const trainerApi = {
       if (res.data?.trainer) {
         const merged = { ...newTrainer, ...res.data.trainer };
         localStorage.setItem(STORAGE_KEYS.TRAINER_AUTH, JSON.stringify(merged));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('trainerAuthChanged'));
+        }
         return merged;
       }
     } catch (e) {
@@ -435,13 +229,44 @@ export const trainerApi = {
   },
 
   loginDemoTrainer() {
-    localStorage.setItem(STORAGE_KEYS.TRAINER_AUTH, JSON.stringify(DEMO_TRAINER));
-    return DEMO_TRAINER;
+    throw new Error('Demo login is disabled for live production.');
   },
 
   logout() {
     localStorage.removeItem(STORAGE_KEYS.TRAINER_AUTH);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('trainerAuthChanged'));
+    }
     return true;
+  },
+
+  /**
+   * Verifies whether current stored credentials are valid.
+   * Checks database status for real registered accounts, and accepts valid demo accounts.
+   * If token/account is invalid or not found, clears stale credentials and returns false.
+   */
+  async verifyCurrentAuth() {
+    const current = this.getCurrentTrainer();
+    if (!current) return false;
+
+    // Verify registered account against backend DB
+    if (current.email) {
+      try {
+        const res = await axios.get(
+          `${API_BASE}/trainers/status?email=${encodeURIComponent(current.email.trim().toLowerCase())}`
+        );
+        if (res.data?.success && res.data?.trainer) {
+          return true;
+        }
+      } catch (err) {
+        if (err.response?.status === 404 || err.response?.status === 401) {
+          this.logout();
+          return false;
+        }
+      }
+    }
+
+    return !!current;
   },
 
   // ---------------- ONBOARDING ----------------
@@ -505,10 +330,19 @@ export const trainerApi = {
         const merged = { ...completeProfile, ...res.data.trainer };
         localStorage.setItem(STORAGE_KEYS.TRAINER_ONBOARDING, JSON.stringify(merged));
         localStorage.setItem(STORAGE_KEYS.TRAINER_AUTH, JSON.stringify(merged));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('wellwigen_trainer_application_submitted', { detail: merged }));
+          window.dispatchEvent(new Event('storage'));
+        }
         return merged;
       }
     } catch (err) {
       console.warn('Backend onboarding sync notice:', err.message);
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('wellwigen_trainer_application_submitted', { detail: completeProfile }));
+      window.dispatchEvent(new Event('storage'));
     }
 
     return completeProfile;
@@ -523,12 +357,12 @@ export const trainerApi = {
     return {
       activeClients: clients.length,
       upcomingClasses: classes.filter((c) => c.status === 'Upcoming').length,
-      monthlyEarnings: '₹48,500',
-      earningsGrowth: '+18.4%',
-      rating: 4.9,
-      totalHoursTrained: '142 Hrs',
-      profileViews: 384,
-      pendingRequests: 4,
+      monthlyEarnings: '₹0',
+      earningsGrowth: '0%',
+      rating: 0,
+      totalHoursTrained: '0 Hrs',
+      profileViews: 0,
+      pendingRequests: 0,
     };
   },
 
@@ -638,6 +472,154 @@ export const trainerApi = {
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
+    }
+  },
+
+  addClient(clientData) {
+    try {
+      const clients = this.getClients();
+      // Check if client with this email already exists
+      const existingIdx = clients.findIndex(
+        (c) => c.email && clientData.email && c.email.toLowerCase() === clientData.email.toLowerCase()
+      );
+
+      if (existingIdx !== -1) {
+        clients[existingIdx] = {
+          ...clients[existingIdx],
+          ...clientData,
+          status: 'Active',
+          subscriptionStatus: 'Active',
+          renewalDate: clientData.renewalDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          updatedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(clients));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('wellwigen_clients_updated'));
+        }
+        return clients[existingIdx];
+      }
+
+      const newClient = {
+        id: clientData.id || `cli_${Date.now()}`,
+        name: clientData.name || clientData.fullName || 'New Client',
+        email: clientData.email || '',
+        phone: clientData.phone || '',
+        goal: clientData.goal || clientData.fitnessGoal || 'General Fitness',
+        plan: clientData.plan || 'Total Wellness Monthly',
+        program: clientData.program || 'Personal Training',
+        sessionsCompleted: clientData.sessionsCompleted || 0,
+        totalSessions: clientData.totalSessions || 12,
+        nextSession: clientData.nextSession || 'Session 1: Initial Assessment',
+        status: 'Active',
+        subscriptionStatus: 'Active',
+        renewalDate: clientData.renewalDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        assignedCoach: (clientData.assignedCoach && clientData.assignedCoach !== 'Vikram Rajput') ? clientData.assignedCoach : '',
+        assignedCoachId: (clientData.assignedCoachId && clientData.assignedCoachId !== 'trn_demo_101') ? clientData.assignedCoachId : '',
+        avatar: clientData.avatar || '',
+        source: 'inquiry_converted',
+        createdAt: new Date().toISOString(),
+      };
+
+      clients.unshift(newClient);
+      localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(clients));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('wellwigen_clients_updated'));
+      }
+      return newClient;
+    } catch (e) {
+      console.error('Failed to add client:', e);
+      return null;
+    }
+  },
+
+  removeClient(clientId) {
+    try {
+      const clients = this.getClients();
+      const updated = clients.filter((c) => c.id !== clientId && c.email !== clientId);
+      localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(updated));
+
+      // Also clean up from subscriptions if present
+      try {
+        const storedSubs = localStorage.getItem('wellwigen_admin_subscriptions');
+        if (storedSubs) {
+          const subs = JSON.parse(storedSubs);
+          const filteredSubs = subs.filter((s) => s.clientId !== clientId && s.clientEmail !== clientId);
+          localStorage.setItem('wellwigen_admin_subscriptions', JSON.stringify(filteredSubs));
+        }
+      } catch (err) {
+        console.warn('Error syncing subscriptions on client removal:', err);
+      }
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('wellwigen_clients_updated'));
+      }
+      return true;
+    } catch (e) {
+      console.error('Failed to remove client:', e);
+      return false;
+    }
+  },
+
+  updateClient(clientId, updatedData) {
+    try {
+      const clients = this.getClients();
+      const idx = clients.findIndex((c) => c.id === clientId || c.email === clientId);
+      if (idx !== -1) {
+        clients[idx] = { ...clients[idx], ...updatedData, updatedAt: new Date().toISOString() };
+        localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(clients));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('wellwigen_clients_updated'));
+        }
+        return clients[idx];
+      }
+      return null;
+    } catch (e) {
+      console.error('Failed to update client:', e);
+      return null;
+    }
+  },
+
+  removeClientSubscription(clientId) {
+    try {
+      const clients = this.getClients();
+      const idx = clients.findIndex((c) => c.id === clientId || c.email === clientId);
+      if (idx !== -1) {
+        clients[idx] = {
+          ...clients[idx],
+          plan: 'No Active Subscription',
+          subscriptionStatus: 'Cancelled',
+          status: 'Cancelled',
+          renewalDate: 'N/A',
+          updatedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(STORAGE_KEYS.TRAINER_CLIENTS, JSON.stringify(clients));
+
+        // Sync with admin subscriptions
+        try {
+          const storedSubs = localStorage.getItem('wellwigen_admin_subscriptions');
+          if (storedSubs) {
+            const subs = JSON.parse(storedSubs);
+            const updatedSubs = subs.map((s) => {
+              if (s.clientId === clientId || s.clientEmail === clients[idx].email) {
+                return { ...s, status: 'Cancelled' };
+              }
+              return s;
+            });
+            localStorage.setItem('wellwigen_admin_subscriptions', JSON.stringify(updatedSubs));
+          }
+        } catch (err) {
+          console.warn('Error syncing subscriptions on sub removal:', err);
+        }
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('wellwigen_clients_updated'));
+        }
+        return clients[idx];
+      }
+      return null;
+    } catch (e) {
+      console.error('Failed to remove client subscription:', e);
+      return null;
     }
   },
 
@@ -866,6 +848,53 @@ export const trainerApi = {
     return settings;
   },
 
+  // ---------------- COACH ASSIGNMENT & AUTOMATED CRON NOTIFICATIONS ----------------
+  async assignCoachToTarget(assignmentData) {
+    try {
+      const res = await axios.post(`${API_BASE}/trainers/assign`, assignmentData);
+      return res.data;
+    } catch (err) {
+      console.warn('API notice assigning coach:', err.message);
+      return { success: false, error: err.message };
+    }
+  },
+
+  async getTrainerAssignments(query = {}) {
+    try {
+      const current = this.getCurrentTrainer();
+      const params = {
+        email: query.email || current?.email,
+        name: query.name || current?.name,
+        coachId: query.coachId || current?.id || current?._id,
+      };
+      const res = await axios.get(`${API_BASE}/trainers/assignments`, { params });
+      if (res.data?.success && Array.isArray(res.data.assignments)) {
+        return res.data.assignments;
+      }
+    } catch (err) {
+      console.warn('API error fetching trainer assignments:', err.message);
+    }
+    return [];
+  },
+
+  async syncTrainerAssignmentNotifications() {
+    try {
+      const current = this.getCurrentTrainer();
+      if (!current) return;
+      const assignments = await this.getTrainerAssignments();
+      assignments.forEach((assign) => {
+        const notifTitle = `🎯 New ${assign.assignmentType === 'group' ? 'Group Class' : 'Trainee'}: ${assign.targetName}`;
+        const notifMessage = `Assigned as lead coach for ${assign.targetName} (${assign.plan || 'Personal Training'}). Goal: ${assign.targetGoal || 'General Fitness'}`;
+        this.addNotification({
+          title: notifTitle,
+          message: notifMessage,
+          type: 'client',
+          link: '/trainer/dashboard',
+        });
+      });
+    } catch {}
+  },
+
   // ---------------- PROFILE & SETTINGS ----------------
   async updateProfile(profileUpdates) {
     await new Promise((r) => setTimeout(r, 350));
@@ -873,6 +902,23 @@ export const trainerApi = {
     const updated = { ...current, ...profileUpdates };
     localStorage.setItem(STORAGE_KEYS.TRAINER_AUTH, JSON.stringify(updated));
     localStorage.setItem(STORAGE_KEYS.TRAINER_ONBOARDING, JSON.stringify(updated));
+
+    if (current.email) {
+      try {
+        const res = await axios.patch(`${API_BASE}/trainers/profile`, {
+          email: current.email,
+          ...profileUpdates,
+        });
+        if (res.data?.trainer) {
+          const synced = { ...updated, ...res.data.trainer };
+          localStorage.setItem(STORAGE_KEYS.TRAINER_AUTH, JSON.stringify(synced));
+          localStorage.setItem(STORAGE_KEYS.TRAINER_ONBOARDING, JSON.stringify(synced));
+          return synced;
+        }
+      } catch (e) {
+        console.warn('Backend profile update notice:', e.message);
+      }
+    }
     return updated;
   },
 
@@ -915,11 +961,13 @@ export const trainerApi = {
         };
         localStorage.setItem(STORAGE_KEYS.TRAINER_AUTH, JSON.stringify(updated));
         localStorage.setItem(STORAGE_KEYS.TRAINER_ONBOARDING, JSON.stringify(updated));
+        await this.syncTrainerAssignmentNotifications();
         return updated;
       }
     } catch {
       // Fallback to local storage state
     }
+    await this.syncTrainerAssignmentNotifications();
     return current;
   },
 
@@ -933,15 +981,15 @@ export const trainerApi = {
     } catch (err) {
       console.warn('Failed to load approved trainers from API, fallback to default:', err.message);
     }
-    // Fallback default approved trainer
-    return [DEMO_TRAINER];
+    // No approved trainers in DB yet
+    return [];
   },
 
   // ---------------- ADMIN PANEL TRAINER OPERATIONS ----------------
   async getAdminTrainers({ status = 'All', search = '', page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'desc' } = {}) {
-    const token = localStorage.getItem('adminToken') || 'mock-admin-token';
+    const token = localStorage.getItem('adminToken') || '';
     const config = {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
       params: { status, search, page, limit, sortBy, sortOrder },
     };
 
@@ -966,26 +1014,26 @@ export const trainerApi = {
       console.warn('API error fetching admin trainers, falling back:', err.message);
     }
 
-    // Local fallback for offline/demo resilience
+    // Local fallback for offline resilience
     const localTrainer = this.getCurrentTrainer();
-    const mockList = localTrainer ? [localTrainer, DEMO_TRAINER] : [DEMO_TRAINER];
+    const list = localTrainer ? [localTrainer] : [];
     return {
       success: true,
-      trainers: mockList,
-      pagination: { total: mockList.length, page: 1, limit, pages: 1 },
+      trainers: list,
+      pagination: { total: list.length, page: 1, limit, pages: 1 },
       counts: {
-        total: mockList.length,
-        pending: mockList.filter((t) => t.status === 'pending').length,
-        approved: mockList.filter((t) => t.status === 'approved').length,
-        rejected: mockList.filter((t) => t.status === 'rejected').length,
+        total: list.length,
+        pending: list.filter((t) => t.status === 'pending').length,
+        approved: list.filter((t) => t.status === 'approved').length,
+        rejected: list.filter((t) => t.status === 'rejected').length,
       },
     };
   },
 
   async getAdminTrainerById(id) {
-    const token = localStorage.getItem('adminToken') || 'mock-admin-token';
+    const token = localStorage.getItem('adminToken') || '';
     const config = {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     };
 
     try {
@@ -1001,7 +1049,7 @@ export const trainerApi = {
     if (current && (current.id === id || current._id === id)) {
       return current;
     }
-    return DEMO_TRAINER;
+    return null;
   },
 
   async updateTrainerStatus(id, { status, rejectionReason = '' }) {
@@ -1025,7 +1073,7 @@ export const trainerApi = {
           { status, rejectionReason: trimmedReason, reason: trimmedReason },
           config
         );
-      } catch (patchErr) {
+      } catch (_patchErr) {
         res = await axios.put(
           `${API_BASE}/admin/trainers/${id}/status`,
           { status, rejectionReason: trimmedReason, reason: trimmedReason },
@@ -1066,6 +1114,21 @@ export const trainerApi = {
     }
 
     return res?.data || { success: true, message: `Trainer status updated to ${status}.` };
+  },
+
+  async deleteTrainer(id) {
+    const token = localStorage.getItem('adminToken') || 'mock-admin-token';
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+
+    try {
+      const res = await axios.delete(`${API_BASE}/admin/trainers/${id}`, config);
+      return res.data;
+    } catch (err) {
+      console.warn('Backend delete trainer failed:', err.message);
+      throw err;
+    }
   },
 };
 

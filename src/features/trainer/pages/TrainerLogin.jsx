@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock, ArrowLeft, ArrowRight, ShieldCheck, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, ArrowRight, ShieldCheck, AlertCircle, Sparkles, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { trainerApi } from '../../../services/trainerApi';
 
 export default function TrainerLogin() {
@@ -12,6 +12,7 @@ export default function TrainerLogin() {
     email: '',
     password: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showForgotMsg, setShowForgotMsg] = useState(false);
@@ -44,13 +45,8 @@ export default function TrainerLogin() {
     }
   };
 
-  const handleDemoLogin = () => {
-    trainerApi.loginDemoTrainer();
-    navigate('/trainer/dashboard', { replace: true });
-  };
-
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans flex flex-col justify-between p-4 sm:p-6 antialiased">
+    <div data-panel="trainer" className="min-h-screen bg-transparent text-slate-800 font-sans flex flex-col justify-between p-4 sm:p-6 antialiased">
       {/* Top Header */}
       <div className="max-w-6xl mx-auto w-full flex items-center justify-between py-2">
         <Link to="/" className="flex items-center gap-2.5 group">
@@ -76,32 +72,12 @@ export default function TrainerLogin() {
 
       {/* Main Card */}
       <div className="max-w-md w-full mx-auto my-8">
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl shadow-slate-200/50 p-6 sm:p-10 space-y-6">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-teal-500/35 shadow-xl shadow-teal-500/10 p-6 sm:p-10 space-y-6">
           <div className="text-center space-y-1.5">
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Trainer Portal Login</h1>
             <p className="text-xs sm:text-sm text-slate-500">
               Access your classes, client rosters, and coach earnings
             </p>
-          </div>
-
-          {/* Quick Demo One-Click Access */}
-          <div className="p-3.5 bg-gradient-to-r from-teal-50 to-sky-50 rounded-2xl border border-teal-200/60 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-teal-500 text-white flex items-center justify-center shrink-0">
-                <Sparkles size={16} />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-teal-950">Quick Review Demo</p>
-                <p className="text-[10.5px] text-teal-700">Explore dashboard with pre-filled coach profile</p>
-              </div>
-            </div>
-            <button
-              onClick={handleDemoLogin}
-              type="button"
-              className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs transition-all whitespace-nowrap cursor-pointer"
-            >
-              One-Click Demo
-            </button>
           </div>
 
           {error && (
@@ -118,7 +94,11 @@ export default function TrainerLogin() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+            {/* Hidden dummy fields to neutralize Chrome password manager autofill */}
+            <input type="text" name="chrome_prevent_autofill_username" className="hidden" tabIndex="-1" aria-hidden="true" autoComplete="off" />
+            <input type="password" name="chrome_prevent_autofill_password" className="hidden" tabIndex="-1" aria-hidden="true" autoComplete="new-password" />
+
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                 Registered Email
@@ -129,6 +109,9 @@ export default function TrainerLogin() {
                 </div>
                 <input
                   type="email"
+                  name="wellwigen_trainer_login_email"
+                  id="wellwigen_trainer_login_email"
+                  autoComplete="off"
                   required
                   placeholder="coach@example.com"
                   value={formData.email}
@@ -156,13 +139,25 @@ export default function TrainerLogin() {
                   <Lock size={16} />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
+                  name="wellwigen_trainer_login_pwd"
+                  id="wellwigen_trainer_login_pwd"
+                  autoComplete="new-password"
                   required
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-teal-700 transition-colors cursor-pointer"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 

@@ -18,6 +18,10 @@ const FloatingContact = React.lazy(() => import("./components/common/FloatingCon
 const AdminLayout = React.lazy(() => import("./features/dashboard/layout/AdminLayout"));
 import ErrorBoundary from "./components/ErrorBoundary";
 import LandingPage from "./features/landing/LandingPage";
+// NEW CODE - Dedicated Personal Training Page
+import PersonalTrainingPage from "./features/landing/pages/PersonalTrainingPage";
+// NEW CODE - Dedicated Group Classes Page
+import GroupClassesPage from "./features/landing/pages/GroupClassesPage";
 import AnimatedBackground from "./components/common/AnimatedBackground";
 
 // OLD CODE (commented by AI)
@@ -111,6 +115,8 @@ const AdminVendors = React.lazy(() => import("./features/admin/pages/AdminVendor
 const ProviderVerification = React.lazy(() => import("./features/admin/pages/ProviderVerification"));
 */
 const AdminDashboard = React.lazy(() => import("./features/admin/pages/AdminDashboard"));
+const AdminLogin = React.lazy(() => import("./features/admin/pages/AdminLogin"));
+import AdminProtectedRoute from "./features/admin/components/AdminProtectedRoute";
 
 const Cart = React.lazy(() => import("./features/shop/pages/Cart"));
 const Pricing = React.lazy(() => import("./features/subscription/pages/PricingPage"));
@@ -138,6 +144,7 @@ const TrainerAvailability = React.lazy(() => import("./features/trainer/pages/Tr
 const TrainerProfile = React.lazy(() => import("./features/trainer/pages/TrainerProfile"));
 const TrainerSettings = React.lazy(() => import("./features/trainer/pages/TrainerSettings"));
 const TrainerNotFound = React.lazy(() => import("./features/trainer/pages/TrainerNotFound"));
+const TrainerSafetyGuidelines = React.lazy(() => import("./features/trainer/pages/TrainerSafetyGuidelines"));
 
 // Route guard to prevent wrong dashboard access and enforce approved status
 function ProviderProtectedRoute({ children, allowedRole }) {
@@ -216,6 +223,11 @@ function App() {
   const location = useLocation();
   const BASE_URL = import.meta.env.VITE_API_URL;
 
+  // Seamless scroll restoration on route changes (prevents jumpy transitions and visual leaks)
+  React.useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [location.pathname]);
+
   React.useEffect(() => {
     // OLD CODE (commented by AI)
     /*
@@ -272,8 +284,12 @@ function App() {
 
       <Toaster position="top-right" reverseOrder={false} />
 
-      {/* ✅ Hide Navbar for Landing Page, Admin, Vendor, and Provider Pages */}
+      {/* ✅ Hide Navbar for Landing Pages (Home, Personal Training, Group Classes), Admin, Vendor, and Provider Pages */}
       {location.pathname !== "/" &&
+        location.pathname !== "/personal-training" &&
+        location.pathname !== "/pricing" &&
+        location.pathname !== "/group-classes" &&
+        location.pathname !== "/schedule" &&
         !location.pathname.startsWith("/admin") &&
         !location.pathname.startsWith("/vendor") &&
         !location.pathname.startsWith("/provider") &&
@@ -288,26 +304,26 @@ function App() {
         )}
 
       <ErrorBoundary>
-        {/* OLD CODE (commented by AI)
-        <Routes location={location} key={location.pathname}>
-        */}
-        {/* NEW CODE - performance optimization: React.Suspense boundary for code-split routes */}
-        <React.Suspense fallback={<div className="min-h-screen bg-[#0E1420]" />}>
-          <Routes location={location} key={location.pathname}>
+        {/* React.Suspense boundary for code-split routes */}
+        <React.Suspense fallback={<div className="min-h-screen bg-[#F2FAF8]" />}>
+          <Routes>
 
           {/* ================= ADMIN ROUTES ================= */}
           <Route path="/cart" element={<Cart />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          {/* OLD CODE (commented by AI) */}
-          {/* (no /admin/inquiries route previously) */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+          <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+          <Route path="/admin/panel" element={<Navigate to="/admin" replace />} />
           {/* NEW CODE - Wellwigen restyle / Inquiries feature */}
-          <Route path="/admin/inquiries" element={<AdminDashboard initialTab="Inquiries" />} />
-          <Route path="/admin/trainers" element={<AdminDashboard initialTab="Trainers" />} />
+          <Route path="/admin/inquiries" element={<AdminProtectedRoute><AdminDashboard initialTab="Inquiries" /></AdminProtectedRoute>} />
+          <Route path="/admin/trainers" element={<AdminProtectedRoute><AdminDashboard initialTab="Trainers" /></AdminProtectedRoute>} />
+          {/* [DISABLED FOR FUTURE USE] Admin Classes & Schedule Route
           <Route path="/admin/classes" element={<AdminDashboard initialTab="Classes" />} />
-          <Route path="/admin/clients" element={<AdminDashboard initialTab="Clients" />} />
-          <Route path="/admin/subscriptions" element={<AdminDashboard initialTab="Subscriptions" />} />
-          <Route path="/admin/settings" element={<AdminDashboard initialTab="Settings" />} />
+          */}
+          <Route path="/admin/clients" element={<AdminProtectedRoute><AdminDashboard initialTab="Clients" /></AdminProtectedRoute>} />
+          <Route path="/admin/subscriptions" element={<AdminProtectedRoute><AdminDashboard initialTab="Subscriptions" /></AdminProtectedRoute>} />
+          <Route path="/admin/settings" element={<AdminProtectedRoute><AdminDashboard initialTab="Settings" /></AdminProtectedRoute>} />
+          <Route path="/admin/*" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
 
           {/* [DISABLED FOR FUTURE USE] Admin Management Sub-Routes (Appointments, Medical Records, Vendors, Categories, Verification)
           <Route path="/admin/manage" element={<AdminLayout />}>
@@ -364,14 +380,34 @@ function App() {
           <Route path="/trainer/login" element={<TrainerLogin />} />
           <Route path="/trainer/register" element={<TrainerRegister />} />
           <Route path="/trainer/onboarding" element={<TrainerProtectedRoute><TrainerOnboarding /></TrainerProtectedRoute>} />
+          <Route path="/trainer/safety-guidelines" element={<TrainerSafetyGuidelines />} />
+          <Route path="/safety-guidelines" element={<TrainerSafetyGuidelines />} />
 
-          {/* Protected Trainer Portal with Light Theme Sidebar & Header Layout */}
+          {/* OLD CODE (commented by AI)
           <Route path="/trainer/dashboard" element={<TrainerProtectedRoute><TrainerLayout><TrainerPortalDashboard /></TrainerLayout></TrainerProtectedRoute>} />
           <Route path="/trainer/classes" element={<TrainerProtectedRoute><TrainerLayout><TrainerClasses /></TrainerLayout></TrainerProtectedRoute>} />
           <Route path="/trainer/clients" element={<TrainerProtectedRoute><TrainerLayout><TrainerClients /></TrainerLayout></TrainerProtectedRoute>} />
-          <Route path="/trainer/availability" element={<TrainerProtectedRoute><TrainerLayout><TrainerAvailability /></TrainerLayout></TrainerProtectedRoute>} />
           <Route path="/trainer/profile" element={<TrainerProtectedRoute><TrainerLayout><TrainerProfile /></TrainerLayout></TrainerProtectedRoute>} />
           <Route path="/trainer/settings" element={<TrainerProtectedRoute><TrainerLayout><TrainerSettings /></TrainerLayout></TrainerProtectedRoute>} />
+          */}
+
+          {/* NEW CODE - Protected Trainer Portal with Persistent Layout & Smooth Sliding Transitions */}
+          <Route
+            element={
+              <TrainerProtectedRoute>
+                <TrainerLayout />
+              </TrainerProtectedRoute>
+            }
+          >
+            <Route path="/trainer/dashboard" element={<TrainerPortalDashboard />} />
+            <Route path="/trainer/classes" element={<TrainerClasses />} />
+            <Route path="/trainer/clients" element={<TrainerClients />} />
+            {/* [DISABLED FOR FUTURE USE] Trainer Availability Route
+            <Route path="/trainer/availability" element={<TrainerAvailability />} />
+            */}
+            <Route path="/trainer/profile" element={<TrainerProfile />} />
+            <Route path="/trainer/settings" element={<TrainerSettings />} />
+          </Route>
           <Route path="/trainer/*" element={<TrainerNotFound />} />
           <Route path="/dashboard" element={<UserDashboard />} />
 
@@ -394,14 +430,18 @@ function App() {
           {/* ================= NEW SINGLE-PAGE LANDING ================= */}
           <Route path="/" element={<LandingPage />} />
 
+          {/* ================= DEDICATED PERSONAL TRAINING PAGE ================= */}
+          <Route path="/personal-training" element={<PersonalTrainingPage />} />
+          <Route path="/pricing" element={<PersonalTrainingPage />} />
+
+          {/* ================= DEDICATED GROUP CLASSES PAGE ================= */}
+          <Route path="/group-classes" element={<GroupClassesPage />} />
+          <Route path="/schedule" element={<GroupClassesPage />} />
+
           {/* ================= REDIRECTS FROM OLD MARKETING ROUTES TO ANCHORS ================= */}
-          <Route path="/personal-training" element={<Navigate to="/#personal-training" replace />} />
-          <Route path="/group-classes" element={<Navigate to="/#group-classes" replace />} />
-          <Route path="/schedule" element={<Navigate to="/#group-classes" replace />} />
           <Route path="/about" element={<Navigate to="/#home" replace />} />
           <Route path="/contact" element={<Navigate to="/#home" replace />} />
           <Route path="/services" element={<Navigate to="/#home" replace />} />
-          <Route path="/pricing" element={<Navigate to="/#personal-training" replace />} />
           <Route path="/testimonial" element={<Navigate to="/#home" replace />} />
           <Route path="/contactus" element={<Navigate to="/#home" replace />} />
 

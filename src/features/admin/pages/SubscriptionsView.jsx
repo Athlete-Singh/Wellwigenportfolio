@@ -17,11 +17,16 @@ import {
   ArrowRight,
   TrendingUp,
   ShieldCheck,
-  Check
+  Check,
+  UserX
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 import { subscriptionPlanService } from '../../subscription/services/subscriptionPlanService';
 import { trainerApi } from '../../../services/trainerApi';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
 
 // Default starter plans if API is loading or offline
 const INITIAL_DEFAULT_PLANS = [
@@ -57,68 +62,11 @@ const INITIAL_DEFAULT_PLANS = [
   },
 ];
 
-// Initial mock subscription records mapping clients to plans
-const INITIAL_MOCK_SUBSCRIPTIONS = [
-  {
-    id: 'sub_101',
-    clientId: 'cli_1',
-    clientName: 'Arjun Mehra',
-    clientEmail: 'arjun.m@example.com',
-    planName: 'Elite Transformation 1-on-1',
-    planTier: 'VIP Elite',
-    billingCycle: 'Monthly',
-    price: '₹5,999',
-    startDate: '2026-03-01',
-    expiryDate: '2026-04-01',
-    status: 'Active',
-    assignedCoach: 'Vikram Rajput',
-  },
-  {
-    id: 'sub_102',
-    clientId: 'cli_2',
-    clientName: 'Simran Kaur',
-    clientEmail: 'simran.k@example.com',
-    planName: 'Strength & Conditioning Tier',
-    planTier: 'Popular',
-    billingCycle: 'Annual',
-    price: '₹29,990',
-    startDate: '2026-01-15',
-    expiryDate: '2027-01-15',
-    status: 'Active',
-    assignedCoach: 'Vikram Rajput',
-  },
-  {
-    id: 'sub_103',
-    clientId: 'cli_3',
-    clientName: 'Rohan Sharma',
-    clientEmail: 'rohan.s@example.com',
-    planName: 'Flex Mobility & Rehab Pass',
-    planTier: 'Starter',
-    billingCycle: 'Monthly',
-    price: '₹1,499',
-    startDate: '2026-02-10',
-    expiryDate: '2026-03-10',
-    status: 'Expired',
-    assignedCoach: 'Vikram Rajput',
-  },
-  {
-    id: 'sub_104',
-    clientId: 'cli_4',
-    clientName: 'Pooja Hegde',
-    clientEmail: 'pooja.h@example.com',
-    planName: 'Strength & Conditioning Tier',
-    planTier: 'Popular',
-    billingCycle: 'Trial',
-    price: '₹0 (Free Trial)',
-    startDate: '2026-03-25',
-    expiryDate: '2026-04-01',
-    status: 'Trial',
-    assignedCoach: 'Unassigned',
-  },
-];
+// Production subscription records mapping clients to plans
+const INITIAL_MOCK_SUBSCRIPTIONS = [];
 
 export default function SubscriptionsView() {
-  const [activeSubTab, setActiveSubTab] = useState('plans'); // 'plans' | 'memberships' | 'mapping'
+  const [activeSubTab, setActiveSubTab] = useState('memberships'); // 'memberships' | 'mapping' | 'plans'
   const [plans, setPlans] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -158,17 +106,21 @@ export default function SubscriptionsView() {
 
   useEffect(() => {
     fetchPlans();
-    // Load subscriptions from local state/storage
-    const savedSubs = localStorage.getItem('wellwigen_admin_subscriptions');
-    if (savedSubs) {
-      try {
-        setSubscriptions(JSON.parse(savedSubs));
-      } catch {
-        setSubscriptions(INITIAL_MOCK_SUBSCRIPTIONS);
+    // Load subscriptions from local state/storage (purge legacy mock subscriptions)
+    try {
+      const savedSubs = localStorage.getItem('wellwigen_admin_subscriptions');
+      if (savedSubs) {
+        if (savedSubs.includes('sub_101') || savedSubs.includes('Arjun Mehra')) {
+          localStorage.setItem('wellwigen_admin_subscriptions', JSON.stringify([]));
+          setSubscriptions([]);
+        } else {
+          setSubscriptions(JSON.parse(savedSubs));
+        }
+      } else {
+        setSubscriptions([]);
       }
-    } else {
-      setSubscriptions(INITIAL_MOCK_SUBSCRIPTIONS);
-      localStorage.setItem('wellwigen_admin_subscriptions', JSON.stringify(INITIAL_MOCK_SUBSCRIPTIONS));
+    } catch {
+      setSubscriptions([]);
     }
   }, []);
 
@@ -322,6 +274,54 @@ export default function SubscriptionsView() {
     toast.success('Membership extended by 30 days!');
   };
 
+  // Cancel / Remove Subscription
+  const handleRemoveSubscription = async (sub) => {
+    const updated = subscriptions.map((s) => {
+      if (s.id === sub.id) {
+        return { ...s, status: 'Cancelled' };
+      }
+      return s;
+    });
+    updateSubscriptions(updated);
+    if (sub.clientId || sub.clientEmail) {
+      trainerApi.removeClientSubscription(sub.clientId || sub.clientEmail);
+    }
+    try {
+      await axios.delete(`${API_BASE}/admin/subscriptions/${sub.id || sub.clientEmail}`);
+    } catch {
+      // local fallback
+    }
+    toast.success(`Subscription cancelled for "${sub.clientName}".`);
+  };
+
+  // Delete Subscriber completely
+  const handleDeleteSubscriber = async (sub) => {
+    const updated = subscriptions.filter((s) => s.id !== sub.id);
+    updateSubscriptions(updated);
+    if (sub.clientId || sub.clientEmail) {
+      trainerApi.removeClient(sub.clientId || sub.clientEmail);
+    }
+    try {
+      await axios.delete(`${API_BASE}/admin/subscribers/${sub.clientId || sub.clientEmail}`);
+    } catch {
+      // local fallback
+    }
+    toast.success(`Subscriber "${sub.clientName}" removed from platform.`);
+  };
+
+  // Change Subscription Status
+  const handleChangeSubStatus = (subId, newStatus) => {
+    const updated = subscriptions.map((s) => {
+      if (s.id === subId) {
+        return { ...s, status: newStatus };
+      }
+      return s;
+    });
+    updateSubscriptions(updated);
+    toast.success(`Membership status updated to ${newStatus}.`);
+  };
+
+
   // Filtered Plans
   const filteredPlans = useMemo(() => {
     return plans.filter((p) => {
@@ -368,20 +368,22 @@ export default function SubscriptionsView() {
             <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded uppercase tracking-wider">
               Membership Engine
             </span>
+            {/* [DISABLED FOR FUTURE USE] Subscriptions breadcrumb
             <span className="text-slate-300">/</span>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               Subscriptions
             </span>
+            */}
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight">
-            Subscriptions & Memberships
+            Memberships
           </h1>
           <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">
-            Configure coaching tiers, monitor active and expired trainee subscriptions, and manage client-to-plan mapping.
+            Monitor active and expired client memberships, renewal dates, and coach assignments.
           </p>
         </div>
 
-        {/* Create Plan Button */}
+        {/* [COMMENTED OUT PER REQUEST] Create Plan Button
         <div className="flex items-center gap-3">
           <button
             onClick={() => handleOpenPlanModal()}
@@ -391,6 +393,7 @@ export default function SubscriptionsView() {
             <span>Create New Plan</span>
           </button>
         </div>
+        */}
       </div>
 
       {/* ================= KPI TELEMETRY ================= */}
@@ -413,7 +416,7 @@ export default function SubscriptionsView() {
         <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-xs">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
-              Active Subscriptions
+              Active Memberships
             </span>
             <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <CheckCircle2 size={16} />
@@ -459,6 +462,7 @@ export default function SubscriptionsView() {
       {/* ================= SUB-TABS NAVIGATION ================= */}
       <div className="border-b border-slate-200">
         <div className="flex gap-8">
+          {/* [DISABLED FOR FUTURE USE] Plans & Tiers Sub-tab Option
           <button
             onClick={() => {
               setActiveSubTab('plans');
@@ -470,8 +474,9 @@ export default function SubscriptionsView() {
                 : 'text-slate-400 hover:text-slate-700'
             }`}
           >
-            1. Plans & Tiers ({plans.length})
+            Plans & Tiers ({plans.length})
           </button>
+          */}
           <button
             onClick={() => {
               setActiveSubTab('memberships');
@@ -483,7 +488,7 @@ export default function SubscriptionsView() {
                 : 'text-slate-400 hover:text-slate-700'
             }`}
           >
-            2. Active & Expired Subscriptions ({subscriptions.length})
+            1. Active &amp; Expired Memberships ({subscriptions.length})
           </button>
           <button
             onClick={() => {
@@ -496,7 +501,7 @@ export default function SubscriptionsView() {
                 : 'text-slate-400 hover:text-slate-700'
             }`}
           >
-            3. Client-to-Plan Mapping
+            2. Client-to-Plan Mapping
           </button>
         </div>
       </div>
@@ -510,11 +515,7 @@ export default function SubscriptionsView() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={
-              activeSubTab === 'plans'
-                ? 'Search plans or tiers...'
-                : 'Search client or subscription...'
-            }
+            placeholder="Search client or membership..."
             className="w-full pl-9 pr-3.5 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:bg-white transition-all"
           />
         </div>
@@ -546,7 +547,7 @@ export default function SubscriptionsView() {
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                {st === 'all' ? 'All Subscriptions' : st}
+                {st === 'all' ? 'All Memberships' : st}
               </button>
             ))
           )}
@@ -664,17 +665,17 @@ export default function SubscriptionsView() {
         <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
-              Trainee Subscription Roster
+              Trainee Membership Roster
             </h3>
             <span className="text-xs font-bold text-slate-400">
-              Showing {filteredSubscriptions.length} subscriptions
+              Showing {filteredSubscriptions.length} memberships
             </span>
           </div>
 
           {filteredSubscriptions.length === 0 ? (
             <div className="p-16 text-center space-y-3">
               <Users size={36} className="mx-auto text-slate-300" />
-              <h4 className="text-sm font-bold text-slate-800">No subscriptions match filters</h4>
+              <h4 className="text-sm font-bold text-slate-800">No memberships match filters</h4>
               <p className="text-xs text-slate-400">Try searching a different client name or resetting status filters.</p>
             </div>
           ) : (
@@ -727,36 +728,55 @@ export default function SubscriptionsView() {
 
                       {/* Status */}
                       <td className="px-5 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                        <select
+                          value={sub.status}
+                          onChange={(e) => handleChangeSubStatus(sub.id, e.target.value)}
+                          className={`px-2.5 py-1 rounded-full text-[11px] font-bold border cursor-pointer focus:outline-none transition-all ${
                             sub.status === 'Active'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                               : sub.status === 'Trial'
-                              ? 'bg-sky-50 text-sky-700 border border-sky-200'
-                              : 'bg-rose-50 text-rose-700 border border-rose-200'
+                              ? 'bg-sky-50 text-sky-700 border-sky-200'
+                              : sub.status === 'Cancelled'
+                              ? 'bg-slate-100 text-slate-700 border-slate-300'
+                              : 'bg-rose-50 text-rose-700 border-rose-200'
                           }`}
                         >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              sub.status === 'Active'
-                                ? 'bg-emerald-500'
-                                : sub.status === 'Trial'
-                                ? 'bg-sky-500'
-                                : 'bg-rose-500'
-                            }`}
-                          />
-                          {sub.status}
-                        </span>
+                          <option value="Active">Active</option>
+                          <option value="Trial">Trial</option>
+                          <option value="Expired">Expired</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
                       </td>
 
                       {/* Action */}
                       <td className="px-5 py-4 text-right whitespace-nowrap">
-                        <button
-                          onClick={() => handleExtendSubscription(sub.id)}
-                          className="px-3 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
-                        >
-                          Extend (+30d)
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleExtendSubscription(sub.id)}
+                            className="px-2.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+                          >
+                            Extend (+30d)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSubscription(sub)}
+                            disabled={sub.status === 'Cancelled'}
+                            title="Cancel / Remove Subscription"
+                            className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 disabled:opacity-40 font-bold text-xs transition-all cursor-pointer flex items-center gap-1"
+                          >
+                            <UserX size={14} />
+                            <span className="hidden xl:inline text-[11px]">Remove Sub</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteSubscriber(sub)}
+                            title="Delete Subscriber Completely"
+                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition-all cursor-pointer"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

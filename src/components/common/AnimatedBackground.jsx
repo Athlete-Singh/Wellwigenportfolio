@@ -11,7 +11,7 @@ import './AnimatedBackground.css';
  */
 export const BACKGROUND_CONFIG = {
   particleCount: 50,             // 40-60 on desktop
-  particleCountMobile: 18,       // 15-20 on mobile
+  particleCountMobile: 28,       // Floating bubbles on mobile
   iconCount: 12,                 // Max 10-14 elements on desktop
   iconCountMobile: 6,            // Scaled down on mobile
   blobOpacityDark: 0.22,         // 15-25% opacity on dark sections
@@ -330,8 +330,8 @@ export default function AnimatedBackground() {
   useEffect(() => {
     // OLD CODE (commented by AI)
     // if (reducedMotion) return;
-    // NEW CODE - performance optimization: disable canvas particle loop on mobile devices
-    if (isMobile || reducedMotion) return;
+    // Active on both mobile and desktop (only disabled if system reduced-motion is active)
+    if (reducedMotion) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -364,14 +364,14 @@ export default function AnimatedBackground() {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 1.6 + 1.1,
+        radius: isMobile ? Math.random() * 2.2 + 1.5 : Math.random() * 1.8 + 1.2,
         // ~65% Teal shades, ~35% Orange embers
         isOrange: Math.random() > 0.65,
         speedY: -(Math.random() * 0.5 + 0.35),
         wobbleSpeed: Math.random() * 0.03 + 0.015,
         wobbleOffset: Math.random() * Math.PI * 2,
-        wobbleAmp: Math.random() * 0.5 + 0.2,
-        alpha: Math.random() * 0.5 + 0.3,
+        wobbleAmp: Math.random() * 0.6 + 0.3,
+        alpha: isMobile ? Math.random() * 0.5 + 0.4 : Math.random() * 0.5 + 0.3,
         pulseSpeed: Math.random() * 0.03 + 0.01,
       });
     }
@@ -507,8 +507,8 @@ export default function AnimatedBackground() {
         </div>
       )}
 
-      {/* 4. Canvas Particles (Rising Embers / Sparks) - desktop only */}
-      {!isMobile && !reducedMotion && <canvas ref={canvasRef} className="ab-canvas-particles" />}
+      {/* 4. Canvas Particles (Rising Ambient Bubbles / Embers) - Active on both Mobile and Desktop */}
+      {!reducedMotion && <canvas ref={canvasRef} className="ab-canvas-particles" />}
 
       {/* 5. Special Effects */}
 

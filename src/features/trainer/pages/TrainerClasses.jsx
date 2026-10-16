@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import {
   Dumbbell,
   Plus,
@@ -41,6 +43,35 @@ export const cleanClassTitle = (rawTitle) => {
   if (!rawTitle) return '';
   // Removes repeated '(Copy)', '(copy)', '(Copy 2)', etc.
   return rawTitle.replace(/\s*(\(\s*copy(\s*\d+)?\s*\))+/gi, '').trim();
+};
+
+// Helpers to convert between 12-hour (e.g. '09:00 AM') and 24-hour (e.g. '09:00') for the clock picker
+export const get24HourTime = (timeStr) => {
+  if (!timeStr) return '09:00';
+  const trimmed = timeStr.trim();
+  if (/^\d{1,2}:\d{2}$/.test(trimmed)) {
+    const [h, m] = trimmed.split(':');
+    return `${h.padStart(2, '0')}:${m}`;
+  }
+  const match = trimmed.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+  if (!match) return '09:00';
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2];
+  const modifier = (match[3] || '').toUpperCase();
+  if (modifier === 'PM' && hours < 12) hours += 12;
+  if (modifier === 'AM' && hours === 12) hours = 0;
+  return `${String(hours).padStart(2, '0')}:${minutes}`;
+};
+
+export const format12Hour = (time24) => {
+  if (!time24) return '';
+  const [hStr, mStr] = time24.split(':');
+  let h = parseInt(hStr, 10);
+  const m = mStr || '00';
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  h = h ? h : 12;
+  return `${String(h).padStart(2, '0')}:${m} ${ampm}`;
 };
 
 /* [DISABLED FOR FUTURE USE] Old generateWhatsAppMessage without title sanitization
@@ -95,12 +126,38 @@ Let's show up and crush this workout together! 💪✨
 *Wellwigen Fitness — Stronger Body. Better You.*`;
 };
 
+// Ultra-sleek validation speech-bubble tooltip with upward arrow
+function ValidationTooltip({ message, align = 'left' }) {
+  if (!message) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.94 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 4, scale: 0.94 }}
+      transition={{ type: 'spring', damping: 20, stiffness: 360 }}
+      className={`absolute ${align === 'left' ? 'left-3' : 'right-3'} top-full mt-2 z-40 flex items-center gap-2 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-900 text-white px-3.5 py-2 rounded-xl shadow-2xl shadow-slate-950/60 border border-slate-700/80 text-xs font-medium tracking-tight pointer-events-none select-none`}
+    >
+      {/* Speech bubble notch pointing UP to the input field */}
+      <div
+        className={`absolute -top-1.5 ${
+          align === 'left' ? 'left-4' : 'right-4'
+        } w-3 h-3 bg-slate-950 rotate-45 border-t border-l border-slate-700/80`}
+      />
+      <span className="w-4 h-4 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-red-500 text-white flex items-center justify-center text-[10px] font-black shrink-0 shadow-md shadow-rose-500/40 animate-pulse">
+        !
+      </span>
+      <span className="font-semibold text-slate-100 tracking-tight whitespace-nowrap">{message}</span>
+    </motion.div>
+  );
+}
+
 export default function TrainerClasses() {
   const [classes, setClasses] = useState([]);
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
 
   // WhatsApp Share Modal states
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
@@ -111,24 +168,24 @@ export default function TrainerClasses() {
   const [actionNotice, setActionNotice] = useState('');
 
   const trainer = trainerApi.getCurrentTrainer() || {};
-  const trainerName = trainer.name || 'Coach Aditya';
+  const trainerName = trainer.name || 'Coach';
 
-  // Modal Form State matching Image 1
+  // Modal Form State (Starts blank with recommendation placeholders)
   const [classForm, setClassForm] = useState({
-    title: 'Morning Mobility & Core Ignition',
+    title: '',
     category: 'Strength & Conditioning',
     fitnessLevel: 'All Levels',
-    date: '2026-10-14',
-    time: '09:00 AM',
+    date: '',
+    time: '',
     duration: 45,
     recurring: 'One-time Session',
     capacity: 20,
-    isFreeDemo: true,
+    isFreeDemo: false,
     allowedTiers: ['STARTER', 'GOLD', 'PLATINUM'],
-    zoomUrl: 'https://us02web.zoom.us/j/8492019284?pwd=WLLWGN26',
-    meetingId: '849 201 9284',
-    passcode: 'WLLWGN26',
-    coverImage: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+    zoomUrl: '',
+    meetingId: '',
+    passcode: '',
+    coverImage: '',
   });
 
   useEffect(() => {
@@ -143,21 +200,22 @@ export default function TrainerClasses() {
   // Open Create Modal with clean defaults
   const handleOpenCreate = () => {
     setEditingId(null);
+    setFormErrors({});
     setClassForm({
-      title: 'Morning Mobility & Core Ignition',
+      title: '',
       category: 'Strength & Conditioning',
       fitnessLevel: 'All Levels',
-      date: '2026-10-14',
-      time: '09:00 AM',
+      date: '',
+      time: '',
       duration: 45,
       recurring: 'One-time Session',
       capacity: 20,
-      isFreeDemo: true,
+      isFreeDemo: false,
       allowedTiers: ['STARTER', 'GOLD', 'PLATINUM'],
-      zoomUrl: 'https://us02web.zoom.us/j/8492019284?pwd=WLLWGN26',
-      meetingId: '849 201 9284',
-      passcode: 'WLLWGN26',
-      coverImage: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      zoomUrl: '',
+      meetingId: '',
+      passcode: '',
+      coverImage: '',
     });
     setShowModal(true);
   };
@@ -165,6 +223,7 @@ export default function TrainerClasses() {
   // Open Edit Modal with existing class data
   const handleOpenEdit = (cls) => {
     setEditingId(cls.id);
+    setFormErrors({});
     setClassForm({
       title: cls.title || '',
       category: cls.category || 'Strength & Conditioning',
@@ -196,10 +255,37 @@ export default function TrainerClasses() {
   // Save (Create or Update) class
   const handleSaveClass = async (e) => {
     e.preventDefault();
-    if (!classForm.title.trim()) {
-      alert('Please enter a class title.');
+    const errors = {};
+    if (!classForm.title?.trim()) {
+      errors.title = 'Please enter a class title.';
+    }
+    if (!classForm.date?.trim()) {
+      errors.date = 'Please select a session date.';
+    }
+    if (!classForm.time?.trim()) {
+      errors.time = 'Please specify the start time.';
+    }
+    if (!classForm.zoomUrl?.trim()) {
+      errors.zoomUrl = 'Please provide the Zoom meeting URL.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast.error('Please complete the highlighted required fields.', {
+        position: 'top-center',
+        style: {
+          borderRadius: '16px',
+          background: '#0f172a',
+          color: '#fff',
+          fontSize: '13px',
+          fontWeight: '600',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
+          border: '1px solid #334155',
+        },
+      });
       return;
     }
+    setFormErrors({});
 
     const payload = {
       ...classForm,
@@ -408,39 +494,24 @@ export default function TrainerClasses() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((cls) => {
-            const coverImg =
-              cls.coverImage ||
-              CATEGORY_COVERS[cls.category] ||
-              'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop';
-
             return (
               <div
                 key={cls.id}
                 className="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group"
               >
                 <div>
-                  {/* Class Cover Image with Category & Status Badges */}
-                  <div className="h-52 w-full relative overflow-hidden bg-slate-900">
-                    <img
-                      src={coverImg}
-                      alt={cls.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-
-                    {/* Top-Left Category Badge */}
-                    <span className="absolute top-3.5 left-3.5 bg-white/95 backdrop-blur-xs text-slate-900 font-extrabold text-[10px] tracking-wider px-3.5 py-1.5 rounded-full uppercase shadow-xs border border-white/60">
-                      {cls.category || 'STRENGTH & CONDITIONING'}
-                    </span>
-
-                    {/* Top-Right Status Badge */}
-                    <span className="absolute top-3.5 right-3.5 bg-emerald-50/95 backdrop-blur-xs text-emerald-800 border border-emerald-200 font-extrabold text-[10px] tracking-wider px-3 py-1.5 rounded-full uppercase shadow-xs flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      {cls.status || 'APPROVED & LIVE'}
-                    </span>
-                  </div>
-
-                  {/* Card Content */}
+                  {/* Card Content - Clean Information Only (Image and overlay texts removed) */}
                   <div className="p-6 space-y-4">
+                    {/* Category & Status Information Row */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-extrabold tracking-wider px-2.5 py-1 rounded-lg uppercase bg-teal-50 text-teal-800 border border-teal-100">
+                        {cls.category || 'Strength & Conditioning'}
+                      </span>
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        {cls.status || 'Approved & Live'}
+                      </span>
+                    </div>
                     <div>
                       <h3 className="text-xl font-black text-slate-900 leading-snug tracking-tight">
                         {cls.title}
@@ -565,17 +636,26 @@ export default function TrainerClasses() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveClass} className="space-y-4">
+            <form noValidate onSubmit={handleSaveClass} className="space-y-4">
               {/* Title input */}
-              <div>
+              <div className="relative">
                 <input
                   type="text"
-                  required
                   placeholder="Morning Mobility & Core Ignition"
                   value={classForm.title}
-                  onChange={(e) => setClassForm({ ...classForm, title: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  onChange={(e) => {
+                    setClassForm({ ...classForm, title: e.target.value });
+                    if (formErrors.title) setFormErrors((prev) => ({ ...prev, title: null }));
+                  }}
+                  className={`w-full px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 ${
+                    formErrors.title
+                      ? 'border-rose-400 bg-rose-50/20 ring-4 ring-rose-500/15 shadow-xs focus:ring-rose-500/20 focus:border-rose-500'
+                      : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500'
+                  }`}
                 />
+                <AnimatePresence>
+                  {formErrors.title && <ValidationTooltip message={formErrors.title} />}
+                </AnimatePresence>
               </div>
 
               {/* Row 1: CATEGORY & FITNESS LEVEL */}
@@ -630,11 +710,20 @@ export default function TrainerClasses() {
                   <div className="relative">
                     <input
                       type="date"
-                      required
                       value={classForm.date}
-                      onChange={(e) => setClassForm({ ...classForm, date: e.target.value })}
-                      className="w-full pl-3 pr-2 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                      onChange={(e) => {
+                        setClassForm({ ...classForm, date: e.target.value });
+                        if (formErrors.date) setFormErrors((prev) => ({ ...prev, date: null }));
+                      }}
+                      className={`w-full pl-3 pr-2 py-2.5 rounded-xl border text-xs font-medium transition-all duration-200 ${
+                        formErrors.date
+                          ? 'border-rose-400 bg-rose-50/20 ring-4 ring-rose-500/15 shadow-xs focus:ring-rose-500/20 focus:border-rose-500'
+                          : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20'
+                      }`}
                     />
+                    <AnimatePresence>
+                      {formErrors.date && <ValidationTooltip message={formErrors.date} />}
+                    </AnimatePresence>
                   </div>
                 </div>
 
@@ -642,15 +731,43 @@ export default function TrainerClasses() {
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                     START TIME (IST) *
                   </label>
-                  <div className="relative">
+                  <div className="relative flex items-center">
                     <input
                       type="text"
-                      required
                       placeholder="09:00 AM"
                       value={classForm.time}
-                      onChange={(e) => setClassForm({ ...classForm, time: e.target.value })}
-                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                      onChange={(e) => {
+                        setClassForm({ ...classForm, time: e.target.value });
+                        if (formErrors.time) setFormErrors((prev) => ({ ...prev, time: null }));
+                      }}
+                      className={`w-full pl-3 pr-10 py-2.5 rounded-xl border text-xs font-medium transition-all duration-200 ${
+                        formErrors.time
+                          ? 'border-rose-400 bg-rose-50/20 ring-4 ring-rose-500/15 shadow-xs focus:ring-rose-500/20 focus:border-rose-500'
+                          : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20'
+                      }`}
                     />
+                    <AnimatePresence>
+                      {formErrors.time && <ValidationTooltip message={formErrors.time} />}
+                    </AnimatePresence>
+                    {/* Clock Option: Trainer can set time with clock */}
+                    <div className="absolute right-2.5 flex items-center justify-center w-6 h-6">
+                      <Clock
+                        size={16}
+                        className="text-slate-500 hover:text-teal-600 transition-colors pointer-events-none"
+                      />
+                      <input
+                        type="time"
+                        aria-label="Set time with clock"
+                        title="Set time with clock"
+                        value={get24HourTime(classForm.time)}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            setClassForm({ ...classForm, time: format12Hour(e.target.value) });
+                          }
+                        }}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -761,18 +878,24 @@ export default function TrainerClasses() {
                   </span>
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                    ZOOM MEETING URL * (MUST BE ZOOM.US / ZOOM.COM)
-                  </label>
+                <div className="relative">
                   <input
                     type="url"
-                    required
                     placeholder="https://us02web.zoom.us/j/8492019284?pwd=..."
                     value={classForm.zoomUrl}
-                    onChange={(e) => setClassForm({ ...classForm, zoomUrl: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    onChange={(e) => {
+                      setClassForm({ ...classForm, zoomUrl: e.target.value });
+                      if (formErrors.zoomUrl) setFormErrors((prev) => ({ ...prev, zoomUrl: null }));
+                    }}
+                    className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-mono bg-white transition-all duration-200 ${
+                      formErrors.zoomUrl
+                        ? 'border-rose-400 bg-rose-50/20 ring-4 ring-rose-500/15 shadow-xs focus:ring-rose-500/20 focus:border-rose-500'
+                        : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500'
+                    }`}
                   />
+                  <AnimatePresence>
+                    {formErrors.zoomUrl && <ValidationTooltip message={formErrors.zoomUrl} />}
+                  </AnimatePresence>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">

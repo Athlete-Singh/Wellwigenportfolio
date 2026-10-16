@@ -35,11 +35,21 @@ import {
 import personalTrainingManImg from '../../../assets/personal-training-man.webp';
 // NEW CODE - Trainer API for fetching verified approved coaches
 import { trainerApi } from '../../../services/trainerApi';
+// NEW CODE - 3D Live Personal Trainer Hero with architectural studio wall formation & moving depth
+import LivePersonalTrainerHero from './LivePersonalTrainerHero';
+// NEW CODE - Distinct, impressive section dividers for Personal Training page
+import {
+  PTSlantHorizonDivider,
+  PTHexPulseDivider,
+  PTSpeedTimelineDivider,
+  PTDarkArenaInclineDivider,
+  PTLightAmphitheaterDivider,
+} from './SectionDividers';
 
 export default function PersonalTrainingSection({ onOpenLeadModal }) {
   // NEW CODE - Approved coaches state (TASK 2: sirf approved trainers dikhao)
   const [approvedCoaches, setApprovedCoaches] = useState([]);
-  const [loadingCoaches, setLoadingCoaches] = useState(true);
+  const [_loadingCoaches, setLoadingCoaches] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -88,117 +98,132 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
         <div className="w-px h-16 bg-teal-500/50" />
       </div>
 
-      {/* ================= LIGHT HEADER / HERO ================= */}
-      <div data-nav-theme="light" className="relative pt-24 pb-16 bg-white hero-white-screen">
-        <div className="absolute top-8 left-10 text-[18vw] watermark-text-light opacity-30 z-0">
+      {/* ================= LIGHT HEADER / HERO (VIBRANT CALM BASE LIKE HOME) ================= */}
+      <div data-nav-theme="light" data-home-bg="mint" className="relative pt-8 sm:pt-10 lg:pt-14 pb-12 sm:pb-16 bg-[#F2FAF8] overflow-hidden">
+        {/* Colorful background ambient glow orbs */}
+        <div className="absolute top-1/4 -right-12 w-96 h-96 bg-teal-200/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-12 left-1/3 w-80 h-80 bg-emerald-100/50 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-orange-200/25 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Floating playful colorful particles across section */}
+        <div className="hidden lg:block absolute inset-0 pointer-events-none select-none z-0" aria-hidden="true">
+          <div className="bg-drift-1 absolute w-2.5 h-2.5 rounded-full bg-[#FF6B35]/60 top-24 left-12 shadow-sm" />
+          <div className="bg-drift-2 absolute w-3 h-3 rounded-full bg-teal-400/60 top-56 left-1/4 shadow-sm" />
+          <div className="bg-drift-1 absolute w-2 h-2 rounded-full bg-[#FF6B35]/70 top-36 right-1/3 shadow-sm" />
+          <div className="bg-drift-2 absolute w-2.5 h-2.5 rounded-full bg-cyan-400/60 bottom-20 left-1/3 shadow-sm" />
+        </div>
+
+        <div className="absolute top-4 left-8 text-[18vw] watermark-text-light opacity-25 z-0 select-none pointer-events-none">
           COACH
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-12 gap-12 items-center mb-16">
+          <div className="grid lg:grid-cols-12 gap-2 sm:gap-4 lg:gap-10 items-center mb-10 sm:mb-14">
             
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="lg:col-span-6 space-y-6"
+              className="order-2 lg:order-1 lg:col-span-6 space-y-4 lg:space-y-5 relative z-20 -mt-16 xs:-mt-20 sm:-mt-24 lg:mt-0"
             >
-              {/* OLD CODE (commented by AI) - Awkward pill badge removed per user request */}
-              {/*
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-display font-extrabold uppercase tracking-wider shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
-                <span>PERSONAL TRAINING</span>
-              </div>
-              */}
-              {/* NEW CODE - Removed awkward pill badge */}
-
-              <h2 className="font-heading text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+              {/* High-Impact Headline */}
+              <h1 className="font-heading text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-black text-slate-900 tracking-tight leading-[1.06]">
                 Personal Training{' '}
-                <span className="gradient-teal-sky-text block sm:inline">
+                <span className="gradient-teal-sky-text block">
                   Built Around You.
                 </span>
-              </h2>
+              </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
-                One-on-one online coaching designed around your goals, fitness level and lifestyle.
+              {/* Concise Subtitle */}
+              <p className="text-base sm:text-lg lg:text-xl text-slate-600 font-medium leading-relaxed max-w-xl">
+                One-on-one online coaching designed around your goals, fitness level, and lifestyle.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3.5 pt-2">
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-0.5">
                 <button
                   onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: 'Transformation' })}
-                  className="btn-power-coral btn-shine px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow group"
+                  className="btn-power-coral btn-shine px-8 py-3.5 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-coral-glow group rounded-2xl hover:scale-105 transition-transform"
                 >
                   <span>Start Personal Training</span>
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={() => onOpenLeadModal({ program: 'Personal Training', plan: 'Consultation' })}
-                  className="btn-outline-brand px-7 py-2.5 sm:py-3 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow"
+                  className="btn-outline-brand px-7 py-3.5 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer shadow-xs hover:shadow rounded-2xl hover:bg-teal-50/50 transition-colors"
                 >
                   <Calendar size={18} />
                   <span>Book a Consultation</span>
                 </button>
               </div>
+
+              {/* 3 Feature Highlights (Under Start Personal Training & Book Consultation) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                <div className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-white/95 border border-teal-500/25 shadow-xs hover:border-teal-500 hover:shadow-md hover:-translate-y-0.5 transition-all group/item">
+                  <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover/item:bg-teal-500 group-hover/item:text-white transition-all shadow-xs">
+                    <Target size={18} className="stroke-[2.5]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-black text-slate-900 leading-tight">100% Custom</p>
+                    <p className="text-[11px] text-slate-500 font-medium truncate">Tailored workouts</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-white/95 border border-teal-500/25 shadow-xs hover:border-teal-500 hover:shadow-md hover:-translate-y-0.5 transition-all group/item">
+                  <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover/item:bg-teal-500 group-hover/item:text-white transition-all shadow-xs">
+                    <Zap size={18} className="stroke-[2.5]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-black text-slate-900 leading-tight">Live Feedback</p>
+                    <p className="text-[11px] text-slate-500 font-medium truncate">Real-time posture</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-white/95 border border-teal-500/25 shadow-xs hover:border-teal-500 hover:shadow-md hover:-translate-y-0.5 transition-all group/item">
+                  <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover/item:bg-teal-500 group-hover/item:text-white transition-all shadow-xs">
+                    <TrendingUp size={18} className="stroke-[2.5]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-black text-slate-900 leading-tight">Fast Results</p>
+                    <p className="text-[11px] text-slate-500 font-medium truncate">Weekly tracking</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Trust Guarantee Highlights */}
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-0.5 text-xs text-slate-600 font-semibold">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 size={15} className="text-teal-600 shrink-0" />
+                  <span>Free 15-Min Discovery Call</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 size={15} className="text-teal-600 shrink-0" />
+                  <span>No Long-Term Lock-In</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 size={15} className="text-teal-600 shrink-0" />
+                  <span>100% Online Flexibility</span>
+                </div>
+              </div>
             </motion.div>
 
+            {/* 3D Live Personal Trainer Hero: FIRST ON MOBILE (< lg) */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-6 relative"
+              className="order-1 lg:order-2 lg:col-span-6 relative flex items-center justify-center mt-0 lg:-mt-2 z-10 w-full lg:-mr-4 xl:-mr-8 overflow-visible"
             >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-900 aspect-[4/3] bg-slate-900 group">
-                {/* Athletic Corner Brackets */}
-                <div className="corner-bracket-tl z-20" />
-                <div className="corner-bracket-br z-20" />
-
-                {/* OLD CODE (commented by AI)
-                <img
-                  src="/images/pt_coaching.jpg"
-                  alt="Woman doing squats during live online 1-on-1 personal training with laptop coach"
-                  className="w-full h-full object-cover object-[55%_35%] sm:object-center group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
-                */}
-                {/* OLD CODE (commented by AI)
-                <img
-                  src="/images/pt_personal_trainer_coaching.jpg"
-                  alt="Personal trainer coaching athlete during dumbbell shoulder press workout"
-                  className="w-full h-full object-cover object-[50%_25%] sm:object-center group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
-                */}
-                {/* NEW CODE - performance optimization: WebP image with responsive srcSet */}
-                <img
-                  src="/images/pt_personal_trainer_coaching.webp"
-                  srcSet="/images/pt_personal_trainer_coaching-480w.webp 480w, /images/pt_personal_trainer_coaching.webp 1024w"
-                  sizes="(max-width: 768px) 100vw, 600px"
-                  alt="Personal trainer coaching athlete during dumbbell shoulder press workout"
-                  className="w-full h-full object-cover object-[50%_25%] sm:object-center group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent pointer-events-none" />
-                
-                {/* OLD CODE (commented by AI) - Awkward floating badge on image removed per user request */}
-                {/*
-                <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-white flex items-center gap-2.5">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-xs font-display font-bold text-slate-800 tracking-wider uppercase">
-                    1:1 Dedicated Master Coach
-                  </span>
-                </div>
-                */}
-                {/* NEW CODE - Removed awkward floating badge overlay */}
-              </div>
+              <LivePersonalTrainerHero />
             </motion.div>
 
           </div>
 
+          {/* NEW CODE - PT Border Format 1: Precision Slant Horizon */}
+          <PTSlantHorizonDivider />
+
           {/* ================= WHO IS IT FOR? (4 GOAL CARDS) ================= */}
-          <div className="pb-16">
+          <div className="pb-12 sm:pb-16">
             <div className="text-center max-w-2xl mx-auto mb-14">
               <span className="text-xs font-display font-extrabold uppercase tracking-widest text-teal-700 bg-teal-50 border border-teal-200 px-4 py-1.5 rounded-full">
                 TARGETED GOALS
@@ -274,8 +299,11 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
         </div>
       </div>
 
+      {/* NEW CODE - PT Border Format 2: Hex Performance Pulse */}
+      <PTHexPulseDivider />
+
       {/* ================= LIGHT SECTION: WHAT YOU GET (6 TILES) ================= */}
-      <div data-nav-theme="light" className="relative py-24 bg-transparent border-t border-slate-200/80 overflow-hidden">
+      <div data-nav-theme="light" className="relative py-16 sm:py-20 bg-transparent overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           <div className="text-center max-w-2xl mx-auto mb-16">
@@ -315,8 +343,11 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
             ))}
           </div>
 
+          {/* NEW CODE - PT Border Format 3: Speed Timeline Ribbon */}
+          <PTSpeedTimelineDivider />
+
           {/* ================= HOW PT WORKS (6 STEPS ON LIGHT) ================= */}
-          <div className="pt-24 mt-24 border-t border-slate-200/80">
+          <div className="pt-4">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <span className="text-xs font-display font-extrabold uppercase tracking-widest text-teal-700 bg-teal-50 border border-teal-200 px-4 py-1.5 rounded-full shadow-sm">
                 YOUR STEP-BY-STEP PATH
@@ -361,8 +392,11 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
         </div>
       </div>
 
+      {/* NEW CODE - PT Border Format 4: Dark Arena Incline Divider */}
+      <PTDarkArenaInclineDivider />
+
       {/* ================= DARK ACCENT SECTION: PRICING ================= */}
-      <div data-nav-theme="dark" className="relative py-28 bg-[#0E1420] text-white overflow-hidden">
+      <div data-nav-theme="dark" className="relative py-24 sm:py-28 bg-[#0E1420] text-white overflow-hidden">
         {/* Blueprint Grid & Noise Texture */}
         <div className="absolute inset-0 bg-blueprint-grid opacity-30 pointer-events-none" />
         <div className="absolute inset-0 bg-noise opacity-40 pointer-events-none" />
@@ -487,8 +521,11 @@ export default function PersonalTrainingSection({ onOpenLeadModal }) {
         </div>
       </div>
 
+      {/* NEW CODE - PT Border Format 5: Light Amphitheater Divider */}
+      <PTLightAmphitheaterDivider />
+
       {/* ================= LIGHT CONTENT SECTION: SUCCESS STORIES & CLOSING ================= */}
-      <div data-nav-theme="light" className="relative py-24 bg-transparent overflow-hidden">
+      <div data-nav-theme="light" className="relative py-20 sm:py-24 bg-transparent overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           {/* ================= PT SUCCESS STORIES ================= */}

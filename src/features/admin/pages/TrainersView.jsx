@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -28,6 +29,10 @@ import {
   MessageSquare,
   Copy,
   Send,
+  Trash2,
+  QrCode,
+  Download,
+  CreditCard,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { trainerApi } from '../../../services/trainerApi';
@@ -95,7 +100,7 @@ const REJECTION_PRESETS = [
   'Profile details and contact information require further athletic verification.',
 ];
 
-export default function TrainersView({ onStatusChange, onNavigateToClasses }) {
+export default function TrainersView({ onStatusChange }) {
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('All');
@@ -208,6 +213,37 @@ export default function TrainersView({ onStatusChange, onNavigateToClasses }) {
       fetchTrainers();
     } catch (err) {
       toast.error(err.message || 'Failed to suspend coach');
+    } finally {
+      setIsSubmittingAction(false);
+    }
+  };
+
+  // NEW CODE - Delete Trainer Profile (Authority for admin to remove unavailable coaches)
+  const [trainerToDelete, setTrainerToDelete] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const handleOpenDeleteModal = (trainer, e) => {
+    if (e) e.stopPropagation();
+    setTrainerToDelete(trainer);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!trainerToDelete) return;
+    const id = trainerToDelete._id || trainerToDelete.id;
+    try {
+      setIsSubmittingAction(true);
+      await trainerApi.deleteTrainer(id);
+      toast.success(`🗑️ Coach ${trainerToDelete.name} has been removed from registry.`);
+
+      if (selectedTrainer && (selectedTrainer._id === id || selectedTrainer.id === id)) {
+        setSelectedTrainer(null);
+      }
+      setDeleteModalOpen(false);
+      setTrainerToDelete(null);
+      fetchTrainers();
+    } catch (err) {
+      toast.error(err.message || 'Failed to delete coach profile');
     } finally {
       setIsSubmittingAction(false);
     }
@@ -346,6 +382,7 @@ Welcome aboard!
         </div>
 
         <div className="flex items-center gap-2.5">
+          {/* [DISABLED FOR FUTURE USE] Classes & Schedule button in Trainers view
           {onNavigateToClasses && (
             <button
               onClick={onNavigateToClasses}
@@ -355,6 +392,7 @@ Welcome aboard!
               <span>Classes &amp; Schedule</span>
             </button>
           )}
+          */}
 
           <button
             onClick={fetchTrainers}
@@ -752,6 +790,16 @@ Welcome aboard!
                               <span className="hidden sm:inline">Reject</span>
                             </button>
                           )}
+                          {/* NEW CODE - Delete Trainer Profile Button */}
+                          <button
+                            onClick={(e) => handleOpenDeleteModal(trn, e)}
+                            disabled={isSubmittingAction}
+                            className="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[11px] transition-colors flex items-center gap-1 cursor-pointer"
+                            title="Delete Trainer Profile"
+                          >
+                            <Trash2 size={12} className="text-rose-600 shrink-0" />
+                            <span className="hidden sm:inline">Delete</span>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -966,6 +1014,16 @@ Welcome aboard!
                   </button>
                 )}
 
+                {/* NEW CODE - Delete Trainer Profile Button in Drawer */}
+                <button
+                  onClick={() => handleOpenDeleteModal(selectedTrainer)}
+                  disabled={isSubmittingAction}
+                  className="w-full py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <Trash2 size={14} className="text-rose-600" />
+                  <span>Delete Coach Profile (Unavailable / Left Company)</span>
+                </button>
+
                 {/* Contact & Location Block */}
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
@@ -1164,16 +1222,138 @@ Welcome aboard!
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
                       <span className="text-slate-400 block text-[10px] uppercase font-bold">1-on-1 Personal Training</span>
                       <span className="font-black text-slate-900 text-sm mt-0.5 block">
-                        ₹{selectedTrainer.services?.oneOnOnePriceMonthly || 4999}
+                        {(selectedTrainer.services?.oneOnOneSharePercent !== undefined && selectedTrainer.services?.oneOnOneSharePercent !== null && selectedTrainer.services?.oneOnOneSharePercent !== '')
+                          ? `${selectedTrainer.services.oneOnOneSharePercent}%`
+                          : (selectedTrainer.oneOnOneSharePercent !== undefined && selectedTrainer.oneOnOneSharePercent !== null && selectedTrainer.oneOnOneSharePercent !== '')
+                          ? `${selectedTrainer.oneOnOneSharePercent}%`
+                          : selectedTrainer.services?.personalTraining === false
+                          ? 'Not Offered'
+                          : 'Not Specified'}
                         <span className="text-slate-400 text-xs font-normal"> / month</span>
                       </span>
                     </div>
                     <div className="p-3 bg-white rounded-xl border border-slate-200">
                       <span className="text-slate-400 block text-[10px] uppercase font-bold">Live Group Classes</span>
                       <span className="font-black text-slate-900 text-sm mt-0.5 block">
-                        ₹{selectedTrainer.services?.groupClassSeatPrice || 499}
+                        {(selectedTrainer.services?.groupClassSharePercent !== undefined && selectedTrainer.services?.groupClassSharePercent !== null && selectedTrainer.services?.groupClassSharePercent !== '')
+                          ? `${selectedTrainer.services.groupClassSharePercent}%`
+                          : (selectedTrainer.groupClassSharePercent !== undefined && selectedTrainer.groupClassSharePercent !== null && selectedTrainer.groupClassSharePercent !== '')
+                          ? `${selectedTrainer.groupClassSharePercent}%`
+                          : selectedTrainer.services?.groupClasses === false
+                          ? 'Not Offered'
+                          : 'Not Specified'}
                         <span className="text-slate-400 text-xs font-normal"> / seat</span>
                       </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* NEW CODE - Coach Payout & Banking Details (with QR Code for Admin Payout) */}
+                <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200/80 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CreditCard size={15} className="text-emerald-700" />
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 block">
+                        Payout &amp; Banking Details
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+                      <QrCode size={11} /> Admin Payout Hub
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Left Column: Bank & UPI Info */}
+                    <div className="space-y-2">
+                      <div className="p-2.5 bg-white rounded-xl border border-slate-200">
+                        <span className="text-slate-400 block text-[10px] uppercase font-bold">Primary UPI ID</span>
+                        <div className="flex items-center justify-between mt-0.5">
+                          <span className="font-semibold text-slate-800 text-xs break-all">
+                            {selectedTrainer.payout?.upiId || selectedTrainer.upiId || 'Not provided'}
+                          </span>
+                          {(selectedTrainer.payout?.upiId || selectedTrainer.upiId) && (
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedTrainer.payout?.upiId || selectedTrainer.upiId);
+                                toast.success('UPI ID copied to clipboard');
+                              }}
+                              title="Copy UPI ID"
+                              className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-teal-700 transition"
+                            >
+                              <Copy size={12} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 bg-white rounded-xl border border-slate-200">
+                        <span className="text-slate-400 block text-[10px] uppercase font-bold">Bank Name</span>
+                        <span className="font-semibold text-slate-800 text-xs mt-0.5 block">
+                          {selectedTrainer.payout?.bankName || 'Not provided'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="p-2.5 bg-white rounded-xl border border-slate-200">
+                          <span className="text-slate-400 block text-[10px] uppercase font-bold">Account Number</span>
+                          <span className="font-semibold text-slate-800 text-xs mt-0.5 block font-mono">
+                            {selectedTrainer.payout?.accountNumber || 'Not provided'}
+                          </span>
+                        </div>
+                        <div className="p-2.5 bg-white rounded-xl border border-slate-200">
+                          <span className="text-slate-400 block text-[10px] uppercase font-bold">IFSC Code</span>
+                          <span className="font-semibold text-slate-800 text-xs mt-0.5 block font-mono uppercase">
+                            {selectedTrainer.payout?.ifsc || 'Not provided'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: QR Code Display for Instant Admin Scan & Payment */}
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 flex flex-col items-center justify-center text-center">
+                      <span className="text-slate-500 text-[10px] uppercase font-bold mb-2 flex items-center gap-1">
+                        <QrCode size={13} className="text-emerald-700" /> Payment UPI QR Code
+                      </span>
+
+                      {selectedTrainer.payout?.qrCodeUrl ? (
+                        <div className="flex flex-col items-center">
+                          <div className="relative group p-1.5 bg-slate-50 rounded-xl border border-slate-200 shadow-inner">
+                            <img
+                              src={selectedTrainer.payout.qrCodeUrl}
+                              alt="Coach Payment QR Code"
+                              className="w-32 h-32 object-contain rounded-lg"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2 mt-2">
+                            <a
+                              href={selectedTrainer.payout.qrCodeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-teal-700 hover:text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-100 transition hover:bg-teal-100"
+                            >
+                              <ExternalLink size={12} /> Full Size
+                            </a>
+                            <a
+                              href={selectedTrainer.payout.qrCodeUrl}
+                              download={`${(selectedTrainer.name || 'coach').replace(/\s+/g, '_')}_payout_qr.png`}
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 transition hover:bg-slate-200"
+                            >
+                              <Download size={12} /> Download
+                            </a>
+                          </div>
+                          <span className="text-[10px] text-slate-400 mt-1">Scan directly with GPay, PhonePe or Paytm</span>
+                        </div>
+                      ) : (
+                        <div className="py-6 px-4 flex flex-col items-center justify-center text-slate-400">
+                          <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-300 mb-2">
+                            <QrCode size={24} />
+                          </div>
+                          <p className="text-xs font-semibold text-slate-600">No QR Code Uploaded</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5 max-w-[160px]">
+                            Coach has not uploaded their payment QR code yet in settings.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1462,6 +1642,88 @@ Welcome aboard!
                     <X size={14} />
                   )}
                   <span>Confirm Rejection</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ================= DELETE TRAINER MODAL ================= */}
+      <AnimatePresence>
+        {deleteModalOpen && trainerToDelete && (
+          <div className="fixed inset-0 z-60 overflow-y-auto flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeleteModalOpen(false)}
+              className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs"
+            />
+
+            {/* Modal Dialog */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 z-10 space-y-5"
+            >
+              <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                    <Trash2 size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-slate-900 text-base">
+                      Delete Trainer Profile
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Coach: <span className="font-bold text-slate-800">{trainerToDelete.name}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setDeleteModalOpen(false)}
+                  className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div className="p-3.5 bg-rose-50/80 rounded-xl border border-rose-200 text-rose-900 text-xs leading-relaxed space-y-1">
+                  <p className="font-bold">Permanent Removal Action</p>
+                  <p className="text-rose-800">
+                    Are you sure you want to remove <strong>{trainerToDelete.name}</strong> ({trainerToDelete.email || 'No email'})?
+                  </p>
+                </div>
+                <p className="text-xs text-slate-500 font-medium">
+                  This trainer will be permanently deleted from the coach registry, public portal, and assigned rosters. This action cannot be undone.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setDeleteModalOpen(false)}
+                  disabled={isSubmittingAction}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  disabled={isSubmittingAction}
+                  className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  {isSubmittingAction ? (
+                    <RefreshCw size={14} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={14} />
+                  )}
+                  <span>Yes, Delete Profile</span>
                 </button>
               </div>
             </motion.div>

@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ArrowRight, Sparkles } from 'lucide-react';
 */
+// OLD CODE (commented by AI)
+/*
 // NEW CODE - Trainer Portal feature: add Link and UserCheck icon
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -14,6 +16,77 @@ export default function Navbar({ onOpenLeadModal }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+*/
+// OLD CODE (commented by AI)
+/*
+import LiveAthlete from './LiveAthlete';
+*/
+// NEW CODE - Live 3D Athlete synchronized Head component
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, ArrowRight, Sparkles, UserCheck } from 'lucide-react';
+import LiveAthleteHead from './LiveAthleteHead';
+import { trainerApi } from '../../../services/trainerApi';
+
+export default function Navbar({ onOpenLeadModal }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Trainer Authentication State (flicker-free initial check from storage)
+  const [isTrainerAuth, setIsTrainerAuth] = useState(() => {
+    return trainerApi.isAuthenticated();
+  });
+
+  // Verify real auth against backend on mount & react to login/logout events without page refresh
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkRealAuth = async () => {
+      const storedAuth = trainerApi.isAuthenticated();
+      if (!storedAuth) {
+        if (isMounted) setIsTrainerAuth(false);
+        return;
+      }
+
+      // Already logged in locally; verify token/account against server to catch expired/invalid tokens
+      try {
+        const isValid = await trainerApi.verifyCurrentAuth();
+        if (isMounted) setIsTrainerAuth(isValid);
+      } catch (err) {
+        if (isMounted) setIsTrainerAuth(false);
+      }
+    };
+
+    checkRealAuth();
+
+    const handleAuthEvent = () => {
+      checkRealAuth();
+    };
+
+    window.addEventListener('trainerAuthChanged', handleAuthEvent);
+    window.addEventListener('storage', handleAuthEvent);
+    window.addEventListener('trainerProfileUpdated', handleAuthEvent);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('trainerAuthChanged', handleAuthEvent);
+      window.removeEventListener('storage', handleAuthEvent);
+      window.removeEventListener('trainerProfileUpdated', handleAuthEvent);
+    };
+  }, []);
+
+  // Path checks
+  const isPersonalTrainingPage = location.pathname === '/personal-training';
+  const isGroupClassesPage = location.pathname === '/group-classes';
+  const isHomePage = location.pathname === '/' || location.pathname === '';
+
+  // Dynamic Trainer Button route & label based on authentication state
+  const trainerRoute = isTrainerAuth ? '/trainer/dashboard' : '/trainer/login';
+  const trainerLabel = isTrainerAuth ? 'Trainer' : 'Trainer (Login/Register)';
 
   // OLD CODE (commented by AI)
   /*
@@ -44,46 +117,48 @@ export default function Navbar({ onOpenLeadModal }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // IntersectionObserver for active section highlight
+  // Route-based active pill highlight
   useEffect(() => {
-    const sectionIds = ['home', 'personal-training', 'group-classes'];
-    const observers = [];
-
-    const observerCallback = (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    };
-
-    const observerOptions = {
-      root: null,
-      rootMargin: '-30% 0px -50% 0px',
-      threshold: 0,
-    };
-
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) {
-        const obs = new IntersectionObserver(observerCallback, observerOptions);
-        obs.observe(el);
-        observers.push(obs);
-      }
-    });
-
-    return () => {
-      observers.forEach((obs) => obs.disconnect());
-    };
-  }, []);
+    if (isPersonalTrainingPage) {
+      setActiveSection('personal-training');
+      return;
+    }
+    if (isGroupClassesPage) {
+      setActiveSection('group-classes');
+      return;
+    }
+    setActiveSection('home');
+  }, [isPersonalTrainingPage, isGroupClassesPage, location.pathname]);
 
   const scrollTo = (id) => {
     setMobileMenuOpen(false);
-    const target = document.getElementById(id);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-      // Update hash without jumping
-      window.history.pushState(null, '', `#${id}`);
+
+    if (id === 'personal-training') {
+      if (location.pathname !== '/personal-training') {
+        navigate('/personal-training');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
+    if (id === 'group-classes') {
+      if (location.pathname !== '/group-classes') {
+        navigate('/group-classes');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
+    if (id === 'home') {
+      if (location.pathname !== '/') {
+        navigate('/');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.history.pushState(null, '', '#home');
+      }
+      return;
     }
   };
 
@@ -113,16 +188,42 @@ export default function Navbar({ onOpenLeadModal }) {
         }`}
       >
       */}
-      {/* NEW CODE - smooth animation/performance: GPU translateZ(0) layer promotion, specific background/padding/shadow transition */}
+      {/* OLD CODE (commented by AI) - transparent gradient header that blended into home page
       <header
         style={{ transform: 'translateZ(0)' }}
         className={`fixed top-0 left-0 right-0 z-50 transition-[padding,background-color,border-color,box-shadow] duration-250 ${
           isScrolled
-            ? 'py-3.5 bg-[#0E1420]/95 backdrop-blur-md shadow-[0_4px_25px_rgba(0,0,0,0.5)] border-b border-slate-800'
-            : 'py-3.5 sm:py-5 bg-[#0E1420]/95 sm:bg-gradient-to-b sm:from-[#0E1420]/85 sm:via-[#0E1420]/40 sm:to-transparent backdrop-blur-md sm:backdrop-blur-none border-b border-slate-800/60 sm:border-transparent'
+            ? 'py-3.5 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/90'
+            : 'py-3.5 sm:py-5 bg-white/90 sm:bg-gradient-to-b sm:from-white/95 sm:via-white/70 sm:to-transparent backdrop-blur-md sm:backdrop-blur-none border-b border-slate-200/60 sm:border-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      */}
+      {/* NEW CODE - Distinct premium header: frosted glass surface, crisp border-b, and animated glowing teal accent line */}
+      <header
+        style={{ transform: 'translateZ(0)' }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-[padding,background-color,border-color,box-shadow] duration-300 ${
+          isScrolled
+            ? 'py-3 bg-white/98 backdrop-blur-xl shadow-md border-b border-slate-200/90'
+            : 'py-3.5 sm:py-4 bg-white/92 backdrop-blur-xl shadow-[0_4px_25px_-5px_rgba(15,23,42,0.06)] border-b border-slate-200/80'
+        }`}
+      >
+        {/* Animated Bottom Border Accent Line: clearly distinguishes header with dynamic glowing energy */}
+        <div className="absolute bottom-0 inset-x-0 h-[2px] overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-500/15 via-teal-500/40 to-sky-500/20" />
+          <motion.div
+            className="h-full w-72 bg-gradient-to-r from-transparent via-teal-500 via-sky-400 to-transparent opacity-90 shadow-[0_0_10px_rgba(45,212,191,0.6)]"
+            animate={{
+              x: ['-100%', '700%'],
+            }}
+            transition={{
+              duration: 5.2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex items-center justify-between">
             {/* Brand Logo */}
             <a
@@ -137,23 +238,17 @@ export default function Navbar({ onOpenLeadModal }) {
                 <span className="font-heading font-black text-lg">W</span>
               </div>
               <div className="flex flex-col text-left">
-                <span className="font-heading font-extrabold text-xl tracking-tight text-white leading-tight group-hover:text-teal-400 transition-colors">
+                <span className="font-heading font-extrabold text-xl tracking-tight text-slate-900 leading-tight group-hover:text-teal-600 transition-colors">
                   WELLWIGEN
                 </span>
-                {/* OLD CODE (commented by AI)
-                <span className="text-[8.5px] font-bold tracking-[0.2em] text-[#2DE2C8] uppercase -mt-0.5">
-                  STRONGER BODY. BETTER YOU.
-                </span>
-                */}
-                {/* NEW CODE - mobile fix: single line tagline, compact font size, hidden below 360px to prevent word-wrap */}
-                <span className="hidden min-[360px]:inline-block text-[7.5px] sm:text-[8.5px] font-bold tracking-[0.15em] sm:tracking-[0.2em] text-[#2DE2C8] uppercase -mt-0.5 whitespace-nowrap">
+                <span className="hidden min-[360px]:inline-block text-[7.5px] sm:text-[8.5px] font-bold tracking-[0.15em] sm:tracking-[0.2em] text-teal-700 uppercase -mt-0.5 whitespace-nowrap">
                   STRONGER BODY. BETTER YOU.
                 </span>
               </div>
             </a>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-1 lg:gap-2 bg-slate-900/70 p-1 rounded-full border border-slate-700/60 backdrop-blur-md shadow-inner">
+            {/* Desktop Navigation Links (Rounded bracket with colored border line) */}
+            <nav data-athlete-nav-pill className="hidden md:flex items-center gap-1 lg:gap-2 bg-slate-100/90 p-1.5 rounded-full border-2 border-teal-500/30 backdrop-blur-md shadow-xs">
               {navLinks.map((link) => {
                 const isActive = activeSection === link.id;
                 return (
@@ -162,14 +257,14 @@ export default function Navbar({ onOpenLeadModal }) {
                     onClick={() => scrollTo(link.id)}
                     className={`relative px-4 py-2 rounded-full text-xs lg:text-sm font-semibold transition-all duration-200 cursor-pointer ${
                       isActive
-                        ? 'text-white font-bold'
-                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                        ? 'text-teal-900 font-extrabold'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="activePill"
-                        className="absolute inset-0 bg-teal-500/25 rounded-full border border-teal-400/50 shadow-[0_0_12px_rgba(45,226,200,0.3)]"
+                        className="absolute inset-0 bg-white rounded-full border-2 border-teal-500 shadow-xs"
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                     )}
@@ -179,54 +274,71 @@ export default function Navbar({ onOpenLeadModal }) {
               })}
             </nav>
 
-            {/* Desktop CTA Button */}
             {/* OLD CODE (commented by AI)
-            <div className="hidden md:flex items-center gap-3">
-              <button
-                onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
-                className="btn-power-coral px-6 py-2.5 rounded-xl text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-coral-glow cursor-pointer group"
-              >
-                <span>Join Now</span>
-                <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </div>
-            */}
-            {/* NEW CODE - Trainer Portal feature: add outline/teal Trainer button alongside Join Now */}
             <div className="hidden md:flex items-center gap-3">
               <Link
                 to="/trainer"
-                className="px-5 py-2.5 rounded-xl border border-teal-400/50 hover:border-teal-300 text-teal-300 hover:text-white hover:bg-teal-500/10 text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-xs transition-all duration-200 cursor-pointer"
+                className="px-5 py-2.5 rounded-full border-2 border-teal-600 hover:border-teal-700 text-teal-800 hover:text-teal-950 hover:bg-teal-50 text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-xs transition-all duration-200 cursor-pointer"
               >
                 <span>Trainer</span>
               </Link>
               <button
                 onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
-                className="btn-power-coral px-6 py-2.5 rounded-xl text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-coral-glow cursor-pointer group"
+                className="btn-power-coral px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-coral-glow cursor-pointer group"
+              >
+                <span>Join Now</span>
+                <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+            */}
+            {/* OLD CODE (commented by AI) - mini athlete inside header
+            <div className="hidden md:flex items-center gap-3">
+              {isHomePage && (
+                <div className="hidden lg:flex items-center justify-center mr-1 xl:mr-2">
+                  <LiveAthlete />
+                </div>
+              )}
+              <Link
+                to="/trainer"
+                className="px-5 py-2.5 rounded-full border-2 border-teal-600 hover:border-teal-700 text-teal-800 hover:text-teal-950 hover:bg-teal-50 text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-xs transition-all duration-200 cursor-pointer"
+              >
+                <span>Trainer</span>
+              </Link>
+              <button
+                onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
+                className="btn-power-coral px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-coral-glow cursor-pointer group"
+              >
+                <span>Join Now</span>
+                <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+            */}
+            {/* Trainer & Join Now buttons preserved */}
+            <div className="hidden md:flex items-center gap-3">
+              <Link
+                data-athlete-trainer-btn
+                to={trainerRoute}
+                className="group h-11 px-5 rounded-full border-2 border-teal-600 text-teal-800 bg-white/90 hover:bg-teal-600 hover:border-teal-600 hover:text-white flex flex-col items-center justify-center text-center shadow-xs hover:shadow-md hover:shadow-teal-600/30 transition-all duration-200 cursor-pointer whitespace-nowrap min-w-[130px]"
+              >
+                <span className="font-heading font-black text-xs sm:text-sm tracking-tight leading-none group-hover:text-white transition-colors">
+                  Trainer
+                </span>
+                {!isTrainerAuth && (
+                  <span className="text-[9px] sm:text-[10px] font-bold tracking-wide text-teal-700 group-hover:text-white/95 leading-none mt-0.5 transition-colors">
+                    Login / Register
+                  </span>
+                )}
+              </Link>
+              <button
+                onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
+                className="btn-power-coral px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold flex items-center gap-1.5 shadow-coral-glow cursor-pointer group"
               >
                 <span>Join Now</span>
                 <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
 
-            {/* OLD CODE (commented by AI)
-            <div className="flex md:hidden items-center gap-2">
-              <button
-                onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
-                className="btn-power-coral px-4 py-2 text-xs font-bold rounded-xl"
-              >
-                Join Now
-              </button>
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-10 h-10 rounded-xl bg-slate-900/80 border border-slate-700 flex items-center justify-center text-slate-200 hover:text-white transition-colors cursor-pointer"
-                aria-label="Toggle menu"
-              >
-                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
-            </div>
-            */}
-
-            {/* NEW CODE - mobile fix: compact single-line pill (whitespace: nowrap, 13px, 40px height) vertically aligned with hamburger */}
+            {/* Mobile Actions */}
             <div className="flex md:hidden items-center gap-2 shrink-0">
               <button
                 onClick={() => onOpenLeadModal({ program: 'Group Classes', plan: 'Trial Class' })}
@@ -236,7 +348,7 @@ export default function Navbar({ onOpenLeadModal }) {
               </button>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-10 h-10 rounded-xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-center text-slate-200 hover:text-white transition-colors cursor-pointer shrink-0"
+                className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-800 hover:text-teal-700 transition-colors cursor-pointer shrink-0"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -329,12 +441,17 @@ export default function Navbar({ onOpenLeadModal }) {
                   })}
 
                   <Link
-                    to="/trainer"
+                    to={trainerRoute}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-teal-700 bg-teal-50/80 border border-teal-200/80 flex items-center justify-between transition-all mt-1"
+                    className="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-teal-800 bg-teal-50/80 hover:bg-teal-600 hover:text-white border border-teal-200/80 flex items-center justify-between transition-all mt-1 group cursor-pointer"
                   >
-                    <span>Trainer Portal</span>
-                    <ArrowRight size={14} className="text-teal-600" />
+                    <div className="flex flex-col">
+                      <span className="font-heading font-black text-sm group-hover:text-white transition-colors">Trainer</span>
+                      {!isTrainerAuth && (
+                        <span className="text-[10px] text-teal-700 group-hover:text-white/95 font-semibold transition-colors">Login / Register</span>
+                      )}
+                    </div>
+                    <ArrowRight size={15} className="text-teal-600 group-hover:text-white group-hover:translate-x-1 transition-all" />
                   </Link>
                 </div>
               </div>

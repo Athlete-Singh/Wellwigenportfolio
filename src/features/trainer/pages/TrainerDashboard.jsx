@@ -201,7 +201,7 @@ See you on the mat! 💪🔥
 
       {/* Verified & Approved Banner */}
       {isApproved && (
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 shadow-xs flex items-center justify-between gap-4">
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-500/50 shadow-md shadow-teal-500/10 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0">
               <ShieldCheck size={18} />
@@ -238,6 +238,7 @@ See you on the mat! 💪🔥
             <Plus size={16} />
             <span>Schedule Group Class</span>
           </Link>
+          {/* [DISABLED FOR FUTURE USE] Trainer Availability Manage Slots Button
           <Link
             to="/trainer/availability"
             className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm shadow-xs transition-all flex items-center gap-1.5"
@@ -245,6 +246,7 @@ See you on the mat! 💪🔥
             <Calendar size={16} />
             <span>Manage Slots</span>
           </Link>
+          */}
         </div>
       </div>
 
@@ -268,7 +270,7 @@ See you on the mat! 💪🔥
         </div>
         */}
 
-        <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md transition-all">
+        <div className="p-6 bg-white/95 backdrop-blur-md border-2 border-teal-500/30 hover:border-teal-500 rounded-2xl shadow-xs hover:shadow-lg transition-all shadow-teal-500/5">
           <div className="flex justify-between items-start mb-4">
             <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
               <Dumbbell size={20} />
@@ -284,44 +286,46 @@ See you on the mat! 💪🔥
           </div>
         </div>
 
-        <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md transition-all">
+        {/* [DISABLED FOR FUTURE USE] Estimated Earnings and Athlete Rating Metric Cards
+        <div className="p-6 bg-white/95 backdrop-blur-md border-2 border-teal-500/30 hover:border-teal-500 rounded-2xl shadow-xs hover:shadow-lg transition-all shadow-teal-500/5">
           <div className="flex justify-between items-start mb-4">
             <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <TrendingUp size={20} />
             </div>
             <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-              +18.4% MoM
+              Live Payout
             </span>
           </div>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Estimated Earnings</p>
           <div className="flex items-baseline gap-2">
-            <h4 className="text-3xl font-black text-slate-900">{stats?.monthlyEarnings || '₹48,500'}</h4>
+            <h4 className="text-3xl font-black text-slate-900">{stats?.monthlyEarnings || '₹0'}</h4>
             <span className="text-xs font-semibold text-slate-400">This Month</span>
           </div>
         </div>
 
-        <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md transition-all">
+        <div className="p-6 bg-white/95 backdrop-blur-md border-2 border-teal-500/30 hover:border-teal-500 rounded-2xl shadow-xs hover:shadow-lg transition-all shadow-teal-500/5">
           <div className="flex justify-between items-start mb-4">
             <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
               <Star size={20} className="fill-current" />
             </div>
             <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
-              38 Reviews
+              {trainer.reviewsCount ? `${trainer.reviewsCount} Reviews` : 'New Coach'}
             </span>
           </div>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Athlete Rating</p>
           <div className="flex items-baseline gap-2">
-            <h4 className="text-3xl font-black text-slate-900">{trainer.rating || '4.9'}</h4>
+            <h4 className="text-3xl font-black text-slate-900">{trainer.rating ? trainer.rating : '—'}</h4>
             <span className="text-xs font-semibold text-slate-400">/ 5.0</span>
           </div>
         </div>
+        */}
       </div>
 
       {/* Main 2-Column Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left 2 Cols: Upcoming Live Classes */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-5">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl border-2 border-teal-500/30 hover:border-teal-500/50 shadow-xs p-6 space-y-5 shadow-teal-500/5">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-900">Live Group Classes Schedule</h3>
@@ -460,7 +464,7 @@ See you on the mat! 💪🔥
         {/* Right Col: Quick Summary & Tips */}
         <div className="space-y-6">
           {/* Coach Quick Card */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-4">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl border-2 border-teal-500/30 hover:border-teal-500/50 shadow-xs p-6 space-y-4 shadow-teal-500/5">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-teal-500 text-white flex items-center justify-center font-black text-lg overflow-hidden shrink-0 shadow-sm">
                 {trainer.photoUrl ? (
@@ -470,37 +474,49 @@ See you on the mat! 💪🔥
                 )}
               </div>
               <div className="min-w-0">
-                <h4 className="text-base font-bold text-slate-900 truncate">{trainer.name || 'Coach Vikram'}</h4>
-                <p className="text-xs text-teal-600 font-semibold truncate">{trainer.specialization || 'Strength Coach'}</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Member since {trainer.joinedDate || '2026'}</p>
+                <h4 className="text-base font-bold text-slate-900 truncate">{trainer.name || 'Coach'}</h4>
+                <p className="text-xs text-teal-600 font-semibold truncate">{trainer.specialization || 'Fitness Coach'}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Member since {trainer.joinedDate || new Date().getFullYear()}</p>
               </div>
             </div>
 
             <div className="p-3 bg-slate-50 rounded-xl space-y-2 text-xs">
               <div className="flex justify-between text-slate-600">
                 <span>1-on-1 Fee:</span>
-                <span className="font-bold text-slate-900">₹{trainer.services?.oneOnOnePriceMonthly || 4999}/mo</span>
+                <span className="font-bold text-slate-900">
+                  {(trainer.services?.oneOnOneSharePercent !== undefined && trainer.services?.oneOnOneSharePercent !== null && trainer.services?.oneOnOneSharePercent !== '')
+                    ? `${trainer.services.oneOnOneSharePercent}%`
+                    : (trainer.oneOnOneSharePercent !== undefined && trainer.oneOnOneSharePercent !== null && trainer.oneOnOneSharePercent !== '')
+                    ? `${trainer.oneOnOneSharePercent}%`
+                    : '50%'}
+                </span>
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>Group Class:</span>
-                <span className="font-bold text-slate-900">₹{trainer.services?.groupClassSeatPrice || 499}/seat</span>
+                <span className="font-bold text-slate-900">
+                  {(trainer.services?.groupClassSharePercent !== undefined && trainer.services?.groupClassSharePercent !== null && trainer.services?.groupClassSharePercent !== '')
+                    ? `${trainer.services.groupClassSharePercent}%`
+                    : (trainer.groupClassSharePercent !== undefined && trainer.groupClassSharePercent !== null && trainer.groupClassSharePercent !== '')
+                    ? `${trainer.groupClassSharePercent}%`
+                    : '75%'}
+                </span>
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>Base Location:</span>
-                <span className="font-bold text-slate-900">{trainer.city || 'Pan-India'}</span>
+                <span className="font-bold text-slate-900">{trainer.city || 'Lucknow'}</span>
               </div>
             </div>
 
             <Link
               to="/trainer/profile"
-              className="block w-full py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs text-center transition-colors"
+              className="block w-full py-2.5 rounded-xl border-2 border-teal-500/30 hover:border-teal-500 hover:bg-teal-50/50 text-slate-700 font-bold text-xs text-center transition-all shadow-xs"
             >
               Edit Public Profile
             </Link>
           </div>
 
           {/* Quick Checklist */}
-          <div className="bg-gradient-to-br from-teal-50/50 to-sky-50/50 rounded-2xl border border-teal-200/70 p-6 space-y-4">
+          <div className="bg-gradient-to-br from-teal-50/70 via-white to-sky-50/60 rounded-2xl border-2 border-teal-500/40 shadow-xs p-6 space-y-4 shadow-teal-500/5">
             <div className="flex items-center gap-2 text-teal-900 font-bold text-sm">
               <Sparkles size={18} className="text-teal-600" />
               <span>Coach Pro Tips</span>

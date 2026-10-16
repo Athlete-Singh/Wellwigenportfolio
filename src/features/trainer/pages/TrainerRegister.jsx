@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, Lock, ArrowLeft, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, Lock, ArrowLeft, ArrowRight, ShieldCheck, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { trainerApi } from '../../../services/trainerApi';
 
 export default function TrainerRegister() {
   const navigate = useNavigate();
+
+  // Reset any cached onboarding/auth data so new registration is completely blank
+  useEffect(() => {
+    try {
+      localStorage.removeItem('wellwigen_trainer_onboarding');
+      localStorage.removeItem('wellwigen_trainer_auth');
+    } catch {}
+  }, []);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -14,6 +22,8 @@ export default function TrainerRegister() {
     confirmPassword: '',
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -55,7 +65,7 @@ export default function TrainerRegister() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans flex flex-col justify-between p-4 sm:p-6 antialiased">
+    <div data-panel="trainer" className="min-h-screen bg-transparent text-slate-800 font-sans flex flex-col justify-between p-4 sm:p-6 antialiased">
       {/* Top Header */}
       <div className="max-w-6xl mx-auto w-full flex items-center justify-between py-2">
         <Link to="/" className="flex items-center gap-2.5 group">
@@ -81,7 +91,7 @@ export default function TrainerRegister() {
 
       {/* Main Card */}
       <div className="max-w-md w-full mx-auto my-8">
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl shadow-slate-200/50 p-6 sm:p-10 space-y-6">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-teal-500/35 shadow-xl shadow-teal-500/10 p-6 sm:p-10 space-y-6">
           <div className="text-center space-y-1.5">
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Become a Wellwigen Coach</h1>
             <p className="text-xs sm:text-sm text-slate-500">
@@ -96,7 +106,11 @@ export default function TrainerRegister() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+            {/* Hidden dummy fields to neutralize Chrome password manager autofill */}
+            <input type="text" name="chrome_prevent_autofill_username" className="hidden" tabIndex="-1" aria-hidden="true" autoComplete="off" />
+            <input type="password" name="chrome_prevent_autofill_password" className="hidden" tabIndex="-1" aria-hidden="true" autoComplete="new-password" />
+
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                 Full Name
@@ -107,8 +121,11 @@ export default function TrainerRegister() {
                 </div>
                 <input
                   type="text"
+                  name="wellwigen_trainer_reg_name"
+                  id="wellwigen_trainer_reg_name"
+                  autoComplete="off"
                   required
-                  placeholder="e.g. Vikram Rajput"
+                  placeholder="e.g. Rahul Sharma"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
@@ -126,6 +143,9 @@ export default function TrainerRegister() {
                 </div>
                 <input
                   type="email"
+                  name="wellwigen_trainer_reg_email"
+                  id="wellwigen_trainer_reg_email"
+                  autoComplete="off"
                   required
                   placeholder="coach@example.com"
                   value={formData.email}
@@ -145,6 +165,9 @@ export default function TrainerRegister() {
                 </div>
                 <input
                   type="tel"
+                  name="wellwigen_trainer_reg_phone"
+                  id="wellwigen_trainer_reg_phone"
+                  autoComplete="off"
                   required
                   placeholder="+91 98765 43210"
                   value={formData.phone}
@@ -164,13 +187,25 @@ export default function TrainerRegister() {
                     <Lock size={16} />
                   </div>
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
+                    name="wellwigen_trainer_reg_password"
+                    id="wellwigen_trainer_reg_password"
+                    autoComplete="new-password"
                     required
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+                    className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-teal-700 transition-colors cursor-pointer"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
               </div>
 
@@ -183,13 +218,25 @@ export default function TrainerRegister() {
                     <Lock size={16} />
                   </div>
                   <input
-                    type="password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="wellwigen_trainer_reg_confirm_password"
+                    id="wellwigen_trainer_reg_confirm_password"
+                    autoComplete="new-password"
                     required
                     placeholder="••••••••"
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+                    className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-teal-700 transition-colors cursor-pointer"
+                    title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
               </div>
             </div>
