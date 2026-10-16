@@ -140,11 +140,12 @@ export default function LiveAthleteHero() {
           />
         </div>
 
-        {/* Layer 2: 3D Tilt Card Canvas with Athlete (Shifted left and down per request) */}
+        {/* Layer 2: 3D Tilt Card Canvas with Athlete (Front image minor scale up per user request, background wall untouched) */}
         <div
           className="relative z-10 w-full h-full pointer-events-none select-none"
           style={{
-            transform: 'translate(-20px, 32px)',
+            transform: 'translate(-20px, 32px) scale(1.05)',
+            transformOrigin: '50% 80%',
           }}
         >
           <motion.div
