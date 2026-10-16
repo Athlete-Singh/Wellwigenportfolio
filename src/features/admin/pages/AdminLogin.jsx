@@ -249,154 +249,154 @@ export default function AdminLogin() {
   return (
     <div
       data-panel="admin"
-      className="min-h-screen bg-white flex flex-col relative overflow-hidden select-none"
+      className="min-h-screen bg-white flex flex-col lg:flex-row relative overflow-hidden select-none"
     >
-      {/* ================= TOP HEADER (Spanning Full Width at Header Position) ================= */}
-      <header className="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 lg:px-10 py-3.5 flex items-center justify-between z-30 select-none">
-        {/* Left: Brand Logo & Interactive Admin Gateway Badge */}
-        <Link to="/" className="flex items-center gap-3 group cursor-pointer select-none">
-          <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-400 rounded-2xl blur-xs opacity-50 group-hover:opacity-100 transition duration-300" />
-            <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-teal-700/20 group-hover:scale-105 transition-transform duration-200">
-              <span className="font-heading font-black text-xl sm:text-2xl tracking-tight">W</span>
+      {/* ================= LEFT COLUMN: FULL-HEIGHT SLIDING SHOWCASE (A Little Dark Theme) ================= */}
+      <div
+        className="relative w-full lg:w-1/2 xl:w-5/12 min-h-[460px] sm:min-h-[520px] lg:min-h-screen bg-slate-900 flex flex-col justify-between px-6 sm:px-10 lg:px-12 pt-6 sm:pt-8 pb-4 sm:pb-6 overflow-hidden text-white"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* Animated Slide Background Image */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSlide}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0"
+          >
+            <img
+              src={current.image}
+              alt={current.title}
+              className="w-full h-full object-cover object-center"
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Gentle ambient vignette (not too dark, natural image visibility) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-transparent z-0 pointer-events-none" />
+
+        {/* TOP: Brand Logo & Interactive Admin Badge (Shifted toward header/top position, NO border) */}
+        <div className="relative z-10 flex items-center justify-between w-full">
+          <Link to="/" className="flex items-center gap-3 group cursor-pointer select-none">
+            {/* Glowing Logo Icon */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-400 rounded-2xl blur-xs opacity-60 group-hover:opacity-100 transition duration-300" />
+              <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-teal-700/30 group-hover:scale-105 transition-transform duration-200">
+                <span className="font-heading font-black text-xl sm:text-2xl tracking-tight">W</span>
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col text-left">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-heading font-extrabold text-xl sm:text-2xl tracking-tight text-slate-900 leading-none">
-                WELLWIGEN
-              </span>
-
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 font-extrabold text-[10px] tracking-wider uppercase backdrop-blur-md shadow-2xs">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            {/* Brand Title + Admin Gateway Badge */}
+            <div className="flex flex-col text-left">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-heading font-extrabold text-xl sm:text-2xl tracking-tight text-white leading-none">
+                  WELLWIGEN
                 </span>
-                <span>Admin Gateway</span>
-              </div>
-            </div>
 
-            <span className="text-[8px] sm:text-[9px] font-extrabold tracking-[0.22em] text-teal-700 uppercase mt-1 whitespace-nowrap">
-              STRONGER BODY. BETTER YOU.
-            </span>
-          </div>
-        </Link>
-
-        {/* Right: Back to Home Button shifted to Header Position */}
-        <Link
-          to="/"
-          className="group px-3.5 sm:px-4 py-2 rounded-xl bg-slate-50 hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-200 hover:border-teal-300 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-2xs"
-        >
-          <ArrowLeft
-            size={15}
-            className="group-hover:-translate-x-1 transition-transform duration-200 text-teal-600"
-          />
-          <span>Back to Home</span>
-        </Link>
-      </header>
-
-      {/* ================= MAIN CONTENT (Split: Image Showcase on Left + Form on Right) ================= */}
-      <div className="flex-1 flex flex-col lg:flex-row relative overflow-hidden">
-        {/* ================= LEFT COLUMN: IMAGE PORTION IN A LITTLE DARK THEME ================= */}
-        <div
-          className="relative w-full lg:w-1/2 xl:w-5/12 min-h-[440px] sm:min-h-[500px] lg:min-h-[calc(100vh-73px)] bg-slate-900 flex flex-col justify-end px-6 sm:px-10 lg:px-12 pt-6 sm:pt-8 pb-3 sm:pb-4 lg:pb-5 overflow-hidden text-white border-r border-slate-200/80"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          {/* Animated Slide Background Image */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeSlide}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0"
-            >
-              <img
-                src={current.image}
-                alt={current.title}
-                className="w-full h-full object-cover object-center"
-              />
-            </motion.div>
-          </AnimatePresence>
-
-          {/* A LITTLE DARK THEME: Gentle ambient vignette (not too dark, natural image visibility) */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent z-0 pointer-events-none" />
-          <div className="absolute inset-0 bg-black/20 z-0 pointer-events-none" />
-
-          {/* Top Right Slide Counter inside the image portion */}
-          <div className="absolute top-5 right-5 z-20 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/20 text-white/95 text-xs font-mono font-bold shadow-md">
-            0{activeSlide + 1} / 0{SLIDES.length}
-          </div>
-
-          {/* Bottom Content: Shifted Down Toward Footer */}
-          <div className="relative z-10 space-y-2.5 sm:space-y-3">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSlide}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-              >
-                <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-1.5 tracking-tight drop-shadow-md">
-                  {current.title.split(' ')[0]}{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-300 to-teal-200">
-                    {current.title.split(' ').slice(1).join(' ')}
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-500/20 border border-teal-400/40 text-teal-300 font-extrabold text-[10px] tracking-wider uppercase backdrop-blur-md shadow-2xs">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                   </span>
-                </h2>
-                <p className="text-slate-200/90 text-xs sm:text-sm font-medium max-w-lg leading-relaxed drop-shadow-sm">
-                  {current.subtitle}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Slider Controls: Progress bars + Prev/Next buttons */}
-            <div className="flex items-center justify-between gap-4 pt-2.5 border-t border-white/20">
-              {/* Progress Indicators */}
-              <div className="flex items-center gap-1.5 flex-1">
-                {SLIDES.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setActiveSlide(idx)}
-                    className="h-1.5 rounded-full transition-all duration-300 cursor-pointer relative overflow-hidden"
-                    style={{
-                      width: activeSlide === idx ? '32px' : '10px',
-                      backgroundColor: activeSlide === idx ? '#2DD4BF' : 'rgba(255,255,255,0.35)',
-                    }}
-                    title={`Slide ${idx + 1}`}
-                  />
-                ))}
+                  <span>Admin Gateway</span>
+                </div>
               </div>
 
-              {/* Prev / Next Chevrons */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={prevSlide}
-                  className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-sm"
-                  title="Previous Slide"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={nextSlide}
-                  className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-sm"
-                  title="Next Slide"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
+              <span className="text-[8px] sm:text-[9px] font-extrabold tracking-[0.22em] text-teal-300/80 uppercase mt-1 whitespace-nowrap">
+                STRONGER BODY. BETTER YOU.
+              </span>
             </div>
+          </Link>
+
+          {/* Top Right Slide Counter */}
+          <div className="px-3 py-1 rounded-full bg-black/55 backdrop-blur-md border border-white/20 text-white/95 text-xs font-mono font-bold shadow-md">
+            0{activeSlide + 1} / 0{SLIDES.length}
           </div>
         </div>
 
-        {/* ================= RIGHT COLUMN: CLEAN & SPACIOUS LOGIN FORM ================= */}
-        <div className="w-full lg:w-1/2 xl:w-7/12 flex-1 bg-white flex flex-col justify-between p-6 sm:p-10 lg:p-16 relative">
+        {/* BOTTOM: Slide Title, Subtitle, and Slide Controls (Shifted Down Toward Footer) */}
+        <div className="relative z-10 space-y-2.5 sm:space-y-3 mt-auto pt-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSlide}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            >
+              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-1.5 tracking-tight drop-shadow-md">
+                {current.title.split(' ')[0]}{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-300 to-teal-200">
+                  {current.title.split(' ').slice(1).join(' ')}
+                </span>
+              </h2>
+              <p className="text-slate-200/90 text-xs sm:text-sm font-medium max-w-lg leading-relaxed drop-shadow-sm">
+                {current.subtitle}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Slider Controls: Progress bars + Prev/Next buttons */}
+          <div className="flex items-center justify-between gap-4 pt-2.5 border-t border-white/20">
+            {/* Progress Indicators */}
+            <div className="flex items-center gap-1.5 flex-1">
+              {SLIDES.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setActiveSlide(idx)}
+                  className="h-1.5 rounded-full transition-all duration-300 cursor-pointer relative overflow-hidden"
+                  style={{
+                    width: activeSlide === idx ? '32px' : '10px',
+                    backgroundColor: activeSlide === idx ? '#2DD4BF' : 'rgba(255,255,255,0.35)',
+                  }}
+                  title={`Slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* Prev / Next Chevrons */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={prevSlide}
+                className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-sm"
+                title="Previous Slide"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={nextSlide}
+                className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 active:scale-95 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-sm"
+                title="Next Slide"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ================= RIGHT COLUMN: CLEAN & SPACIOUS LOGIN FORM ================= */}
+      <div className="w-full lg:w-1/2 xl:w-7/12 min-h-screen bg-white flex flex-col justify-between p-6 sm:p-10 lg:p-16 relative">
+        {/* Top Header on Right: Back to Home (Shifted toward top, NO border) */}
+        <div className="flex items-center justify-end w-full pb-2">
+          <Link
+            to="/"
+            className="group px-3.5 sm:px-4 py-2 rounded-xl bg-slate-50 hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-200 hover:border-teal-300 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-2xs"
+          >
+            <ArrowLeft
+              size={15}
+              className="group-hover:-translate-x-1 transition-transform duration-200 text-teal-600"
+            />
+            <span>Back to Home</span>
+          </Link>
+        </div>
 
         {/* Center Form Section (Generous spacing, modern SaaS format) */}
         <div className="max-w-md w-full mx-auto my-auto py-8">
@@ -512,6 +512,5 @@ export default function AdminLogin() {
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 }
