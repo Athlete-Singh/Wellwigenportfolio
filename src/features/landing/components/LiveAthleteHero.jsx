@@ -36,7 +36,7 @@ export default function LiveAthleteHero() {
         style={{
           position: 'absolute',
           top: 'var(--athlete-top-offset, 52px)',
-          right: 'clamp(-180px, calc((100vw - 1440px) / 2 - 130px), 140px)',
+          right: 'clamp(-130px, calc((100vw - 1440px) / 2 - 50px), 220px)',
           width: 'var(--athlete-width)',
           height: 'var(--athlete-height)',
           maskImage: 'linear-gradient(to bottom, black 84%, transparent 99%)',
@@ -140,10 +140,16 @@ export default function LiveAthleteHero() {
           />
         </div>
 
-        {/* Layer 2: 3D Tilt Card Canvas with Athlete */}
-        <motion.div
+        {/* Layer 2: 3D Tilt Card Canvas with Athlete (Shifted left and down per request) */}
+        <div
+          className="relative z-10 w-full h-full pointer-events-none select-none"
           style={{
-            position: 'relative',
+            transform: 'translate(-40px, 32px)',
+          }}
+        >
+          <motion.div
+            style={{
+              position: 'relative',
             width: '100%',
             height: '100%',
             transformOrigin: '50% 15%',
@@ -248,6 +254,7 @@ export default function LiveAthleteHero() {
             />
           </picture>
         </motion.div>
+        </div>
       </motion.div>
     </div>
   );

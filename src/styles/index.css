@@ -29,7 +29,7 @@
 
   /* Live 3D Athlete Configuration Variables (Home Page Only) */
   --athlete-scale: 0.95;              /* Minor reduction in scale per user request */
-  --athlete-top-offset: clamp(58px, 7.5vh, 76px); /* Shifted down from navbar per user request */
+  --athlete-top-offset: clamp(72px, 9vh, 98px); /* Shifted down from navbar per user request */
   --athlete-opacity-scrolled: 0.18;   /* Faded opacity on scroll past hero */
   --athlete-parallax-speed: 0.06;     /* Parallax scrolling rate */
   --header-h: 80px;
