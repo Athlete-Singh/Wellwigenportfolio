@@ -618,7 +618,9 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
                 {/* Image Showcase Frame (100% visible, clean) */}
                 <div className="relative h-52 sm:h-56 rounded-2xl overflow-hidden mb-4 bg-slate-100 border border-slate-200/60 shadow-sm">
                   <img
-                    src="/images/home_personal_training.jpg"
+                    src="/images/home_personal_training.webp"
+                    srcSet="/images/home_personal_training-480w.webp 480w, /images/home_personal_training.webp 1024w"
+                    sizes="(max-width: 640px) 100vw, 550px"
                     alt="Personal trainer coaching athlete with barbell in fitness studio"
                     className="w-full h-full object-cover object-[60%_15%] sm:object-[70%_15%] group-hover:scale-105 transition-transform duration-700 ease-out"
                     loading="lazy"
@@ -674,7 +676,9 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
                 {/* Image Showcase Frame (100% visible, clean) */}
                 <div className="relative h-52 sm:h-56 rounded-2xl overflow-hidden mb-4 bg-slate-100 border border-slate-200/60 shadow-sm">
                   <img
-                    src="/images/home_group_classes.jpg"
+                    src="/images/home_group_classes.webp"
+                    srcSet="/images/home_group_classes-480w.webp 480w, /images/home_group_classes.webp 1024w"
+                    sizes="(max-width: 640px) 100vw, 550px"
                     alt="Online group fitness class performing synchronized dumbbell workout"
                     className="w-full h-full object-cover object-[78%_top] sm:object-[80%_top] group-hover:scale-105 transition-transform duration-700 ease-out"
                     loading="lazy"

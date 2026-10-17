@@ -209,45 +209,56 @@ html, body {
   box-shadow: 0 0 60px rgba(59, 130, 246, 0.5);
 }
 
-/* ================= BUTTON ================= */
-/* OLD CODE (commented by AI)
-.btn-primary {
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+/* ================= UNIVERSAL SMOOTH BUTTON & COLOR-POP SYSTEM ================= */
+button,
+[role="button"],
+.btn-primary,
+.btn-glass {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transition-property: color, background-color, border-color, box-shadow, filter, opacity, transform;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-duration: 200ms;
 }
-*/
-/* NEW CODE - smooth animation/performance: specific opacity & transform transition */
+
+@media (hover: hover) and (pointer: fine) {
+  button:hover:not(:disabled),
+  [role="button"]:hover:not([aria-disabled="true"]) {
+    filter: brightness(1.05);
+  }
+  button:active:not(:disabled),
+  [role="button"]:active:not([aria-disabled="true"]) {
+    filter: brightness(0.97);
+  }
+}
+
 .btn-primary {
   background: linear-gradient(90deg, #3b82f6, #2563eb);
   padding: 12px 24px;
   border-radius: 12px;
   font-weight: 500;
   touch-action: manipulation;
-  transition: opacity 200ms ease, transform 200ms ease;
+  transition: opacity 200ms ease, filter 200ms ease, box-shadow 200ms ease;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
+  filter: brightness(1.08);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
 }
 
 /* Glass button */
-/* OLD CODE (commented by AI)
-.btn-glass {
-  @apply glass px-6 py-3 rounded-xl;
-  transition: all 0.3s ease;
-}
-*/
-/* NEW CODE - smooth animation/performance: specific background transition */
 .btn-glass {
   @apply glass px-6 py-3 rounded-xl;
   touch-action: manipulation;
-  transition: background-color 200ms ease, transform 200ms ease;
+  transition: background-color 200ms ease, border-color 200ms ease, filter 200ms ease;
 }
 .btn-glass:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.14);
+  filter: brightness(1.08);
 }
 
 /* ================= CARD ================= */
@@ -432,7 +443,7 @@ html, body {
   color: #0B4E48;
 }
 */
-/* NEW CODE - smooth animation/performance: specific property transitions, touch-action manipulation */
+/* Gradient CTA Buttons with Smooth Color-Pop & Anti-Flicker */
 .btn-primary-gradient {
   background: linear-gradient(135deg, #1FB5A3 0%, #3B9BD4 100%);
   color: #FFFFFF;
@@ -441,13 +452,19 @@ html, body {
   position: relative;
   overflow: hidden;
   touch-action: manipulation;
-  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   box-shadow: 0 10px 25px -5px rgba(31, 181, 163, 0.35);
+  transition: filter 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease, opacity 200ms ease;
 }
 
-.btn-primary-gradient:hover {
-  transform: translate3d(0, -2px, 0);
-  box-shadow: 0 14px 30px -4px rgba(31, 181, 163, 0.45);
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary-gradient:hover {
+    filter: brightness(1.08) saturate(1.06);
+    box-shadow: 0 14px 32px -4px rgba(31, 181, 163, 0.52);
+  }
 }
 
 .btn-coral-gradient {
@@ -458,13 +475,19 @@ html, body {
   position: relative;
   overflow: hidden;
   touch-action: manipulation;
-  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   box-shadow: 0 10px 25px -5px rgba(255, 122, 89, 0.4);
+  transition: filter 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease, opacity 200ms ease;
 }
 
-.btn-coral-gradient:hover {
-  transform: translate3d(0, -2px, 0);
-  box-shadow: 0 14px 30px -4px rgba(255, 122, 89, 0.5);
+@media (hover: hover) and (pointer: fine) {
+  .btn-coral-gradient:hover {
+    filter: brightness(1.08) saturate(1.06);
+    box-shadow: 0 14px 32px -4px rgba(255, 122, 89, 0.55);
+  }
 }
 
 .btn-outline-brand {
@@ -474,13 +497,21 @@ html, body {
   font-weight: 600;
   border-radius: 9999px;
   touch-action: manipulation;
-  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease, filter 200ms ease;
 }
 
-.btn-outline-brand:hover {
-  background: #F3FBF9;
-  border-color: #0F766E;
-  color: #0B4E48;
+@media (hover: hover) and (pointer: fine) {
+  .btn-outline-brand:hover {
+    background-color: #F3FBF9;
+    border-color: #0F766E;
+    color: #0B4E48;
+    filter: brightness(1.02);
+    box-shadow: 0 4px 14px -2px rgba(15, 118, 110, 0.16);
+  }
 }
 
 /* ================= UNIFIED SMOOTH POP ENTRANCE SYSTEM ================= */
@@ -674,13 +705,19 @@ html, body {
   position: relative;
   overflow: hidden;
   touch-action: manipulation;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   box-shadow: 0 10px 25px -4px rgba(255, 107, 53, 0.45);
-  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+  transition: filter 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease, opacity 200ms ease;
 }
 
-.btn-power-coral:hover {
-  transform: translate3d(0, -2px, 0);
-  box-shadow: 0 14px 30px -4px rgba(255, 107, 53, 0.6);
+@media (hover: hover) and (pointer: fine) {
+  .btn-power-coral:hover {
+    filter: brightness(1.08) saturate(1.06);
+    box-shadow: 0 14px 32px -4px rgba(255, 107, 53, 0.62);
+  }
 }
 
 /* Clipped Badge */
@@ -737,21 +774,21 @@ html, body {
   box-shadow: 0 4px 20px -4px rgba(20, 184, 166, 0.08) !important;
 }
 
-/* 4. Universal Box & Container Styling with Attractive, Visible Colored Borders */
-[data-panel="admin"] .bg-white.rounded-2xl,
-[data-panel="admin"] .bg-white.rounded-xl,
-[data-panel="admin"] .bg-white.rounded-3xl,
-[data-panel="trainer"] .bg-white.rounded-2xl,
-[data-panel="trainer"] .bg-white.rounded-xl,
-[data-panel="trainer"] .bg-white.rounded-3xl,
-[data-panel="admin"] .bg-white.rounded-lg,
-[data-panel="trainer"] .bg-white.rounded-lg,
-[data-panel="admin"] [class*="rounded-2xl"].border,
-[data-panel="admin"] [class*="rounded-xl"].border,
-[data-panel="admin"] [class*="rounded-3xl"].border,
-[data-panel="trainer"] [class*="rounded-2xl"].border,
-[data-panel="trainer"] [class*="rounded-xl"].border,
-[data-panel="trainer"] [class*="rounded-3xl"].border {
+/* 4. Universal Box & Container Styling with Attractive, Visible Colored Borders (CONTAINERS ONLY - EXCLUDES BUTTONS & LINKS) */
+[data-panel="admin"] div.bg-white.rounded-2xl:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="admin"] div.bg-white.rounded-xl:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="admin"] div.bg-white.rounded-3xl:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="trainer"] div.bg-white.rounded-2xl:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="trainer"] div.bg-white.rounded-xl:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="trainer"] div.bg-white.rounded-3xl:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="admin"] div.bg-white.rounded-lg:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="trainer"] div.bg-white.rounded-lg:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="admin"] div[class*="rounded-2xl"].border:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="admin"] div[class*="rounded-xl"].border:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="admin"] div[class*="rounded-3xl"].border:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="trainer"] div[class*="rounded-2xl"].border:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="trainer"] div[class*="rounded-xl"].border:not(button):not(a):not(input):not(select):not([role="button"]),
+[data-panel="trainer"] div[class*="rounded-3xl"].border:not(button):not(a):not(input):not(select):not([role="button"]) {
   background: rgba(255, 255, 255, 0.92) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
@@ -761,16 +798,53 @@ html, body {
 }
 
 /* Hover state for boxes & cards */
-[data-panel="admin"] .bg-white.rounded-2xl:hover,
-[data-panel="admin"] .bg-white.rounded-xl:hover,
-[data-panel="trainer"] .bg-white.rounded-2xl:hover,
-[data-panel="trainer"] .bg-white.rounded-xl:hover,
-[data-panel="admin"] [class*="rounded-2xl"].border:hover,
-[data-panel="admin"] [class*="rounded-xl"].border:hover,
-[data-panel="trainer"] [class*="rounded-2xl"].border:hover,
-[data-panel="trainer"] [class*="rounded-xl"].border:hover {
+[data-panel="admin"] div.bg-white.rounded-2xl:not(button):not(a):not(input):not(select):not([role="button"]):hover,
+[data-panel="admin"] div.bg-white.rounded-xl:not(button):not(a):not(input):not(select):not([role="button"]):hover,
+[data-panel="trainer"] div.bg-white.rounded-2xl:not(button):not(a):not(input):not(select):not([role="button"]):hover,
+[data-panel="trainer"] div.bg-white.rounded-xl:not(button):not(a):not(input):not(select):not([role="button"]):hover,
+[data-panel="admin"] div[class*="rounded-2xl"].border:not(button):not(a):not(input):not(select):not([role="button"]):hover,
+[data-panel="admin"] div[class*="rounded-xl"].border:not(button):not(a):not(input):not(select):not([role="button"]):hover,
+[data-panel="trainer"] div[class*="rounded-2xl"].border:not(button):not(a):not(input):not(select):not([role="button"]):hover,
+[data-panel="trainer"] div[class*="rounded-xl"].border:not(button):not(a):not(input):not(select):not([role="button"]):hover {
   border-color: rgba(20, 184, 166, 0.82) !important;
   box-shadow: 0 10px 28px -4px rgba(20, 184, 166, 0.22), 0 4px 10px -2px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* 4b. Dedicated Smooth Color-Pop & Anti-Blink Engine for Admin & Trainer Panel Buttons */
+[data-panel="admin"] button,
+[data-panel="trainer"] button,
+[data-panel="admin"] [role="button"],
+[data-panel="trainer"] [role="button"],
+[data-panel="admin"] a.rounded-xl,
+[data-panel="trainer"] a.rounded-xl,
+[data-panel="admin"] a.rounded-lg,
+[data-panel="trainer"] a.rounded-lg {
+  touch-action: manipulation;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transition: color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              filter 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-panel="admin"] button:hover:not(:disabled),
+  [data-panel="trainer"] button:hover:not(:disabled),
+  [data-panel="admin"] [role="button"]:hover:not([aria-disabled="true"]),
+  [data-panel="trainer"] [role="button"]:hover:not([aria-disabled="true"]) {
+    filter: brightness(1.05);
+  }
+
+  [data-panel="admin"] button:active:not(:disabled),
+  [data-panel="trainer"] button:active:not(:disabled) {
+    filter: brightness(0.96);
+  }
 }
 
 /* Modals & Dialogs */

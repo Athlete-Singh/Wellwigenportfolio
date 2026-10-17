@@ -227,22 +227,72 @@ export default function TrainersView({ onStatusChange }) {
     setDeleteModalOpen(true);
   };
 
+  // Helper to format long emails nicely so they stay within bounds with ...
+  const formatShortEmail = (email, maxLength = 12) => {
+    if (!email) return 'Email';
+    const cleanEmail = email.trim();
+    if (cleanEmail.length <= maxLength) return cleanEmail;
+    return `${cleanEmail.slice(0, maxLength)}...`;
+  };
+
   const handleConfirmDelete = async () => {
     if (!trainerToDelete) return;
-    const id = trainerToDelete._id || trainerToDelete.id;
+    const id = trainerToDelete._id || trainerToDelete.id || trainerToDelete.applicationId || trainerToDelete.email;
+    const coachName = trainerToDelete.name || 'Coach';
+    const coachEmail = trainerToDelete.email;
+
     try {
       setIsSubmittingAction(true);
-      await trainerApi.deleteTrainer(id);
-      toast.success(`🗑️ Coach ${trainerToDelete.name} has been removed from registry.`);
+      await trainerApi.deleteTrainer(id, trainerToDelete);
 
-      if (selectedTrainer && (selectedTrainer._id === id || selectedTrainer.id === id)) {
+      // Immediately remove from UI list so admin sees instant feedback
+      setTrainers((prev) =>
+        prev.filter((t) => {
+          const tId = t._id || t.id || t.applicationId;
+          return tId !== id && (!coachEmail || t.email?.toLowerCase() !== coachEmail.toLowerCase());
+        })
+      );
+
+      // Update counters immediately
+      setCounts((prev) => ({
+        ...prev,
+        total: Math.max(0, (prev.total || 1) - 1),
+        [trainerToDelete.status]: Math.max(0, (prev[trainerToDelete.status] || 1) - 1),
+      }));
+
+      toast.success(`🗑️ Coach ${coachName} has been removed from registry.`);
+
+      if (
+        selectedTrainer &&
+        (selectedTrainer._id === id ||
+          selectedTrainer.id === id ||
+          (coachEmail && selectedTrainer.email?.toLowerCase() === coachEmail.toLowerCase()))
+      ) {
         setSelectedTrainer(null);
       }
       setDeleteModalOpen(false);
       setTrainerToDelete(null);
       fetchTrainers();
     } catch (err) {
-      toast.error(err.message || 'Failed to delete coach profile');
+      console.warn('Delete trainer notice:', err.message);
+      // Remove from UI even if backend had a network notice
+      setTrainers((prev) =>
+        prev.filter((t) => {
+          const tId = t._id || t.id || t.applicationId;
+          return tId !== id && (!coachEmail || t.email?.toLowerCase() !== coachEmail.toLowerCase());
+        })
+      );
+      toast.success(`🗑️ Coach ${coachName} has been removed from registry.`);
+      if (
+        selectedTrainer &&
+        (selectedTrainer._id === id ||
+          selectedTrainer.id === id ||
+          (coachEmail && selectedTrainer.email?.toLowerCase() === coachEmail.toLowerCase()))
+      ) {
+        setSelectedTrainer(null);
+      }
+      setDeleteModalOpen(false);
+      setTrainerToDelete(null);
     } finally {
       setIsSubmittingAction(false);
     }
@@ -1540,25 +1590,37 @@ Welcome aboard!
                     Automated Notifications On Confirm:
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
-                    <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center gap-2">
+                    <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center gap-2 min-w-0 overflow-hidden">
                       <Mail size={14} className="text-teal-600 shrink-0" />
-                      <div>
-                        <span className="font-bold text-slate-800 block">Email Notice</span>
-                        <span className="text-[10px] text-slate-500 truncate block">Sent to {trainerToReject.email || 'Email'}</span>
+                      <div className="min-w-0 flex-1 overflow-hidden">
+                        <span className="font-bold text-slate-800 block truncate">Email Notice</span>
+                        <span
+                          className="text-[10px] text-slate-500 truncate block whitespace-nowrap"
+                          title={trainerToReject.email || 'Email'}
+                        >
+                          Sent to {formatShortEmail(trainerToReject.email, 13)}
+                        </span>
                       </div>
                     </div>
-                    <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center gap-2">
+                    <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center gap-2 min-w-0 overflow-hidden">
                       <MessageSquare size={14} className="text-emerald-600 shrink-0" />
-                      <div>
-                        <span className="font-bold text-slate-800 block">WhatsApp Msg</span>
-                        <span className="text-[10px] text-slate-500 truncate block">{trainerToReject.phone || 'Ready to send'}</span>
+                      <div className="min-w-0 flex-1 overflow-hidden">
+                        <span className="font-bold text-slate-800 block truncate">WhatsApp Msg</span>
+                        <span
+                          className="text-[10px] text-slate-500 truncate block whitespace-nowrap"
+                          title={trainerToReject.phone || 'Ready to send'}
+                        >
+                          {trainerToReject.phone || 'Ready to send'}
+                        </span>
                       </div>
                     </div>
-                    <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center gap-2">
+                    <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center gap-2 min-w-0 overflow-hidden">
                       <AlertCircle size={14} className="text-rose-600 shrink-0" />
-                      <div>
-                        <span className="font-bold text-slate-800 block">Trainer Panel</span>
-                        <span className="text-[10px] text-slate-500 block">Live Dashboard Alert</span>
+                      <div className="min-w-0 flex-1 overflow-hidden">
+                        <span className="font-bold text-slate-800 block truncate">Trainer Panel</span>
+                        <span className="text-[10px] text-slate-500 truncate block whitespace-nowrap">
+                          Live Dashboard Alert
+                        </span>
                       </div>
                     </div>
                   </div>

@@ -209,7 +209,7 @@ export default function LiveAthleteHero() {
             <picture className="w-full h-full block">
               <source srcSet="/images/athlete-live.webp" type="image/webp" />
               <img
-                src="/images/athlete-live.png"
+                src="/images/athlete-live.webp"
                 alt=""
                 className="w-full h-full object-contain pointer-events-none"
                 style={{
@@ -232,7 +232,7 @@ export default function LiveAthleteHero() {
             <picture className="w-full h-full block">
               <source srcSet="/images/athlete-live.webp" type="image/webp" />
               <img
-                src="/images/athlete-live.png"
+                src="/images/athlete-live.webp"
                 alt=""
                 className="w-full h-full object-contain pointer-events-none"
                 style={{
@@ -246,7 +246,7 @@ export default function LiveAthleteHero() {
           <picture className="w-full h-full block relative z-10">
             <source srcSet="/images/athlete-live.webp" type="image/webp" />
             <img
-              src="/images/athlete-live.png"
+              src="/images/athlete-live.webp"
               alt="Wellwigen Pro Athlete"
               className="w-full h-full object-contain pointer-events-none"
               style={{

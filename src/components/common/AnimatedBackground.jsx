@@ -299,38 +299,45 @@ export default function AnimatedBackground() {
     if (isMobile || !BACKGROUND_CONFIG.enableMouseSpotlight || reducedMotion) return;
 
     let animId;
+    let isSpotlightActive = false;
     const handleMouseMove = (e) => {
       mouseTargetRef.current = { x: e.clientX, y: e.clientY };
+      if (!isSpotlightActive) {
+        isSpotlightActive = true;
+        animId = requestAnimationFrame(updateSpotlight);
+      }
     };
 
     const updateSpotlight = () => {
-      // Lerp (smooth lag)
       const target = mouseTargetRef.current;
       const current = mouseCurrentRef.current;
-      current.x += (target.x - current.x) * 0.08;
-      current.y += (target.y - current.y) * 0.08;
+      const dx = target.x - current.x;
+      const dy = target.y - current.y;
+      current.x += dx * 0.08;
+      current.y += dy * 0.08;
 
       if (spotlightRef.current) {
         spotlightRef.current.style.background = `radial-gradient(circle 380px at ${current.x.toFixed(1)}px ${current.y.toFixed(1)}px, var(--ab-spotlight-color), transparent 70%)`;
       }
 
-      animId = requestAnimationFrame(updateSpotlight);
+      // Idle sleep: only schedule next frame while cursor is moving
+      if (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3) {
+        animId = requestAnimationFrame(updateSpotlight);
+      } else {
+        isSpotlightActive = false;
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    animId = requestAnimationFrame(updateSpotlight);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animId);
+      if (animId) cancelAnimationFrame(animId);
     };
   }, [isMobile, reducedMotion]);
 
   // 4. Glowing Embers / Sparks Canvas Particles
   useEffect(() => {
-    // OLD CODE (commented by AI)
-    // if (reducedMotion) return;
-    // Active on both mobile and desktop (only disabled if system reduced-motion is active)
     if (reducedMotion) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -338,7 +345,7 @@ export default function AnimatedBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animFrameId;
+    let animFrameId = null;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -365,7 +372,6 @@ export default function AnimatedBackground() {
         x: Math.random() * width,
         y: Math.random() * height,
         radius: isMobile ? Math.random() * 2.2 + 1.5 : Math.random() * 1.8 + 1.2,
-        // ~65% Teal shades, ~35% Orange embers
         isOrange: Math.random() > 0.65,
         speedY: -(Math.random() * 0.5 + 0.35),
         wobbleSpeed: Math.random() * 0.03 + 0.015,
@@ -376,62 +382,70 @@ export default function AnimatedBackground() {
       });
     }
 
-    let isTabVisible = document.visibilityState === 'visible';
-    const handleVisibilityChange = () => {
-      isTabVisible = document.visibilityState === 'visible';
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Particle render loop
+    // High performance particle render loop (Zero CPU lag & battery-friendly)
     const render = () => {
-      if (isTabVisible) {
-        ctx.clearRect(0, 0, width, height);
+      if (document.visibilityState !== 'visible') {
+        animFrameId = null;
+        return;
+      }
 
-        // Smoothly decay scroll boost
-        const currentBoost = 1 + scrollBoostRef.current;
-        scrollBoostRef.current *= 0.94;
+      ctx.clearRect(0, 0, width, height);
 
-        for (let i = 0; i < particles.length; i++) {
-          const p = particles[i];
+      // Smoothly decay scroll boost
+      const currentBoost = 1 + scrollBoostRef.current;
+      scrollBoostRef.current *= 0.94;
 
-          // Upward drift + horizontal sine wobble
-          p.wobbleOffset += p.wobbleSpeed;
-          p.x += Math.sin(p.wobbleOffset) * p.wobbleAmp;
-          p.y += p.speedY * currentBoost;
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
 
-          // Wrap around top edge to bottom
-          if (p.y < -15) {
-            p.y = height + 15;
-            p.x = Math.random() * width;
-          }
-          if (p.x < -10) p.x = width + 10;
-          if (p.x > width + 10) p.x = -10;
+        // Upward drift + horizontal sine wobble
+        p.wobbleOffset += p.wobbleSpeed;
+        p.x += Math.sin(p.wobbleOffset) * p.wobbleAmp;
+        p.y += p.speedY * currentBoost;
 
-          // Pulse opacity gently
-          const currentAlpha = p.alpha * (0.8 + 0.2 * Math.sin(p.wobbleOffset));
-
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-
-          if (p.isOrange) {
-            ctx.fillStyle = `rgba(242, 122, 61, ${currentAlpha.toFixed(3)})`;
-            ctx.shadowColor = 'rgba(242, 122, 61, 0.4)';
-          } else {
-            ctx.fillStyle = `rgba(45, 212, 191, ${currentAlpha.toFixed(3)})`;
-            ctx.shadowColor = 'rgba(45, 212, 191, 0.45)';
-          }
-          ctx.shadowBlur = 6;
-          ctx.fill();
+        // Wrap around top edge to bottom
+        if (p.y < -15) {
+          p.y = height + 15;
+          p.x = Math.random() * width;
         }
+        if (p.x < -10) p.x = width + 10;
+        if (p.x > width + 10) p.x = -10;
+
+        // Pulse opacity gently
+        const currentAlpha = p.alpha * (0.8 + 0.2 * Math.sin(p.wobbleOffset));
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+
+        if (p.isOrange) {
+          ctx.fillStyle = `rgba(242, 122, 61, ${currentAlpha.toFixed(3)})`;
+        } else {
+          ctx.fillStyle = `rgba(45, 212, 191, ${currentAlpha.toFixed(3)})`;
+        }
+        ctx.fill();
       }
 
       animFrameId = requestAnimationFrame(render);
     };
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        if (!animFrameId) {
+          animFrameId = requestAnimationFrame(render);
+        }
+      } else {
+        if (animFrameId) {
+          cancelAnimationFrame(animFrameId);
+          animFrameId = null;
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     animFrameId = requestAnimationFrame(render);
 
     return () => {
-      cancelAnimationFrame(animFrameId);
+      if (animFrameId) cancelAnimationFrame(animFrameId);
       window.removeEventListener('resize', resizeCanvas);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };

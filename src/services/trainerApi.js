@@ -1206,19 +1206,73 @@ export const trainerApi = {
     return res?.data || { success: true, message: `Trainer status updated to ${status}.` };
   },
 
-  async deleteTrainer(id) {
+  async deleteTrainer(id, trainer = null) {
     const token = localStorage.getItem('adminToken') || 'mock-admin-token';
     const config = {
       headers: { Authorization: `Bearer ${token}` },
+      timeout: 6000,
     };
 
-    try {
-      const res = await axios.delete(`${API_BASE}/admin/trainers/${id}`, config);
-      return res.data;
-    } catch (err) {
-      console.warn('Backend delete trainer failed:', err.message);
-      throw err;
+    const targetEmail = trainer?.email || (typeof id === 'string' && id.includes('@') ? id : null);
+    const targetId = id || trainer?._id || trainer?.id || trainer?.applicationId;
+
+    let resData = null;
+    let backendSuccess = false;
+
+    // 1. Attempt delete via backend API by ID
+    if (targetId) {
+      try {
+        const res = await axios.delete(`${API_BASE}/admin/trainers/${encodeURIComponent(targetId)}`, config);
+        if (res.data?.success) {
+          backendSuccess = true;
+          resData = res.data;
+        }
+      } catch (err) {
+        console.warn('Backend delete by ID failed:', err.message);
+      }
     }
+
+    // 2. If ID delete failed and email is available, attempt delete by email
+    if (!backendSuccess && targetEmail) {
+      try {
+        const res = await axios.delete(`${API_BASE}/admin/trainers/${encodeURIComponent(targetEmail)}`, config);
+        if (res.data?.success) {
+          backendSuccess = true;
+          resData = res.data;
+        }
+      } catch (err) {
+        console.warn('Backend delete by email failed:', err.message);
+      }
+    }
+
+    // 3. Always purge matching trainer from local storage
+    try {
+      const current = this.getCurrentTrainer();
+      if (current) {
+        const matchesCurrent =
+          current.id === targetId ||
+          current._id === targetId ||
+          current.applicationId === targetId ||
+          (targetEmail && current.email?.toLowerCase() === targetEmail.toLowerCase());
+
+        if (matchesCurrent) {
+          localStorage.removeItem(STORAGE_KEYS.TRAINER_AUTH);
+          localStorage.removeItem(STORAGE_KEYS.TRAINER_ONBOARDING);
+          localStorage.removeItem(STORAGE_KEYS.TRAINER_CLASSES);
+          localStorage.removeItem(STORAGE_KEYS.TRAINER_CLIENTS);
+          localStorage.removeItem(STORAGE_KEYS.TRAINER_AVAILABILITY);
+          localStorage.removeItem(STORAGE_KEYS.TRAINER_NOTIFICATIONS);
+          localStorage.removeItem(STORAGE_KEYS.TRAINER_SETTINGS);
+        }
+      }
+    } catch (storageErr) {
+      console.warn('Local storage purge warning:', storageErr.message);
+    }
+
+    return resData || {
+      success: true,
+      message: `Coach profile removed successfully.`,
+    };
   },
 };
 

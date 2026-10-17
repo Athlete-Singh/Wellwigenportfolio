@@ -66,24 +66,18 @@ export default function LivePersonalTrainerHero() {
         }}
         className="relative w-full h-[360px] xs:h-[420px] sm:h-[500px] md:h-[580px] lg:h-[650px] xl:h-[700px] flex items-center justify-center overflow-visible"
       >
-        {/* ================= COMPACT VIBRANT ARCHITECTURAL FORMATION (Shifted left per user request) ================= */}
-        <div
-          className="absolute inset-0 pointer-events-none"
+        {/* ================= COMPACT VIBRANT ARCHITECTURAL FORMATION ================= */}
+        <motion.div
           style={{
-            transform: 'translateX(-54px)',
+            x: prefersReducedMotion ? 0 : wallTranslateX,
+            y: prefersReducedMotion ? 0 : wallTranslateY,
+            transformStyle: 'preserve-3d',
           }}
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
         >
-          <motion.div
-            style={{
-              x: prefersReducedMotion ? 0 : wallTranslateX,
-              y: prefersReducedMotion ? 0 : wallTranslateY,
-              transformStyle: 'preserve-3d',
-            }}
-            className="w-full h-full flex items-center justify-center pointer-events-none"
-          >
           {/* Radiant Multi-Color Ambient Bloom */}
           <div
-            className="absolute top-[16%] sm:top-[18%] w-[68%] sm:w-[62%] lg:w-[58%] xl:w-[54%] h-[66%] sm:h-[62%] lg:h-[58%] xl:h-[56%] rounded-[48px] bg-gradient-to-tr from-teal-400/30 via-emerald-400/20 to-orange-400/15 blur-2xl -z-10"
+            className="absolute top-[16%] sm:top-[18%] inset-x-0 mx-auto w-[68%] sm:w-[62%] lg:w-[58%] xl:w-[54%] h-[66%] sm:h-[62%] lg:h-[58%] xl:h-[56%] rounded-[48px] bg-gradient-to-tr from-teal-400/30 via-emerald-400/20 to-orange-400/15 blur-2xl -z-10"
             aria-hidden="true"
           />
 
@@ -95,7 +89,7 @@ export default function LivePersonalTrainerHero() {
               height: 'var(--pt-circle-size, 230px)',
               backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
               top: '14%',
-              left: '10%',
+              left: '12%',
               opacity: 0.95,
             }}
             aria-hidden="true"
@@ -103,17 +97,17 @@ export default function LivePersonalTrainerHero() {
 
           {/* Colorful Shape 2: Deep Luxury Teal-Emerald Contrast Arch (#0F766E) tilted -7deg */}
           <div
-            className="absolute top-[18%] sm:top-[20%] right-[10%] sm:right-[14%] lg:right-[16%] w-[64%] sm:w-[58%] lg:w-[54%] xl:w-[50%] h-[66%] sm:h-[62%] lg:h-[58%] xl:h-[55%] rounded-[36px] sm:rounded-[44px] shadow-[0_18px_40px_rgba(15,23,42,0.18)]"
+            className="absolute top-[18%] sm:top-[20%] inset-x-0 mx-auto w-[64%] sm:w-[58%] lg:w-[54%] xl:w-[50%] h-[66%] sm:h-[62%] lg:h-[58%] xl:h-[55%] rounded-[36px] sm:rounded-[44px] shadow-[0_18px_40px_rgba(15,23,42,0.18)]"
             style={{
               backgroundColor: 'var(--solid-teal-dark, #0F766E)',
-              transform: 'rotate(-7deg) translate(-10px, 8px)',
+              transform: 'rotate(-7deg) translate(-6px, 8px)',
             }}
             aria-hidden="true"
           />
 
           {/* Colorful Shape 3: Main Vibrant Electric Teal & Aqua Arch Box (#2DE2C8 to #0F766E) */}
           <div
-            className="absolute top-[20%] sm:top-[22%] w-[62%] sm:w-[56%] lg:w-[52%] xl:w-[48%] h-[66%] sm:h-[62%] lg:h-[58%] xl:h-[55%] rounded-[34px] sm:rounded-[42px] shadow-[0_24px_50px_rgba(15,23,42,0.22)] overflow-hidden border-2 border-teal-200/60"
+            className="absolute top-[20%] sm:top-[22%] inset-x-0 mx-auto w-[62%] sm:w-[56%] lg:w-[52%] xl:w-[48%] h-[66%] sm:h-[62%] lg:h-[58%] xl:h-[55%] rounded-[34px] sm:rounded-[42px] shadow-[0_24px_50px_rgba(15,23,42,0.22)] overflow-hidden border-2 border-teal-200/60"
             style={{
               background: 'linear-gradient(145deg, #2DE2C8 0%, #1FB5A3 38%, #14998A 72%, #0F766E 100%)',
               transform: 'translateZ(-25px)',
@@ -226,14 +220,13 @@ export default function LivePersonalTrainerHero() {
 
           {/* Ground Contact Shadow Plane */}
           <div
-            className="absolute bottom-2 sm:bottom-4 w-[75%] sm:w-[70%] h-8 pointer-events-none"
+            className="absolute bottom-2 sm:bottom-4 inset-x-0 mx-auto w-[75%] sm:w-[70%] h-8 pointer-events-none"
             style={{
               background: 'radial-gradient(ellipse 65% 30% at 50% 90%, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.15) 50%, transparent 75%)',
               filter: 'blur(6px)',
             }}
           />
         </motion.div>
-        </div>
 
         {/* ================= ENLARGED 3D BREAK-OUT TRAINER & ATHLETE DUO ================= */}
         {/* Cutout image is significantly enlarged, breaking out dramatically beyond the background box in true 3D */}
@@ -241,8 +234,8 @@ export default function LivePersonalTrainerHero() {
           style={{
             x: prefersReducedMotion ? 0 : athleteTranslateX,
             y: prefersReducedMotion ? 0 : athleteTranslateY,
+            z: 55,
             transformStyle: 'preserve-3d',
-            transform: 'translateZ(55px)',
           }}
           animate={
             prefersReducedMotion
@@ -271,7 +264,7 @@ export default function LivePersonalTrainerHero() {
             <picture className="w-full h-full block">
               <source srcSet="/images/pt_trainer_athlete_duo.webp" type="image/webp" />
               <img
-                src="/images/pt_trainer_athlete_duo.png"
+                src="/images/pt_trainer_athlete_duo.webp"
                 alt=""
                 className="w-full h-full object-contain pointer-events-none"
                 style={{ filter: 'brightness(0)' }}
@@ -292,7 +285,7 @@ export default function LivePersonalTrainerHero() {
             <picture className="w-full h-full block">
               <source srcSet="/images/pt_trainer_athlete_duo.webp" type="image/webp" />
               <img
-                src="/images/pt_trainer_athlete_duo.png"
+                src="/images/pt_trainer_athlete_duo.webp"
                 alt=""
                 className="w-full h-full object-contain pointer-events-none"
                 style={{ filter: 'brightness(0)' }}
@@ -304,7 +297,7 @@ export default function LivePersonalTrainerHero() {
           <picture className="w-full h-full block relative z-10">
             <source srcSet="/images/pt_trainer_athlete_duo.webp" type="image/webp" />
             <img
-              src="/images/pt_trainer_athlete_duo.png"
+              src="/images/pt_trainer_athlete_duo.webp"
               alt="Personal trainer coaching athlete with resistance band"
               className="w-full h-full object-contain pointer-events-none"
               style={{

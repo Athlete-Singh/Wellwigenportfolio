@@ -279,7 +279,7 @@ export default function LiveGroupClassesHero() {
               <picture className="w-full h-full block">
                 <source srcSet="/images/group_yoga_athletes_cutout.webp" type="image/webp" />
                 <img
-                  src="/images/group_yoga_athletes_cutout.png"
+                  src="/images/group_yoga_athletes_cutout.webp"
                   alt=""
                   className="w-full h-full object-contain pointer-events-none"
                   style={{ filter: 'brightness(0)' }}
@@ -300,7 +300,7 @@ export default function LiveGroupClassesHero() {
               <picture className="w-full h-full block">
                 <source srcSet="/images/group_yoga_athletes_cutout.webp" type="image/webp" />
                 <img
-                  src="/images/group_yoga_athletes_cutout.png"
+                  src="/images/group_yoga_athletes_cutout.webp"
                   alt=""
                   className="w-full h-full object-contain pointer-events-none"
                   style={{ filter: 'brightness(0)' }}
@@ -312,7 +312,7 @@ export default function LiveGroupClassesHero() {
             <picture className="w-full h-full block relative z-10">
               <source srcSet="/images/group_yoga_athletes_cutout.webp" type="image/webp" />
               <img
-                src="/images/group_yoga_athletes_cutout.png"
+                src="/images/group_yoga_athletes_cutout.webp"
                 alt="Group fitness & yoga class practicing meditation on mats"
                 className="w-full h-full object-contain pointer-events-none"
                 style={{

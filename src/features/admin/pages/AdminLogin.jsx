@@ -17,11 +17,21 @@ import {
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+import slide1Img from '../../../assets/admin-slider/slide1.webp';
+import slide2Img from '../../../assets/admin-slider/slide2.webp';
+import slide3Img from '../../../assets/admin-slider/slide3.webp';
+import slide4Img from '../../../assets/admin-slider/slide4.webp';
+import slide5Img from '../../../assets/admin-slider/slide5.webp';
+import slide6Img from '../../../assets/admin-slider/slide6.webp';
+import slide7Img from '../../../assets/admin-slider/slide7.webp';
+import slide8Img from '../../../assets/admin-slider/slide8.webp';
+
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const SLIDES = [
   {
-    image: '/admin-slider/slide1.jpg',
+    image: slide1Img,
+    fallback: '/admin-slider/slide1.jpg',
     tag: 'Elite Coaching',
     title: 'Precision Strength & Hypertrophy',
     subtitle: 'Institutional control over personalized fitness programs, progressive overload, and client rosters.',
@@ -29,7 +39,8 @@ const SLIDES = [
     statLabel: 'Program Adherence',
   },
   {
-    image: '/admin-slider/slide2.jpg',
+    image: slide2Img,
+    fallback: '/admin-slider/slide2.jpg',
     tag: 'MetCon Endurance',
     title: 'High-Intensity Conditioning',
     subtitle: 'Real-time workout logging, biometric tracking, and automated client renewal cycles.',
@@ -37,7 +48,8 @@ const SLIDES = [
     statLabel: 'Active Trainees',
   },
   {
-    image: '/admin-slider/slide3.jpg',
+    image: slide3Img,
+    fallback: '/admin-slider/slide3.jpg',
     tag: 'Structural Mastery',
     title: 'Engineered Muscle & Biomechanics',
     subtitle: 'Seamless oversight of certified trainers, verified certifications, and client progress metrics.',
@@ -45,7 +57,8 @@ const SLIDES = [
     statLabel: 'Verified Coaches',
   },
   {
-    image: '/admin-slider/slide4.jpg',
+    image: slide4Img,
+    fallback: '/admin-slider/slide4.jpg',
     tag: 'Dynamic Fitness',
     title: 'Mobility & Functional Power',
     subtitle: 'Holistic lifestyle tracking with nutrition guidance and automated order generation.',
@@ -53,7 +66,8 @@ const SLIDES = [
     statLabel: 'Security Protected',
   },
   {
-    image: '/admin-slider/slide5.jpg',
+    image: slide5Img,
+    fallback: '/admin-slider/slide5.jpg',
     tag: 'Apex Power',
     title: 'Peak Athletic Transformation',
     subtitle: 'The apex administrative engine powering the Wellwigen health and fitness ecosystem.',
@@ -61,7 +75,8 @@ const SLIDES = [
     statLabel: 'Encrypted Gateway',
   },
   {
-    image: '/admin-slider/slide6.jpg',
+    image: slide6Img,
+    fallback: '/admin-slider/slide6.jpg',
     tag: 'Personalized Coaching',
     title: 'Expert 1-on-1 Trainer Guidance',
     subtitle: 'Comprehensive workout tracking, form correction, and dedicated coach-client mentorship.',
@@ -69,7 +84,8 @@ const SLIDES = [
     statLabel: 'Guided Coaching',
   },
   {
-    image: '/admin-slider/slide7.jpg',
+    image: slide7Img,
+    fallback: '/admin-slider/slide7.jpg',
     tag: 'Power & Form',
     title: 'Elite Strength & Hypertrophy',
     subtitle: 'Dedicated progressive resistance regimens engineered for peak athletic conditioning.',
@@ -77,7 +93,8 @@ const SLIDES = [
     statLabel: 'Target Achievement',
   },
   {
-    image: '/admin-slider/slide8.jpg',
+    image: slide8Img,
+    fallback: '/admin-slider/slide8.jpg',
     tag: 'Functional Agility',
     title: 'Calisthenics & Gymnastic Mastery',
     subtitle: 'Holistic movement mastery, core balance, and functional bodyweight strength.',
@@ -103,6 +120,14 @@ export default function AdminLogin() {
   // Slider State
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+
+  // Preload all slide images into browser cache immediately for instantaneous, glitch-free transitions
+  useEffect(() => {
+    SLIDES.forEach((slide) => {
+      const img = new Image();
+      img.src = slide.image;
+    });
+  }, []);
 
   // Auto-slide effect every 4.5 seconds (pauses on hover)
   useEffect(() => {
@@ -263,22 +288,42 @@ export default function AdminLogin() {
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {/* Animated Slide Background Image */}
-        <AnimatePresence mode="wait">
+        {/* Continuous underlying base slide - guarantees zero empty background gaps */}
+        <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+          <img
+            src={current.image}
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover"
+            style={{
+              objectPosition: current.objectPosition || 'center center',
+            }}
+          />
+        </div>
+
+        {/* Animated Slide Background Image with seamless crossfade (no blank wait gap) */}
+        <AnimatePresence initial={false}>
           <motion.div
             key={activeSlide}
-            initial={{ opacity: 0, scale: 1.05 }}
+            initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0"
           >
             <img
               src={current.image}
               alt={current.title}
+              loading="eager"
+              decoding="async"
               className="w-full h-full object-cover"
               style={{
                 objectPosition: current.objectPosition || 'center center',
+              }}
+              onError={(e) => {
+                if (current.fallback && e.currentTarget.src !== current.fallback) {
+                  e.currentTarget.src = current.fallback;
+                }
               }}
             />
           </motion.div>
