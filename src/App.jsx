@@ -308,24 +308,24 @@ function App() {
         <React.Suspense fallback={<div className="min-h-screen bg-[#F2FAF8]" />}>
           <Routes>
 
-          {/* ================= ADMIN ROUTES ================= */}
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
-          <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
-          <Route path="/admin/panel" element={<Navigate to="/admin" replace />} />
-          {/* NEW CODE - Wellwigen restyle / Inquiries feature */}
-          <Route path="/admin/inquiries" element={<AdminProtectedRoute><AdminDashboard initialTab="Inquiries" /></AdminProtectedRoute>} />
-          <Route path="/admin/trainers" element={<AdminProtectedRoute><AdminDashboard initialTab="Trainers" /></AdminProtectedRoute>} />
-          {/* [DISABLED FOR FUTURE USE] Admin Classes & Schedule Route
+            {/* ================= ADMIN ROUTES ================= */}
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+            <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+            <Route path="/admin/panel" element={<Navigate to="/admin" replace />} />
+            {/* NEW CODE - Wellwigen restyle / Inquiries feature */}
+            <Route path="/admin/inquiries" element={<AdminProtectedRoute><AdminDashboard initialTab="Inquiries" /></AdminProtectedRoute>} />
+            <Route path="/admin/trainers" element={<AdminProtectedRoute><AdminDashboard initialTab="Trainers" /></AdminProtectedRoute>} />
+            {/* [DISABLED FOR FUTURE USE] Admin Classes & Schedule Route
           <Route path="/admin/classes" element={<AdminDashboard initialTab="Classes" />} />
           */}
-          <Route path="/admin/clients" element={<AdminProtectedRoute><AdminDashboard initialTab="Clients" /></AdminProtectedRoute>} />
-          <Route path="/admin/subscriptions" element={<AdminProtectedRoute><AdminDashboard initialTab="Subscriptions" /></AdminProtectedRoute>} />
-          <Route path="/admin/settings" element={<AdminProtectedRoute><AdminDashboard initialTab="Settings" /></AdminProtectedRoute>} />
-          <Route path="/admin/*" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+            <Route path="/admin/clients" element={<AdminProtectedRoute><AdminDashboard initialTab="Clients" /></AdminProtectedRoute>} />
+            <Route path="/admin/subscriptions" element={<AdminProtectedRoute><AdminDashboard initialTab="Subscriptions" /></AdminProtectedRoute>} />
+            <Route path="/admin/settings" element={<AdminProtectedRoute><AdminDashboard initialTab="Settings" /></AdminProtectedRoute>} />
+            <Route path="/admin/*" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
 
-          {/* [DISABLED FOR FUTURE USE] Admin Management Sub-Routes (Appointments, Medical Records, Vendors, Categories, Verification)
+            {/* [DISABLED FOR FUTURE USE] Admin Management Sub-Routes (Appointments, Medical Records, Vendors, Categories, Verification)
           <Route path="/admin/manage" element={<AdminLayout />}>
             <Route path="medical-records" element={<MedicalRecords />} />
             <Route path="prescriptions" element={<Prescriptions />} />
@@ -338,7 +338,7 @@ function App() {
           </Route>
           */}
 
-          {/* [DISABLED FOR FUTURE USE] Flat Admin Route Aliases to prevent 404s from Sidebar links
+            {/* [DISABLED FOR FUTURE USE] Flat Admin Route Aliases to prevent 404s from Sidebar links
           <Route path="/admin/appointments" element={<AdminLayout><Appointments /></AdminLayout>} />
           <Route path="/admin/medical-records" element={<AdminLayout><MedicalRecords /></AdminLayout>} />
           <Route path="/admin/vendors" element={<AdminLayout><AdminVendors /></AdminLayout>} />
@@ -348,42 +348,43 @@ function App() {
 
 
 
-          {/* ================= VENDOR ROUTES ================= */}
+            {/* ================= VENDOR ROUTES ================= */}
 
-          <Route path="/provider/onboarding" element={<OnboardingWizard />} />
-          <Route path="/provider/status" element={<ProviderStatus />} />
-          <Route path="/vendor/register" element={<OnboardingWizard />} />
+            <Route path="/provider/onboarding" element={<OnboardingWizard />} />
+            <Route path="/provider/status" element={<ProviderStatus />} />
+            <Route path="/vendor/register" element={<OnboardingWizard />} />
 
-          <Route path="/vendor/login" element={
-            <PageWrapper>
-              <Helmet>
-                <title>Partner & Provider Portal Login | Wellwigen Partner Hub</title>
-                <meta name="description" content="Access the partner login portal for doctors, pharmacists, laboratory technicians, certified fitness trainers, and wellness vendors on the Wellwigen network." />
-                <meta name="keywords" content="doctor portal login, partner store dashboard, lab testing portal access, fitness coach login, provider portal login" />
-                <link rel="canonical" href={window.location.origin + "/vendor/login"} />
-              </Helmet>
-              <VendorLogin />
-            </PageWrapper>
-          } />
+            <Route path="/vendor/login" element={
+              <PageWrapper>
+                <Helmet>
+                  <title>Partner & Provider Portal Login | Wellwigen Partner Hub</title>
+                  <meta name="description" content="Access the partner login portal for doctors, pharmacists, laboratory technicians, certified fitness trainers, and wellness vendors on the Wellwigen network." />
+                  <meta name="keywords" content="doctor portal login, partner store dashboard, lab testing portal access, fitness coach login, provider portal login" />
+                  <link rel="canonical" href={window.location.origin + "/vendor/login"} />
+                </Helmet>
+                <VendorLogin />
+              </PageWrapper>
+            } />
 
-          {/* ✅ Role-Specific Provider Dashboards */}
-          <Route path="/provider/dashboard" element={<ProviderProtectedRoute><UnifiedDashboard /></ProviderProtectedRoute>} />
-          <Route path="/doctor/dashboard" element={<ProviderProtectedRoute allowedRole="DOCTOR"><UnifiedDashboard /></ProviderProtectedRoute>} />
-          <Route path="/vendor/dashboard" element={<ProviderProtectedRoute allowedRole="VENDOR"><UnifiedDashboard /></ProviderProtectedRoute>} />
-          <Route path="/lab/dashboard" element={<ProviderProtectedRoute allowedRole="LAB"><UnifiedDashboard /></ProviderProtectedRoute>} />
-          <Route path="/nutrition/dashboard" element={<ProviderProtectedRoute allowedRole="NUTRITION"><UnifiedDashboard /></ProviderProtectedRoute>} />
-          {/* OLD CODE (commented by AI)
+            {/* [DISABLED FOR NOW] Provider Dashboards (Doctor, Lab, Vendor, Nutrition)
+            <Route path="/provider/dashboard" element={<ProviderProtectedRoute><UnifiedDashboard /></ProviderProtectedRoute>} />
+            <Route path="/doctor/dashboard" element={<ProviderProtectedRoute allowedRole="DOCTOR"><UnifiedDashboard /></ProviderProtectedRoute>} />
+            <Route path="/vendor/dashboard" element={<ProviderProtectedRoute allowedRole="VENDOR"><UnifiedDashboard /></ProviderProtectedRoute>} />
+            <Route path="/lab/dashboard" element={<ProviderProtectedRoute allowedRole="LAB"><UnifiedDashboard /></ProviderProtectedRoute>} />
+            <Route path="/nutrition/dashboard" element={<ProviderProtectedRoute allowedRole="NUTRITION"><UnifiedDashboard /></ProviderProtectedRoute>} />
+            */}
+            {/* OLD CODE (commented by AI)
           <Route path="/trainer/dashboard" element={<ProviderProtectedRoute allowedRole="TRAINER"><TrainerDashboard /></ProviderProtectedRoute>} />
           */}
-          {/* NEW CODE - Wellwigen Trainer Portal (Public intro, auth, 6-step onboarding, and full dashboard suite) */}
-          <Route path="/trainer" element={<TrainerIntro />} />
-          <Route path="/trainer/login" element={<TrainerLogin />} />
-          <Route path="/trainer/register" element={<TrainerRegister />} />
-          <Route path="/trainer/onboarding" element={<TrainerProtectedRoute><TrainerOnboarding /></TrainerProtectedRoute>} />
-          <Route path="/trainer/safety-guidelines" element={<TrainerSafetyGuidelines />} />
-          <Route path="/safety-guidelines" element={<TrainerSafetyGuidelines />} />
+            {/* NEW CODE - Wellwigen Trainer Portal (Public intro, auth, 6-step onboarding, and full dashboard suite) */}
+            <Route path="/trainer" element={<TrainerIntro />} />
+            <Route path="/trainer/login" element={<TrainerLogin />} />
+            <Route path="/trainer/register" element={<TrainerRegister />} />
+            <Route path="/trainer/onboarding" element={<TrainerProtectedRoute><TrainerOnboarding /></TrainerProtectedRoute>} />
+            <Route path="/trainer/safety-guidelines" element={<TrainerSafetyGuidelines />} />
+            <Route path="/safety-guidelines" element={<TrainerSafetyGuidelines />} />
 
-          {/* OLD CODE (commented by AI)
+            {/* OLD CODE (commented by AI)
           <Route path="/trainer/dashboard" element={<TrainerProtectedRoute><TrainerLayout><TrainerPortalDashboard /></TrainerLayout></TrainerProtectedRoute>} />
           <Route path="/trainer/classes" element={<TrainerProtectedRoute><TrainerLayout><TrainerClasses /></TrainerLayout></TrainerProtectedRoute>} />
           <Route path="/trainer/clients" element={<TrainerProtectedRoute><TrainerLayout><TrainerClients /></TrainerLayout></TrainerProtectedRoute>} />
@@ -391,68 +392,68 @@ function App() {
           <Route path="/trainer/settings" element={<TrainerProtectedRoute><TrainerLayout><TrainerSettings /></TrainerLayout></TrainerProtectedRoute>} />
           */}
 
-          {/* NEW CODE - Protected Trainer Portal with Persistent Layout & Smooth Sliding Transitions */}
-          <Route
-            element={
-              <TrainerProtectedRoute>
-                <TrainerLayout />
-              </TrainerProtectedRoute>
-            }
-          >
-            <Route path="/trainer/dashboard" element={<TrainerPortalDashboard />} />
-            <Route path="/trainer/classes" element={<TrainerClasses />} />
-            <Route path="/trainer/clients" element={<TrainerClients />} />
-            {/* [DISABLED FOR FUTURE USE] Trainer Availability Route
+            {/* NEW CODE - Protected Trainer Portal with Persistent Layout & Smooth Sliding Transitions */}
+            <Route
+              element={
+                <TrainerProtectedRoute>
+                  <TrainerLayout />
+                </TrainerProtectedRoute>
+              }
+            >
+              <Route path="/trainer/dashboard" element={<TrainerPortalDashboard />} />
+              <Route path="/trainer/classes" element={<TrainerClasses />} />
+              <Route path="/trainer/clients" element={<TrainerClients />} />
+              {/* [DISABLED FOR FUTURE USE] Trainer Availability Route
             <Route path="/trainer/availability" element={<TrainerAvailability />} />
             */}
-            <Route path="/trainer/profile" element={<TrainerProfile />} />
-            <Route path="/trainer/settings" element={<TrainerSettings />} />
-          </Route>
-          <Route path="/trainer/*" element={<TrainerNotFound />} />
-          <Route path="/dashboard" element={<UserDashboard />} />
+              <Route path="/trainer/profile" element={<TrainerProfile />} />
+              <Route path="/trainer/settings" element={<TrainerSettings />} />
+            </Route>
+            <Route path="/trainer/*" element={<TrainerNotFound />} />
+            <Route path="/dashboard" element={<UserDashboard />} />
 
-          {/* ================= TERMS ================= */}
-          <Route
-            path="/terms-and-conditions"
-            element={
-              <PageWrapper>
-                <Helmet>
-                  <title>Terms & Conditions & Privacy Policy | Wellwigen</title>
-                  <meta name="description" content="Review the Terms & Conditions and Privacy Policy for utilizing the Wellwigen smart wellness platform and telemedicine consultation network." />
-                  <link rel="canonical" href={window.location.origin + "/terms-and-conditions"} />
-                </Helmet>
-                <TermsAndConditions />
-                <Footer />
-              </PageWrapper>
-            }
-          />
+            {/* ================= TERMS ================= */}
+            <Route
+              path="/terms-and-conditions"
+              element={
+                <PageWrapper>
+                  <Helmet>
+                    <title>Terms & Conditions & Privacy Policy | Wellwigen</title>
+                    <meta name="description" content="Review the Terms & Conditions and Privacy Policy for utilizing the Wellwigen smart wellness platform and telemedicine consultation network." />
+                    <link rel="canonical" href={window.location.origin + "/terms-and-conditions"} />
+                  </Helmet>
+                  <TermsAndConditions />
+                  <Footer />
+                </PageWrapper>
+              }
+            />
 
-          {/* ================= NEW SINGLE-PAGE LANDING ================= */}
-          <Route path="/" element={<LandingPage />} />
+            {/* ================= NEW SINGLE-PAGE LANDING ================= */}
+            <Route path="/" element={<LandingPage />} />
 
-          {/* ================= DEDICATED PERSONAL TRAINING PAGE ================= */}
-          <Route path="/personal-training" element={<PersonalTrainingPage />} />
-          <Route path="/pricing" element={<PersonalTrainingPage />} />
+            {/* ================= DEDICATED PERSONAL TRAINING PAGE ================= */}
+            <Route path="/personal-training" element={<PersonalTrainingPage />} />
+            <Route path="/pricing" element={<PersonalTrainingPage />} />
 
-          {/* ================= DEDICATED GROUP CLASSES PAGE ================= */}
-          <Route path="/group-classes" element={<GroupClassesPage />} />
-          <Route path="/schedule" element={<GroupClassesPage />} />
+            {/* ================= DEDICATED GROUP CLASSES PAGE ================= */}
+            <Route path="/group-classes" element={<GroupClassesPage />} />
+            <Route path="/schedule" element={<GroupClassesPage />} />
 
-          {/* ================= REDIRECTS FROM OLD MARKETING ROUTES TO ANCHORS ================= */}
-          <Route path="/about" element={<Navigate to="/#home" replace />} />
-          <Route path="/contact" element={<Navigate to="/#home" replace />} />
-          <Route path="/services" element={<Navigate to="/#home" replace />} />
-          <Route path="/testimonial" element={<Navigate to="/#home" replace />} />
-          <Route path="/contactus" element={<Navigate to="/#home" replace />} />
+            {/* ================= REDIRECTS FROM OLD MARKETING ROUTES TO ANCHORS ================= */}
+            <Route path="/about" element={<Navigate to="/#home" replace />} />
+            <Route path="/contact" element={<Navigate to="/#home" replace />} />
+            <Route path="/services" element={<Navigate to="/#home" replace />} />
+            <Route path="/testimonial" element={<Navigate to="/#home" replace />} />
+            <Route path="/contactus" element={<Navigate to="/#home" replace />} />
 
-          {/* ================= LEGACY START: Original Multi-page Homepage =================
+            {/* ================= LEGACY START: Original Multi-page Homepage =================
           <Route
             path="/legacy-home"
             element={
               <PageWrapper>
                 <Helmet>
                   <title>Wellwigen | 24/7 Online Doctor Consultation, AI Diet Planner & Fitness Coach</title>
-                  <meta name="description" content="Wellwigen is an AI-powered health and wellness ecosystem. Get 24/7 online doctor consultations, personalized AI meal plans, and certified virtual personal fitness trainers. Sync biometric devices, book home lab tests, and get doorstep medicine delivery." />
+                  <meta name="description" content="Wellwigen is an health and wellness ecosystem. Get 24/7 online doctor consultations, personalized AI meal plans, and certified virtual personal fitness trainers. Sync biometric devices, book home lab tests, and get doorstep medicine delivery." />
                   <meta name="keywords" content="online doctor consultation, 24/7 online doctor, AI meal planner, AI nutrition app, virtual fitness trainer, online personal training, immediate virtual care, telehealth app, home lab tests, prescription medicine delivery online, AI diet coach, medical health ecosystem, digital clinic" />
                   <link rel="canonical" href={window.location.origin + "/"} />
                   <meta property="og:type" content="website" />
@@ -471,9 +472,9 @@ function App() {
                           "name": "Wellwigen",
                           "alternateName": "Wellwigen Health & Fitness",
                           "url": "https://wellwigen.com",
-                          "logo": "https://wellwigen.com/favicon.svg",
+                          "logo": "https://wellwigen.com/images/wellwigen-logo.png",
                           "image": "https://wellwigen.com/og-image.jpg",
-                          "description": "Wellwigen is an AI-powered health and wellness platform offering 24/7 online doctor consultations, personalized AI meal plans, and virtual fitness coaching.",
+                          "description": "Wellwigen is an health and wellness platform offering 24/7 online doctor consultations, personalized AI meal plans, and virtual fitness coaching.",
                           "telephone": "+919598506627",
                           "email": "wellwigen@gmail.com",
                           "address": {
@@ -523,7 +524,7 @@ function App() {
           />
           ================= LEGACY END: Original Multi-page Homepage ================= */}
 
-          {/* ================= LEGACY START: Original Marketing Sub-routes (redirected to single-scroll anchors above) =================
+            {/* ================= LEGACY START: Original Marketing Sub-routes (redirected to single-scroll anchors above) =================
           <Route path="/services" element={
             <PageWrapper>
               <Helmet>
@@ -576,15 +577,15 @@ function App() {
             </PageWrapper>
           } />
           ================= LEGACY END: Original Marketing Sub-routes ================= */}
-          <Route path="/join-as-trainer" element={
-            <PageWrapper>
-              <Helmet>
-                <title>Become a Certified Online Personal Trainer | Wellwigen Careers</title>
-                <meta name="description" content="Sign up as a certified fitness coach or trainer on the Wellwigen network. Work remotely, create custom workout plans, track client biometrics, and build your digital training business." />
-                <meta name="keywords" content="online personal trainer jobs, virtual fitness coach sign up, remote personal training career, certified fitness trainer platform, work as fitness trainer online" />
-                <link rel="canonical" href={window.location.origin + "/join-as-trainer"} />
-                <script type="application/ld+json">
-                  {`
+            <Route path="/join-as-trainer" element={
+              <PageWrapper>
+                <Helmet>
+                  <title>Become a Certified Online Personal Trainer | Wellwigen Careers</title>
+                  <meta name="description" content="Sign up as a certified fitness coach or trainer on the Wellwigen network. Work remotely, create custom workout plans, track client biometrics, and build your digital training business." />
+                  <meta name="keywords" content="online personal trainer jobs, virtual fitness coach sign up, remote personal training career, certified fitness trainer platform, work as fitness trainer online" />
+                  <link rel="canonical" href={window.location.origin + "/join-as-trainer"} />
+                  <script type="application/ld+json">
+                    {`
                       {
                         "@context": "https://schema.org",
                         "@type": "WebPage",
@@ -592,23 +593,23 @@ function App() {
                         "description": "Onboarding page for professional personal trainers to offer remote fitness coaching."
                       }
                     `}
-                </script>
-              </Helmet>
-              <TrainerForm />
-              <Footer />
-            </PageWrapper>
-          } />
+                  </script>
+                </Helmet>
+                <TrainerForm />
+                <Footer />
+              </PageWrapper>
+            } />
 
-          {/* ================= REGISTER ================= */}
-          <Route path="/register" element={
-            <PageWrapper>
-              <Helmet>
-                <title>Sign Up for Wellwigen | Start Your Personalized AI Wellness Journey</title>
-                <meta name="description" content="Sign up for Wellwigen today to access 24/7 online doctor consultations, personalized AI diet plans, sync your biometric devices, and connect with certified fitness coaches." />
-                <meta name="keywords" content="register telemedicine app, sign up AI wellness platform, create personalized fitness profile, join online doctor system" />
-                <link rel="canonical" href={window.location.origin + "/register"} />
-                <script type="application/ld+json">
-                  {`
+            {/* ================= REGISTER ================= */}
+            <Route path="/register" element={
+              <PageWrapper>
+                <Helmet>
+                  <title>Sign Up for Wellwigen | Start Your Personalized AI Wellness Journey</title>
+                  <meta name="description" content="Sign up for Wellwigen today to access 24/7 online doctor consultations, personalized AI diet plans, sync your biometric devices, and connect with certified fitness coaches." />
+                  <meta name="keywords" content="register telemedicine app, sign up AI wellness platform, create personalized fitness profile, join online doctor system" />
+                  <link rel="canonical" href={window.location.origin + "/register"} />
+                  <script type="application/ld+json">
+                    {`
                       {
                         "@context": "https://schema.org",
                         "@type": "RegisterAction",
@@ -616,25 +617,25 @@ function App() {
                         "description": "Start your personalized health, telemedicine, and fitness program."
                       }
                     `}
-                </script>
-              </Helmet>
-              <ResponsiveSection>
-                <ConsultationForm />
-              </ResponsiveSection>
-              <Footer />
-            </PageWrapper>
-          } />
+                  </script>
+                </Helmet>
+                <ResponsiveSection>
+                  <ConsultationForm />
+                </ResponsiveSection>
+                <Footer />
+              </PageWrapper>
+            } />
 
-          {/* ================= LOGIN ================= */}
-          <Route path="/login" element={
-            <PageWrapper>
-              <Helmet>
-                <title>Patient Portal Login | Access Your Secure Wellwigen Dashboard</title>
-                <meta name="description" content="Log in to your secure Wellwigen health portal. Access your telemedicine prescriptions, track health metrics, chat with your trainer, and view lab test results." />
-                <meta name="keywords" content="telehealth portal sign in, patient login, access medical records online, patient health dashboard, login to doctor app" />
-                <link rel="canonical" href={window.location.origin + "/login"} />
-                <script type="application/ld+json">
-                  {`
+            {/* ================= LOGIN ================= */}
+            <Route path="/login" element={
+              <PageWrapper>
+                <Helmet>
+                  <title>Patient Portal Login | Access Your Secure Wellwigen Dashboard</title>
+                  <meta name="description" content="Log in to your secure Wellwigen health portal. Access your telemedicine prescriptions, track health metrics, chat with your trainer, and view lab test results." />
+                  <meta name="keywords" content="telehealth portal sign in, patient login, access medical records online, patient health dashboard, login to doctor app" />
+                  <link rel="canonical" href={window.location.origin + "/login"} />
+                  <script type="application/ld+json">
+                    {`
                       {
                         "@context": "https://schema.org",
                         "@type": "WebPage",
@@ -642,13 +643,13 @@ function App() {
                         "description": "Secure sign-in for patient health tracking and consultations."
                       }
                     `}
-                </script>
-              </Helmet>
-              <Login />
-            </PageWrapper>
-          } />
+                  </script>
+                </Helmet>
+                <Login />
+              </PageWrapper>
+            } />
 
-        </Routes>
+          </Routes>
         </React.Suspense>
       </ErrorBoundary>
       {/* Hide floating contact in admin, trainer portal, and marketing pages that already render FloatingWhatsApp */}
@@ -659,10 +660,10 @@ function App() {
         location.pathname !== '/schedule' &&
         !location.pathname.startsWith('/admin') &&
         !location.pathname.startsWith('/trainer') && (
-        <React.Suspense fallback={null}>
-          <FloatingContact />
-        </React.Suspense>
-      )}
+          <React.Suspense fallback={null}>
+            <FloatingContact />
+          </React.Suspense>
+        )}
     </div>
   );
 }

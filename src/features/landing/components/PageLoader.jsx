@@ -16,22 +16,14 @@ export default function PageLoader({ isLoading }) {
             transition={{ duration: 0.4 }}
             className="flex flex-col items-center text-center px-4"
           >
-            {/* Animated Logo Icon */}
-            <div className="relative w-16 h-16 mb-4 flex items-center justify-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                className="absolute inset-0 rounded-2xl border-2 border-teal-500/20 border-t-teal-500"
-              />
-              <span className="text-2xl font-black text-teal-600 font-heading">W</span>
-            </div>
-
-            <div className="font-heading font-black text-2xl tracking-wider text-slate-900">
-              WELLWIGEN
-            </div>
-            <div className="text-[10px] font-bold tracking-[0.25em] text-teal-600 uppercase mt-1">
-              STRONGER BODY. BETTER YOU.
-            </div>
+            {/* 3D Brand Logo */}
+            <motion.img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen - Your Wellness Partner."
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              className="h-16 sm:h-20 md:h-24 w-auto object-contain select-none mb-2 drop-shadow-md"
+            />
 
             {/* Subtle Progress Indicator */}
             <div className="w-36 h-1 bg-slate-100 rounded-full mt-6 overflow-hidden">

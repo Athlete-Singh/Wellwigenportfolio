@@ -232,19 +232,14 @@ export default function Navbar({ onOpenLeadModal }) {
                 e.preventDefault();
                 scrollTo('home');
               }}
-              className="flex items-center gap-2.5 group cursor-pointer"
+              className="flex items-center group cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-xl gradient-teal-sky flex items-center justify-center text-white shadow-md shadow-teal-500/25 group-hover:scale-105 transition-transform duration-200">
-                <span className="font-heading font-black text-lg">W</span>
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="font-heading font-extrabold text-xl tracking-tight text-slate-900 leading-tight group-hover:text-teal-600 transition-colors">
-                  WELLWIGEN
-                </span>
-                <span className="hidden min-[360px]:inline-block text-[7.5px] sm:text-[8.5px] font-bold tracking-[0.15em] sm:tracking-[0.2em] text-teal-700 uppercase -mt-0.5 whitespace-nowrap">
-                  STRONGER BODY. BETTER YOU.
-                </span>
-              </div>
+              <img
+                src="/images/wellwigen-logo.webp"
+                alt="Wellwigen - Your Wellness Partner."
+                className="h-12 sm:h-13 md:h-14 lg:h-16 w-auto object-contain select-none group-hover:scale-105 transition-transform duration-200"
+                loading="eager"
+              />
             </a>
 
             {/* Desktop Navigation Links (Rounded bracket with colored border line) */}
@@ -379,17 +374,21 @@ export default function Navbar({ onOpenLeadModal }) {
               <div>
                 {/* Header */}
                 <div className="flex items-center justify-between pb-6 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg gradient-teal-sky flex items-center justify-center text-white font-bold text-sm">
-                      W
-                    </div>
-                    <div>
-                      <div className="font-heading font-black text-slate-900 text-base">WELLWIGEN</div>
-                      <div className="text-[7.5px] font-bold tracking-widest text-teal-600 uppercase">
-                        STRONGER BODY
-                      </div>
-                    </div>
-                  </div>
+                  <a
+                    href="#home"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setMobileMenuOpen(false);
+                      scrollTo('home');
+                    }}
+                    className="flex items-center"
+                  >
+                    <img
+                      src="/images/wellwigen-logo.webp"
+                      alt="Wellwigen"
+                      className="h-11 sm:h-12 w-auto object-contain select-none"
+                    />
+                  </a>
                   <button
                     onClick={() => setMobileMenuOpen(false)}
                     className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600"

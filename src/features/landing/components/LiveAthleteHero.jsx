@@ -145,11 +145,11 @@ export default function LiveAthleteHero() {
           />
         </div>
 
-        {/* Layer 2: 3D Tilt Card Canvas with Athlete (Front image minor right shift, background wall unchanged) */}
+        {/* Layer 2: 3D Tilt Card Canvas with Athlete (Minor downward nudge per user request) */}
         <div
           className="relative z-10 w-full h-full pointer-events-none select-none"
           style={{
-            transform: 'translate(-4px, 32px) scale(1.05)',
+            transform: 'translate(-4px, 50px) scale(1.05)',
             transformOrigin: '50% 80%',
           }}
         >
@@ -278,7 +278,7 @@ export function MobileAthleteHero() {
 
   return (
     <div
-      className="block lg:hidden relative w-full h-[325px] xs:h-[355px] sm:h-[395px] -mt-3 sm:-mt-5 mb-0 select-none pointer-events-none z-10"
+      className="block lg:hidden relative w-full h-[325px] xs:h-[355px] sm:h-[395px] -mt-1 sm:-mt-2 mb-0 select-none pointer-events-none z-10"
       style={{ perspective: '800px' }}
       aria-hidden="true"
     >

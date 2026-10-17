@@ -111,11 +111,12 @@ const Login = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-teal-900/50 to-gray-900/90 z-0"></div>
                 
-                <div className="relative z-10 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center text-white shadow-lg">
-                        <Activity size={22} strokeWidth={2.5} />
-                    </div>
-                    <span className="text-2xl font-extrabold text-white tracking-tight">Wellwigen</span>
+                <div className="relative z-10 flex items-center">
+                    <img 
+                        src="/images/wellwigen-logo-white.webp" 
+                        alt="Wellwigen" 
+                        className="h-12 sm:h-14 md:h-16 w-auto object-contain select-none filter drop-shadow-[0_2px_12px_rgba(45,212,191,0.35)]" 
+                    />
                 </div>
 
                 <div className="relative z-10 mt-auto">
@@ -141,6 +142,13 @@ const Login = () => {
             <div className="w-full md:w-1/2 lg:w-7/12 flex flex-col justify-center px-6 py-12 md:px-16 lg:px-24 xl:px-32 relative bg-white">
                 
                 <div className="max-w-md w-full mx-auto">
+                    <div className="md:hidden mb-6 flex justify-center">
+                        <img 
+                            src="/images/wellwigen-logo.webp" 
+                            alt="Wellwigen" 
+                            className="h-11 sm:h-12 w-auto object-contain select-none" 
+                        />
+                    </div>
                     <div className="mb-6">
                         <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">
                             Welcome Back

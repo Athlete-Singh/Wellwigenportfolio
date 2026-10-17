@@ -42,18 +42,16 @@ export default function Footer({ onNavigateSection, onOpenLegalModal }) {
           
           {/* Col 1: Brand Info (2 columns wide on large screens) */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl gradient-teal-sky flex items-center justify-center text-white shadow-md">
-                <span className="font-heading font-black text-lg">W</span>
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="font-heading font-extrabold text-xl tracking-tight text-white leading-tight">
-                  WELLWIGEN
-                </span>
-                <span className="text-[8.5px] font-bold tracking-[0.2em] text-teal-400 uppercase -mt-0.5">
-                  STRONGER BODY. BETTER YOU.
-                </span>
-              </div>
+            <div className="relative inline-flex items-center group">
+              {/* Ambient Backlight Energy Glow */}
+              <div className="absolute -inset-3 bg-gradient-to-r from-teal-500/30 via-cyan-400/25 to-teal-400/15 rounded-full blur-2xl opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              
+              {/* Logo directly with backlight, no outer border */}
+              <img
+                src="/images/wellwigen-logo-white.webp"
+                alt="Wellwigen - Your Wellness Partner."
+                className="relative z-10 h-12 sm:h-14 md:h-16 w-auto object-contain select-none filter drop-shadow-[0_2px_14px_rgba(45,212,191,0.45)] group-hover:scale-[1.02] transition-transform duration-300"
+              />
             </div>
 
             <p className="text-xs sm:text-sm text-teal-100/70 max-w-sm leading-relaxed">

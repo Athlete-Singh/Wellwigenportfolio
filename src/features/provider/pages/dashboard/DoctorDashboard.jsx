@@ -1,3 +1,4 @@
+/* [DISABLED FOR CURRENT RELEASE - DoctorDashboard]
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -59,9 +60,9 @@ const DoctorDashboard = () => {
   const socketRef = useRef(null);
   const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
   const providerInfo = JSON.parse(localStorage.getItem("providerInfo") || localStorage.getItem("vendorInfo") || "{}");
-  const doctorName = providerInfo.ownerName || "Dr. Ananya Mishra";
-  const doctorSpecialty = "General Physician + Diabetologist";
-  const doctorNMC = "NMC#DL-2019-04821";
+  const doctorName = providerInfo.ownerName || providerInfo.businessName || "Doctor";
+  const doctorSpecialty = providerInfo.specialty || providerInfo.category || "General Practitioner";
+  const doctorNMC = providerInfo.licenseNumber || providerInfo.registrationNumber || "";
 
   const handleLogout = () => {
     localStorage.clear();
@@ -85,23 +86,16 @@ const DoctorDashboard = () => {
           rawStatus: o.status
         }));
 
-      setConsultations(liveConsults.length > 0 ? liveConsults : [
-        { id: 'mock-1', patient: 'Suresh Kumar', time: '9:00 AM', note: 'Diabetes follow-up · Reviewed sugar report', status: 'Done', rawStatus: 'delivered' },
-        { id: 'mock-2', patient: 'Meera Jain', time: '9:30 AM', note: 'Hypertension · BP 142/90 · Adjusted medication', status: 'Done', rawStatus: 'delivered' }
-      ]);
+      setConsultations(liveConsults);
     } catch (err) {
       console.error(err);
+      setConsultations([]);
     } finally {
       setLoading(false);
     }
   };
 
   const completeConsultation = async (id) => {
-    if (id.startsWith('mock-')) {
-      toast.success("Mock consultation completed");
-      setConsultations(prev => prev.map(c => c.id === id ? { ...c, status: 'Done', rawStatus: 'delivered' } : c));
-      return;
-    }
     try {
       const res = await axios.put(`${API}/orders/${id}/status`, { status: 'delivered' });
       if (res.data.success) {
@@ -133,7 +127,7 @@ const DoctorDashboard = () => {
     <div className="flex h-screen bg-[#fcfaf6] font-sans text-slate-900 overflow-hidden">
       <Toaster position="top-right" />
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Overlay * /}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
@@ -146,15 +140,21 @@ const DoctorDashboard = () => {
         )}
       </AnimatePresence>
 
-      {/* Sidebar - Fully Operational */}
+      {/* Sidebar - Fully Operational * /}
       <aside className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-[#f8f9fa] border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm">W</div>
-            <span className="font-bold text-gray-900 tracking-tight text-sm">Wellwigen <span className="text-blue-600 font-semibold">MD</span></span>
+          <div className="flex flex-col items-start gap-1.5">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain select-none"
+            />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-blue-50 text-blue-600 border border-blue-200 ml-0.5">
+              MD
+            </span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:bg-white rounded">
             <X size={20} />
@@ -196,22 +196,26 @@ const DoctorDashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content Area * /}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile Header */}
+        {/* Mobile Header * /}
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-gray-100 bg-white">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-slate-500">
               <Menu size={24} />
             </button>
-            <span className="font-bold text-gray-900 text-sm">Wellwigen MD</span>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-8 sm:h-9 w-auto object-contain select-none"
+            />
           </div>
           <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold border border-blue-100">
             MD
           </div>
         </header>
 
-        {/* Scrollable Content */}
+        {/* Scrollable Content * /}
         <main className="flex-1 overflow-y-auto p-4 lg:p-8">
         <AnimatePresence mode="wait">
           {activeTab === 'Overview' || activeTab === 'Schedule' ? (
@@ -353,5 +357,13 @@ const DoctorDashboard = () => {
     </div>
   );
 };
+
+export default DoctorDashboard;
+
+*/
+
+import React from "react";
+
+const DoctorDashboard = () => null;
 
 export default DoctorDashboard;

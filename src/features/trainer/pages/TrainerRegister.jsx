@@ -68,16 +68,15 @@ export default function TrainerRegister() {
     <div data-panel="trainer" className="min-h-screen bg-transparent text-slate-800 font-sans flex flex-col justify-between p-4 sm:p-6 antialiased">
       {/* Top Header */}
       <div className="max-w-6xl mx-auto w-full flex items-center justify-between py-2">
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-sky-500 shadow-sm flex items-center justify-center text-white font-black text-sm shrink-0">
-            W
-          </div>
-          <div>
-            <span className="font-black text-slate-900 tracking-tight text-base">WELLWIGEN</span>
-            <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded uppercase tracking-wider ml-1.5 border border-teal-200/50">
-              Coach
-            </span>
-          </div>
+        <Link to="/" className="flex items-center gap-2 group">
+          <img
+            src="/images/wellwigen-logo.webp"
+            alt="Wellwigen"
+            className="h-12 sm:h-14 md:h-16 w-auto object-contain select-none group-hover:scale-105 transition-transform duration-200"
+          />
+          <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-teal-200/60 shadow-2xs">
+            Coach
+          </span>
         </Link>
 
         <Link

@@ -40,7 +40,14 @@ const Login = () => {
 
   return (
     <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Admin Login</h2>
+      <div className="flex justify-center mb-6">
+        <img
+          src="/images/wellwigen-logo.webp"
+          alt="Wellwigen"
+          className="h-12 sm:h-14 md:h-16 w-auto object-contain select-none"
+        />
+      </div>
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h2>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

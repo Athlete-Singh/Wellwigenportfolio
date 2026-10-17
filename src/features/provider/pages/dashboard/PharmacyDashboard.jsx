@@ -1,3 +1,4 @@
+/* [DISABLED FOR CURRENT RELEASE - PharmacyDashboard]
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -100,43 +101,15 @@ const PrescriptionsView = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {[
-                { id: 'RX-9901', patient: 'Suresh Kumar', meds: 'Metformin 500mg, Insulin 10ml', doc: 'Dr. R. Mehta', status: 'Pending Verification', alert: false },
-                { id: 'RX-9902', patient: 'Ravi Mehta', meds: 'Warfarin 5mg, Aspirin 75mg', doc: 'Dr. S. Sharma', status: 'Interaction Alert', alert: true },
-                { id: 'RX-9903', patient: 'Anjali Desai', meds: 'Amoxicillin 500mg (10 caps)', doc: 'Dr. V. Gupta', status: 'Verified - Ready', alert: false },
-                { id: 'RX-9904', patient: 'Vikram Singh', meds: 'Telmisartan 40mg', doc: 'Dr. R. Mehta', status: 'Dispensed', alert: false },
-              ].map((rx, i) => (
-                <tr key={i} className="hover:bg-gray-50/50 transition">
-                  <td className="py-4 px-4">
-                    <p className="text-sm font-semibold text-gray-900">{rx.patient}</p>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase">{rx.id}</p>
-                  </td>
-                  <td className="py-4 px-4 text-sm text-gray-600 font-medium">{rx.meds}</td>
-                  <td className="py-4 px-4 text-sm text-gray-600">{rx.doc}</td>
-                  <td className="py-4 px-4">
-                    <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
-                      rx.status === 'Dispensed' ? 'bg-emerald-50 text-emerald-700' :
-                      rx.alert ? 'bg-red-50 text-red-700' :
-                      rx.status.includes('Ready') ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'
-                    }`}>
-                      {rx.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4 text-right">
-                    {rx.status !== 'Dispensed' ? (
-                      <button className={`px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition ${
-                        rx.alert ? 'bg-[#d92d20] text-white hover:bg-red-700' : 'bg-gray-900 text-white hover:bg-gray-800'
-                      }`}>
-                        {rx.alert ? 'Review' : 'Process'}
-                      </button>
-                    ) : (
-                      <span className="text-xs font-bold text-gray-400 flex items-center justify-end gap-1">
-                        <CheckCircle2 size={14} /> Done
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              <tr>
+                <td colSpan="5" className="py-12 text-center text-gray-500 font-medium">
+                  <div className="flex flex-col items-center justify-center">
+                    <FileText className="w-8 h-8 text-gray-300 mb-2" />
+                    <p className="text-sm font-semibold text-gray-700">No pending prescriptions</p>
+                    <p className="text-xs text-gray-400 mt-0.5">New prescriptions issued by clinicians will appear here in real-time.</p>
+                  </div>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -350,14 +323,14 @@ const PharmacyDashboard = () => {
 
   // Dynamic Provider Info
   const providerInfo = JSON.parse(localStorage.getItem("providerInfo") || localStorage.getItem("vendorInfo") || "{}");
-  const pharmacyName = providerInfo.businessName || 'Health First Pharmacy';
-  const ownerName = providerInfo.ownerName || 'Admin User';
-  const pharmacyInitials = pharmacyName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'HF';
-  const licenseNumber = providerInfo.licenseNumber || 'UP-LKO-2018-0341';
+  const pharmacyName = providerInfo.businessName || 'Pharmacy Partner';
+  const ownerName = providerInfo.ownerName || 'Pharmacy Manager';
+  const pharmacyInitials = (pharmacyName || 'PH').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'PH';
+  const licenseNumber = providerInfo.licenseNumber || '';
 
   return (
     <div className="flex h-screen bg-[#f8f7f5] font-sans text-slate-900 overflow-hidden">
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Overlay * /}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
@@ -370,15 +343,21 @@ const PharmacyDashboard = () => {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
+      {/* Sidebar * /}
       <aside className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-[#f8f9fa] border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 flex items-center justify-between border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#d92d20] rounded flex items-center justify-center text-white font-bold text-sm">W</div>
-            <span className="font-bold text-gray-900 tracking-tight text-sm">Wellwigen <span className="text-[#d92d20] font-semibold">Pharmacy</span></span>
+          <div className="flex flex-col items-start gap-1.5">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain select-none"
+            />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-red-50 text-red-700 border border-red-200 ml-0.5">
+              Pharmacy
+            </span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:bg-white rounded">
             <CloseIcon size={20} />
@@ -407,21 +386,25 @@ const PharmacyDashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content * /}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-gray-100 bg-white">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-slate-500">
               <Menu size={24} />
             </button>
-            <span className="font-bold text-gray-900 text-sm">Wellwigen</span>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-8 sm:h-9 w-auto object-contain select-none"
+            />
           </div>
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 lg:p-8">
           <div className="max-w-6xl mx-auto space-y-6">
             
-            {/* Header Section */}
+            {/* Header Section * /}
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Pharmacy Dashboard</h1>
@@ -459,7 +442,7 @@ const PharmacyDashboard = () => {
             <AnimatePresence mode="wait">
               {activeTab === 'Overview' && (
                 <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
-                  {/* Stats Row */}
+                  {/* Stats Row * /}
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <StatCard label="ORDERS TODAY" value="52" trend="↑ 6 vs avg" />
                     <StatCard label="AUTO-REFILLS" value="18" subtext="Chronic patients" />
@@ -468,7 +451,7 @@ const PharmacyDashboard = () => {
                     <StatCard label="DRUG ALERTS" value="1" subtext="Interaction flagged" alert={true} />
                   </div>
 
-                  {/* Alert Banner */}
+                  {/* Alert Banner * /}
                   <div className="bg-[#fdf4f4] border-l-4 border-[#d92d20] rounded-r-xl p-4 flex gap-3 shadow-sm">
                     <div className="flex-1">
                       <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-1">
@@ -480,10 +463,10 @@ const PharmacyDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Bottom Sections */}
+                  {/* Bottom Sections * /}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     
-                    {/* Active Prescription Queue */}
+                    {/* Active Prescription Queue * /}
                     <div className="md:col-span-2 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                       <div className="flex justify-between items-center mb-6">
                         <h3 className="text-sm font-semibold text-gray-900">Active Prescription Queue</h3>
@@ -491,7 +474,7 @@ const PharmacyDashboard = () => {
                       </div>
                       
                       <div className="space-y-4">
-                        {/* Item 1 */}
+                        {/* Item 1 * /}
                         <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-100">
                           <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-lg bg-[#fdf4f4] flex items-center justify-center">
@@ -514,7 +497,7 @@ const PharmacyDashboard = () => {
                       </div>
                     </div>
 
-                    {/* Stock Alerts */}
+                    {/* Stock Alerts * /}
                     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                       <div className="flex justify-between items-center mb-6">
                         <h3 className="text-sm font-semibold text-gray-900">Stock Alerts</h3>
@@ -561,7 +544,7 @@ const PharmacyDashboard = () => {
         </main>
       </div>
 
-      {/* Custom toggle style for Pharmacy */}
+      {/* Custom toggle style for Pharmacy * /}
       <style dangerouslySetInnerHTML={{__html: `
         .toggle-checkbox:checked {
           right: 0;
@@ -593,5 +576,13 @@ const PharmacyDashboard = () => {
     </div>
   );
 };
+
+export default PharmacyDashboard;
+
+*/
+
+import React from "react";
+
+const PharmacyDashboard = () => null;
 
 export default PharmacyDashboard;

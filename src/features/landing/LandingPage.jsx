@@ -171,7 +171,7 @@ export default function LandingPage() {
               "name": "Wellwigen Online Fitness",
               "alternateName": "Wellwigen",
               "url": "https://wellwigen.com",
-              "logo": "https://wellwigen.com/favicon.svg",
+              "logo": "https://wellwigen.com/images/wellwigen-logo.png",
               "image": "https://wellwigen.com/images/hero_workout.jpg",
               "description": "Online personal training and live interactive group fitness classes coached by certified master trainers.",
               "telephone": "+919598506627",

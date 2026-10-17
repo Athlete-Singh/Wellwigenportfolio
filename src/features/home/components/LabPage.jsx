@@ -18,11 +18,11 @@ const LabPage = () => {
               Diagnostic Excellence
             </span>
             <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-8">
-              Precision Diagnostics <br/>
+              Precision Diagnostics <br />
               <span className="text-purple-500">Accelerating Health.</span>
             </h1>
             <p className="text-lg text-slate-400 mb-10 max-w-2xl">
-              Connect your laboratory to the Wellwigen Health Engine. Real-time sample tracking, AI-powered marker analysis, and instant report delivery to patients.
+              Connect your laboratory to the Wellwigen Health Engine. Real-time sample tracking, marker analysis, and instant report delivery to patients.
             </p>
             <div className="flex flex-wrap gap-4">
               <button className="px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all shadow-xl shadow-purple-900/20">
@@ -40,17 +40,17 @@ const LabPage = () => {
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <FeatureCard 
+            <FeatureCard
               icon={<FlaskConical className="text-purple-600" />}
               title="Automated Logistics"
               desc="Seamless home sample collection scheduling and real-time tracking for your field agents."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<ShieldCheck className="text-emerald-600" />}
               title="NABL Integration"
               desc="Full compliance with international laboratory standards. Digital signatures and secure report storage."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Zap className="text-amber-600" />}
               title="Instant Delivery"
               desc="Reports are delivered directly to the patient's AI Health Dashboard within seconds of approval."

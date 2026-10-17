@@ -17,13 +17,14 @@ const navConfig = [
 const Sidebar = ({ activeView, onSelect, provider }) => {
   return (
     <aside className="fixed left-0 top-0 h-full w-72 border-r border-slate-200 bg-white shadow-sm">
-      <div className="flex h-28 items-center px-6 border-b border-slate-200">
-        <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-teal-600 text-white shadow-sm">
-          <span className="text-lg font-black">W</span>
-        </div>
-        <div className="ml-4">
-          <p className="text-sm font-semibold text-slate-900">Wellwigen Market</p>
-          <p className="text-xs text-slate-500">{provider.roleLabel} dashboard</p>
+      <div className="flex h-24 items-center px-6 border-b border-slate-200">
+        <div className="flex flex-col gap-1">
+          <img
+            src="/images/wellwigen-logo.webp"
+            alt="Wellwigen"
+            className="h-10 sm:h-11 md:h-12 w-auto object-contain select-none"
+          />
+          <p className="text-[11px] font-semibold text-slate-500 capitalize pl-0.5">{provider?.roleLabel || 'Command'} dashboard</p>
         </div>
       </div>
 

@@ -271,36 +271,12 @@ const ScheduleView = () => (
        </div>
     </div>
 
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-      <div className="divide-y divide-gray-100">
-        {[
-          { time: '6:00 AM', duration: '60 min', title: 'Batch Yoga (5 members)', type: 'Group Session', status: 'Completed', location: 'Sector 3 Park' },
-          { time: '7:30 AM', duration: '45 min', title: 'Neha Srivastava', type: 'Weight Loss', status: 'Completed', location: 'Home Visit' },
-          { time: '9:00 AM', duration: '60 min', title: 'Rajan Khanna', type: 'Strength Training', status: 'Upcoming', location: 'Online Video' },
-          { time: '11:00 AM', duration: '30 min', title: 'Consultation - Amit', type: 'Initial Review', status: 'Upcoming', location: 'Phone Call' },
-          { time: '4:30 PM', duration: '60 min', title: 'Sarah Jones', type: 'Endurance Prep', status: 'Upcoming', location: 'Elite Fitness Gym' },
-        ].map((session, i) => (
-          <div key={i} className="p-6 flex items-start gap-6 hover:bg-gray-50 transition relative group">
-             <div className="w-24 shrink-0 text-right">
-                <p className="font-bold text-gray-900">{session.time}</p>
-                <p className="text-xs text-gray-500 mt-1">{session.duration}</p>
-             </div>
-             <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                   <h3 className="font-bold text-gray-900 text-lg">{session.title}</h3>
-                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${session.status === 'Completed' ? 'bg-teal-50 text-teal-700' : 'bg-purple-50 text-purple-700'}`}>{session.status}</span>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                   <span className="flex items-center gap-1"><Dumbbell size={14} /> {session.type}</span>
-                   <span className="flex items-center gap-1"><Activity size={14} /> {session.location}</span>
-                </div>
-             </div>
-             <button className="opacity-0 group-hover:opacity-100 p-2 hover:bg-gray-200 rounded transition absolute right-6 top-6">
-               <MoreVertical size={20} className="text-gray-500" />
-             </button>
-          </div>
-        ))}
-      </div>
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-12 text-center">
+      <Calendar className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+      <h3 className="text-base font-bold text-gray-900 mb-1">No sessions scheduled for today</h3>
+      <p className="text-xs text-gray-500 max-w-sm mx-auto">
+        When clients book 1-on-1 coaching or group sessions, they will be listed here automatically.
+      </p>
     </div>
   </motion.div>
 );
@@ -464,9 +440,9 @@ const TrainerDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const providerInfo = JSON.parse(localStorage.getItem("providerInfo") || localStorage.getItem("vendorInfo") || "{}");
-  const trainerName = providerInfo.ownerName || providerInfo.businessName || 'Vikram Tiwari';
-  const trainerTitle = providerInfo.specialization || 'Certified Yoga & Strength Coach';
-  const trainerInitials = trainerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'VT';
+  const trainerName = providerInfo.ownerName || providerInfo.businessName || 'Coach';
+  const trainerTitle = providerInfo.specialization || 'Certified Fitness Coach';
+  const trainerInitials = (trainerName || 'CO').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'CO';
 
   return (
     <div className="flex h-screen bg-[#f8f7f5] font-sans text-slate-900 overflow-hidden">
@@ -489,9 +465,15 @@ const TrainerDashboard = () => {
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 flex items-center justify-between border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#6941c6] rounded flex items-center justify-center text-white font-bold text-sm">W</div>
-            <span className="font-bold text-gray-900 tracking-tight text-sm">Wellwigen <span className="text-[#6941c6] font-semibold">Trainer</span></span>
+          <div className="flex flex-col items-start gap-1.5">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain select-none"
+            />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-purple-50 text-purple-700 border border-purple-200 ml-0.5">
+              Trainer
+            </span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:bg-white rounded">
             <CloseIcon size={20} />
@@ -527,7 +509,11 @@ const TrainerDashboard = () => {
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-slate-500">
               <Menu size={24} />
             </button>
-            <span className="font-bold text-gray-900 text-sm">Wellwigen</span>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-8 sm:h-9 w-auto object-contain select-none"
+            />
           </div>
         </header>
 

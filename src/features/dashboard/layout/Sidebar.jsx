@@ -60,14 +60,13 @@ export default function Sidebar() {
       
       {/* BRANDING */}
       <div className="p-8 pb-4">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-teal-500/20">
-            <Zap size={20} fill="currentColor" />
-          </div>
-          <div>
-            <h1 className="text-lg font-black text-white tracking-tight leading-none">Wellwigen</h1>
-            <p className="text-[9px] font-bold text-teal-500 uppercase tracking-widest mt-1.5">Network Command</p>
-          </div>
+        <div className="flex flex-col gap-2 mb-8">
+          <img 
+            src="/images/wellwigen-logo-white.webp" 
+            alt="Wellwigen" 
+            className="h-10 sm:h-11 md:h-12 w-auto object-contain select-none filter drop-shadow-[0_2px_10px_rgba(45,212,191,0.3)]" 
+          />
+          <p className="text-[9px] font-bold text-teal-400 uppercase tracking-widest pl-0.5">Network Command</p>
         </div>
       </div>
 

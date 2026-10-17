@@ -177,19 +177,15 @@ export default function TrainerLayout({ children }) {
       >
         {/* Brand / Logo */}
         <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-          <Link to="/trainer/dashboard" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-sky-500 shadow-md shadow-teal-500/20 flex items-center justify-center text-white font-black text-base shrink-0 group-hover:scale-105 transition-transform">
-              W
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-slate-900 tracking-tight text-base">WELLWIGEN</span>
-                <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded uppercase tracking-wider border border-teal-200/50">
-                  Coach
-                </span>
-              </div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Trainer Portal</p>
-            </div>
+          <Link to="/trainer/dashboard" className="flex flex-col items-start gap-1.5 group">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-10 sm:h-11 md:h-12 w-auto object-contain select-none group-hover:scale-105 transition-transform duration-200"
+            />
+            <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-teal-200/50 ml-0.5">
+              Coach
+            </span>
           </Link>
           <button
             onClick={() => setMobileSidebarOpen(false)}

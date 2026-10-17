@@ -1,3 +1,4 @@
+/* [DISABLED FOR CURRENT RELEASE - LabDashboard]
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -108,31 +109,16 @@ const LabDashboard = () => {
                        'bg-amber-50 text-amber-700 border border-amber-100'
         }));
 
-      setOrders(labOrders.length > 0 ? labOrders : [
-        { id: 'mock-1', customer: 'Suresh Kumar', tests: 'HbA1c + FBS + Lipid Panel', price: '₹799', status: 'out_for_delivery', displayStatus: 'REPORT READY', statusColor: 'bg-blue-50 text-blue-700 border border-blue-100' },
-        { id: 'mock-2', customer: 'Meera Jain', tests: 'CBC + Electrolytes - Home', price: '₹450', status: 'pending', displayStatus: 'REPORT PENDING', statusColor: 'bg-amber-50 text-amber-700 border border-amber-100' }
-      ]);
+      setOrders(labOrders);
     } catch (err) {
       console.error(err);
+      setOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
   const updateStatus = async (orderId, newStatus) => {
-    if (orderId.startsWith('mock-')) {
-      setOrders(prev => prev.map(o => o.id === orderId ? { 
-        ...o, 
-        status: newStatus,
-        displayStatus: newStatus === 'delivered' ? 'REPORT SENT' : newStatus === 'out_for_delivery' ? 'REPORT READY' : 'REPORT PENDING',
-        statusColor: newStatus === 'delivered' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 
-                     newStatus === 'out_for_delivery' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 
-                     'bg-amber-50 text-amber-700 border border-amber-100'
-      } : o));
-      toast.success(`Status updated to ${newStatus}`);
-      return;
-    }
-
     try {
       const res = await axios.put(`${API}/orders/${orderId}/status`, { status: newStatus });
       if (res.data.success) {
@@ -162,15 +148,21 @@ const LabDashboard = () => {
     <div className="flex h-screen bg-[#f9fafb] font-sans text-slate-900 overflow-hidden">
       <Toaster position="top-right" />
 
-      {/* Sidebar - Vendor Style */}
+      {/* Sidebar - Vendor Style * /}
       <aside className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-[#f8f9fa] border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm">W</div>
-            <span className="font-bold text-gray-900 tracking-tight text-sm">Wellwigen <span className="text-blue-600 font-semibold">Portal</span></span>
+          <div className="flex flex-col items-start gap-1.5">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain select-none"
+            />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-blue-50 text-blue-600 border border-blue-200 ml-0.5">
+              Portal
+            </span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:bg-white rounded">
             <CloseIcon size={20} />
@@ -205,19 +197,23 @@ const LabDashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content Area * /}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
-        {/* Mobile Header */}
+        {/* Mobile Header * /}
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-gray-100 bg-white">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-slate-500">
               <Menu size={24} />
             </button>
-            <span className="font-bold text-gray-900 text-sm">Wellwigen</span>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-8 sm:h-9 w-auto object-contain select-none"
+            />
           </div>
         </header>
 
-        {/* Scrollable Content */}
+        {/* Scrollable Content * /}
         <main className="flex-1 overflow-y-auto p-4 lg:p-8">
           <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-gray-100 pb-6 gap-4">
             <div>
@@ -229,7 +225,7 @@ const LabDashboard = () => {
               </p>
             </div>
             <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-              {/* Socket Status */}
+              {/* Socket Status * /}
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded border text-[10px] font-black uppercase tracking-wider transition-all ${socketConnected ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
                 <div className={`w-1.5 h-1.5 rounded-full ${socketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></div>
                 {socketConnected ? 'Live' : 'Offline'}
@@ -248,7 +244,7 @@ const LabDashboard = () => {
           <AnimatePresence mode="wait">
             {activeTab === 'Overview' || activeTab === 'Orders' ? (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-                {/* Stats Grid - Vendor Style */}
+                {/* Stats Grid - Vendor Style * /}
                 <div className="grid grid-cols-1 gap-4 mb-8 md:grid-cols-4">
                   <StatCard label="Total Tests" value="1,248" trend="+12%" icon={<ActivityIcon size={20} />} />
                   <StatCard label="Pending" value={String(orders.filter(o => o.status !== 'delivered').length)} trend="Action Required" icon={<Clock size={20} />} positive={orders.length === 0} />
@@ -343,7 +339,7 @@ const LabDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Sidebar Widget - Vendor Style */}
+                  {/* Sidebar Widget - Vendor Style * /}
                   <div className="space-y-6">
                     <div className="bg-slate-900 rounded-lg p-6 text-white shadow-sm relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
@@ -393,5 +389,13 @@ const LabDashboard = () => {
     </div>
   );
 };
+
+export default LabDashboard;
+
+*/
+
+import React from "react";
+
+const LabDashboard = () => null;
 
 export default LabDashboard;

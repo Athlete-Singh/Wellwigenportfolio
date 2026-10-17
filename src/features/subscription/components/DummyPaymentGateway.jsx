@@ -5,8 +5,14 @@ const DummyPaymentGateway = ({ plan, amount, onClose, onSuccess }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [cardNumber, setCardNumber] = useState('4242 4242 4242 4242');
   const [expiry, setExpiry] = useState('12/26');
-  const [cvv, setCvv] = useState('123');
-  const [name, setName] = useState('John Doe');
+  const [name, setName] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('userInfo') || '{}');
+      return u.name || '';
+    } catch {
+      return '';
+    }
+  });
 
   const handlePayment = (e) => {
     e.preventDefault();

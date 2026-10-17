@@ -2272,17 +2272,15 @@ const AdminDashboard = ({ initialTab = 'Dashboard' }) => {
 
         {/* NEW CODE - Wellwigen restyle / Inquiries feature */}
         <div className="p-6 flex items-center justify-between border-b border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#00C9B7] to-[#0284C7] shadow-md shadow-teal-500/20 flex items-center justify-center text-white font-black text-sm shrink-0">
-              W
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-base tracking-tight text-[#0F172A]">WELLWIGEN</span>
-                <span className="text-[9px] font-bold text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded uppercase tracking-wider">Admin</span>
-              </div>
-              <span className="text-[10px] font-medium text-slate-400 tracking-tight">Stronger Body. Better You.</span>
-            </div>
+          <div className="flex flex-col items-start gap-1.5">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-10 sm:h-11 md:h-12 w-auto object-contain select-none"
+            />
+            <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-teal-200/50 ml-0.5">
+              Admin
+            </span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:bg-white rounded-lg">
             <CloseIcon size={20} />

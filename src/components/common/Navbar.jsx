@@ -100,12 +100,13 @@ const Navbar = () => {
           <Link
             to="/"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex items-center gap-2 font-semibold text-lg sm:text-xl cursor-pointer text-gray-900"
+            className="flex items-center cursor-pointer py-1"
           >
-            <div className="bg-teal-500 text-white w-8 h-8 flex items-center justify-center rounded-lg font-bold">
-              W
-            </div>
-            <span className="hidden sm:inline">WellWigen</span>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-11 sm:h-12 md:h-14 w-auto object-contain select-none"
+            />
           </Link>
 
           {/* DESKTOP NAV */}

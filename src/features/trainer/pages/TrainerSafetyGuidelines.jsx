@@ -33,22 +33,14 @@ export default function TrainerSafetyGuidelines() {
         {/* Top Header with Home Page Brand Logo */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-teal-500/25">
           <Link to="/" className="flex items-center gap-3 group cursor-pointer">
-            <div className="w-11 h-11 rounded-2xl gradient-teal-sky flex items-center justify-center text-white shadow-lg shadow-teal-500/30 group-hover:scale-105 transition-transform duration-200">
-              <span className="font-heading font-black text-2xl">W</span>
-            </div>
-            <div className="flex flex-col text-left">
-              <div className="flex items-center gap-2">
-                <span className="font-heading font-extrabold text-2xl tracking-tight text-slate-900 leading-none group-hover:text-teal-600 transition-colors">
-                  WELLWIGEN
-                </span>
-                <span className="text-[10px] font-bold text-teal-800 bg-teal-100/70 px-2 py-0.5 rounded uppercase tracking-wider border border-teal-300/60">
-                  Coach Governance
-                </span>
-              </div>
-              <span className="text-[9px] font-bold tracking-[0.2em] text-teal-700 uppercase mt-1 whitespace-nowrap">
-                STRONGER BODY. BETTER YOU.
-              </span>
-            </div>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-12 sm:h-14 md:h-16 w-auto object-contain select-none group-hover:scale-105 transition-transform duration-200"
+            />
+            <span className="text-[10px] font-bold text-teal-800 bg-teal-100/70 px-2 py-0.5 rounded uppercase tracking-wider border border-teal-300/60">
+              Coach Governance
+            </span>
           </Link>
 
           <div className="flex items-center gap-2.5">

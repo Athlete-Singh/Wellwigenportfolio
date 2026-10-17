@@ -422,9 +422,12 @@ const OnboardingWizard = () => {
       {/* Sidebar Stepper - Only shown from Step 2 onwards */}
       {step > 1 && (
         <div className="hidden lg:flex w-80 bg-white border-r border-gray-100 flex-col p-10 h-screen overflow-y-auto">
-          <Link to="/" className="flex items-center gap-3 mb-16 cursor-pointer hover:opacity-80 transition-opacity w-max">
-            <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg shadow-teal-100">W</div>
-            <span className="text-xl font-bold tracking-tight text-gray-900">Wellwigen</span>
+          <Link to="/" className="flex items-center mb-16 cursor-pointer hover:opacity-90 transition-opacity w-max">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-11 sm:h-12 md:h-14 w-auto object-contain select-none"
+            />
           </Link>
 
           <div className="space-y-1">
@@ -473,9 +476,12 @@ const OnboardingWizard = () => {
           
           {/* Header Branding (only if no sidebar) */}
           {step === 1 && (
-            <Link to="/" className="flex items-center justify-center lg:justify-start gap-3 mb-12 cursor-pointer hover:opacity-80 transition-opacity w-max mx-auto lg:mx-0">
-              <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg shadow-teal-100">W</div>
-              <span className="text-xl font-bold tracking-tight text-gray-900">Wellwigen <span className="text-teal-600">Health</span></span>
+            <Link to="/" className="flex items-center justify-center lg:justify-start mb-12 cursor-pointer hover:opacity-90 transition-opacity w-max mx-auto lg:mx-0">
+              <img
+                src="/images/wellwigen-logo.webp"
+                alt="Wellwigen"
+                className="h-11 sm:h-12 md:h-14 w-auto object-contain select-none"
+              />
             </Link>
           )}
           

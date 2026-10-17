@@ -1,11 +1,6 @@
 import React from "react";
 
-const appointmentsData = [
-  { id: 1, patient: "John Doe", doctor: "Dr. Smith", date: "2026-04-12", time: "10:00 AM", status: "Confirmed" },
-  { id: 2, patient: "Jane Smith", doctor: "Dr. Johnson", date: "2026-04-13", time: "11:30 AM", status: "Pending" },
-  { id: 3, patient: "Michael Brown", doctor: "Dr. Lee", date: "2026-04-14", time: "2:00 PM", status: "Cancelled" },
-  { id: 4, patient: "Emily Davis", doctor: "Dr. Smith", date: "2026-04-15", time: "4:00 PM", status: "Confirmed" }
-];
+const appointmentsData = [];
 
 export default function Appointments() {
   return (
@@ -26,22 +21,30 @@ export default function Appointments() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {appointmentsData.map((appointment) => (
-              <tr key={appointment.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm text-gray-600">{appointment.id}</td>
-                <td className="px-6 py-4 text-sm text-gray-800">{appointment.patient}</td>
-                <td className="px-6 py-4 text-sm text-gray-800">{appointment.doctor}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{appointment.date}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{appointment.time}</td>
-                <td className={`px-6 py-4 text-sm font-medium ${
-                  appointment.status === "Confirmed" ? "text-green-600" :
-                  appointment.status === "Pending" ? "text-yellow-600" :
-                  "text-red-600"
-                }`}>
-                  {appointment.status}
+            {appointmentsData.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="px-6 py-12 text-center text-gray-500 font-medium">
+                  No appointments scheduled yet.
                 </td>
               </tr>
-            ))}
+            ) : (
+              appointmentsData.map((appointment) => (
+                <tr key={appointment.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-600">{appointment.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{appointment.patient}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{appointment.doctor}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{appointment.date}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{appointment.time}</td>
+                  <td className={`px-6 py-4 text-sm font-medium ${
+                    appointment.status === "Confirmed" ? "text-green-600" :
+                    appointment.status === "Pending" ? "text-yellow-600" :
+                    "text-red-600"
+                  }`}>
+                    {appointment.status}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

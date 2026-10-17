@@ -336,33 +336,18 @@ export default function AdminLogin() {
         {/* TOP: Brand Logo & Interactive Admin Badge (Shifted toward header/top position, NO border) */}
         <div className="relative z-10 flex items-center justify-between w-full">
           <Link to="/" className="flex items-center gap-3 group cursor-pointer select-none">
-            {/* Glowing Logo Icon */}
-            <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-400 rounded-2xl blur-xs opacity-60 group-hover:opacity-100 transition duration-300" />
-              <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-teal-700/30 group-hover:scale-105 transition-transform duration-200">
-                <span className="font-heading font-black text-xl sm:text-2xl tracking-tight">W</span>
-              </div>
-            </div>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-12 sm:h-14 md:h-16 w-auto object-contain select-none group-hover:scale-105 transition-transform duration-200"
+            />
 
-            {/* Brand Title + Admin Gateway Badge */}
-            <div className="flex flex-col text-left">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-heading font-extrabold text-xl sm:text-2xl tracking-tight text-white leading-none">
-                  WELLWIGEN
-                </span>
-
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-500/20 border border-teal-400/40 text-teal-300 font-extrabold text-[10px] tracking-wider uppercase backdrop-blur-md shadow-2xs">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-                  </span>
-                  <span>Admin Gateway</span>
-                </div>
-              </div>
-
-              <span className="text-[8px] sm:text-[9px] font-extrabold tracking-[0.22em] text-teal-300/80 uppercase mt-1 whitespace-nowrap">
-                STRONGER BODY. BETTER YOU.
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-500/20 border border-teal-400/40 text-teal-300 font-extrabold text-[10px] tracking-wider uppercase backdrop-blur-md shadow-2xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
               </span>
+              <span>Admin Gateway</span>
             </div>
           </Link>
 

@@ -1,3 +1,4 @@
+/* [DISABLED FOR CURRENT RELEASE - NutritionDashboard]
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -99,27 +100,14 @@ const NutritionDashboard = () => {
   }, []);
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem("vendorProducts");
-    const locals = saved ? JSON.parse(saved) : [];
-    return [
-      { id: '1', name: 'Seasonal Fruit Box', category: 'Fruits', price: 450, stock: 25 },
-      { id: '2', name: 'Organic Citrus Pack', category: 'Citrus', price: 320, stock: 15 },
-      { id: '3', name: 'Tropical Wellness Tray', category: 'Exotic', price: 850, stock: 10 },
-      ...locals
-    ];
+    return saved ? JSON.parse(saved) : [];
   });
   
   // States for Marketplace view (User Customization)
   const [categories, setCategories] = useState([{ _id: '1', name: 'All' }, { _id: '2', name: 'Organic' }, { _id: '3', name: 'Seasonal' }]);
   const [marketProducts, setMarketProducts] = useState(() => {
     const saved = localStorage.getItem("vendorProducts");
-    const locals = (saved ? JSON.parse(saved) : []).map(p => ({ ...p, _id: p.id })); // Map id to _id for marketplace consistency
-    return [
-      { _id: 'm1', name: 'Premium Alphonso Mangoes', price: 450, healthGoal: 'Vitality', images: [] },
-      { _id: 'm2', name: 'Fuji Apples (Global)', price: 180, healthGoal: 'Immunity', images: [] },
-      { _id: 'm3', name: 'Honey Pineapple', price: 120, healthGoal: 'Digestion', images: [] },
-      { _id: 'm4', name: 'Organic Blueberries', price: 550, healthGoal: 'Brain Health', images: [] },
-      ...locals
-    ];
+    return (saved ? JSON.parse(saved) : []).map(p => ({ ...p, _id: p.id }));
   });
   const [activeGoal, setActiveGoal] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -443,7 +431,7 @@ const NutritionDashboard = () => {
 
   return (
     <div className="flex h-screen bg-[#f9fafb] font-sans text-slate-900 overflow-hidden">
-      {/* Overlay for mobile sidebar */}
+      {/* Overlay for mobile sidebar * /}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div 
@@ -456,15 +444,21 @@ const NutritionDashboard = () => {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
+      {/* Sidebar * /}
       <aside className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-[#f8f9fa] border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm">W</div>
-            <span className="font-bold text-gray-900 tracking-tight">Wellwigen <span className="text-blue-600 font-semibold">Market</span></span>
+          <div className="flex flex-col items-start gap-1.5">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain select-none"
+            />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-blue-50 text-blue-600 border border-blue-200 ml-0.5">
+              Market
+            </span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:bg-white rounded">
             <CloseIcon size={20} />
@@ -511,15 +505,19 @@ const NutritionDashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content Area * /}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
-        {/* Mobile Header */}
+        {/* Mobile Header * /}
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-gray-100 bg-white">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-slate-500">
               <Menu size={24} />
             </button>
-            <span className="font-bold text-gray-900 text-sm">Wellwigen</span>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-8 sm:h-9 w-auto object-contain select-none"
+            />
           </div>
           <div className="flex items-center gap-3">
             <img 
@@ -530,7 +528,7 @@ const NutritionDashboard = () => {
           </div>
         </header>
 
-        {/* Scrollable Content */}
+        {/* Scrollable Content * /}
         <main className="flex-1 overflow-y-auto p-4 lg:p-8">
           <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-gray-100 pb-6 gap-4">
             <div>
@@ -542,7 +540,7 @@ const NutritionDashboard = () => {
               </p>
             </div>
             <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-            {/* Store Status Toggle */}
+            {/* Store Status Toggle * /}
             <button 
               onClick={() => setStoreActive(!storeActive)}
               className={`px-3 py-1.5 rounded flex items-center gap-2 border transition-all hover:shadow-sm ${
@@ -557,7 +555,7 @@ const NutritionDashboard = () => {
               </span>
             </button>
 
-            {/* Socket Status Indicator */}
+            {/* Socket Status Indicator * /}
             <div className={`flex items-center gap-2 px-3 py-1.5 rounded border text-[10px] font-black uppercase tracking-wider transition-all ${socketConnected ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
               <div className={`w-1.5 h-1.5 rounded-full ${socketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></div>
               {socketConnected ? 'Socket Live' : 'Socket Offline'}
@@ -786,7 +784,7 @@ const NutritionDashboard = () => {
                     ))}
                   </div>
                   
-                  {/* Floating Order Bar */}
+                  {/* Floating Order Bar * /}
                   {Object.keys(cart).length > 0 && (
                     <motion.div 
                       initial={{ y: 100 }} animate={{ y: 0 }}
@@ -982,5 +980,13 @@ const NutritionDashboard = () => {
     </div>
   );
 };
+
+export default NutritionDashboard;
+
+*/
+
+import React from "react";
+
+const NutritionDashboard = () => null;
 
 export default NutritionDashboard;

@@ -33,10 +33,7 @@ const DigDevicesDashboard = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'Overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [orders, setOrders] = useState([
-    { id: '1', customer: 'Rajesh Kumar', plan: 'Health Monitor', product: 'Digital Heart Rate Monitor', date: '2026-04-29', status: 'Pending', type: 'Subscription' },
-    { id: '2', customer: 'Simran Kumari', plan: 'Daily Checkup', product: 'Smart BP Cuff', date: '2026-04-29', status: 'Out for Delivery', type: 'Subscription' },
-  ]);
+  const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
@@ -76,7 +73,7 @@ const DigDevicesDashboard = () => {
   };
   
   const vendorInfo = JSON.parse(localStorage.getItem("providerInfo") || localStorage.getItem("vendorInfo") || "{}");
-  const providerName = vendorInfo.ownerName || vendorInfo.name || 'Digital Health Solutions';
+  const providerName = vendorInfo.ownerName || vendorInfo.name || vendorInfo.businessName || 'Devices Partner';
   
   const dashboardMetrics = [
     { label: "Today's Orders", value: '12', note: '+2 vs yesterday', positive: true },
@@ -118,9 +115,15 @@ const DigDevicesDashboard = () => {
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-teal-100">W</div>
-            <span className="font-bold text-gray-900 tracking-tight">Wellwigen <span className="text-teal-600 font-black">Market</span></span>
+          <div className="flex flex-col items-start gap-1.5">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain select-none"
+            />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-teal-50 text-teal-700 border border-teal-200 ml-0.5">
+              Market
+            </span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:bg-gray-100 rounded">
             <X size={20} />
@@ -170,7 +173,11 @@ const DigDevicesDashboard = () => {
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-slate-500">
               <Menu size={24} />
             </button>
-            <span className="font-bold text-gray-900 text-sm">Wellwigen</span>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-8 sm:h-9 w-auto object-contain select-none"
+            />
           </div>
           <img
             src={vendorInfo.profileImage || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'}

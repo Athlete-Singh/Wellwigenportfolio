@@ -192,7 +192,7 @@ export default function UserDashboard() {
         name: storedUser.name,
         email: storedUser.email || "",
         phone: storedUser.phone || storedUser.mobile || "",
-        avatar: storedUser.avatar || "https://i.pravatar.cc/150?img=32",
+        avatar: storedUser.avatar || "",
         joinDate: storedUser.joinDate || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
       };
     }
@@ -209,10 +209,10 @@ export default function UserDashboard() {
   const [subscription, setSubscription] = useState(() => {
     const saved = localStorage.getItem("userSubscription");
     return saved ? JSON.parse(saved) : {
-      plan: "Gold",
-      status: "Active",
-      nextBilling: "June 05, 2026",
-      price: "₹999/mo"
+      plan: "No Active Plan",
+      status: "Inactive",
+      nextBilling: "N/A",
+      price: "₹0"
     };
   });
 
@@ -514,9 +514,15 @@ export default function UserDashboard() {
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm">W</div>
-            <span className="font-bold text-gray-900 tracking-tight">Wellwigen <span className="text-blue-600 font-semibold">User</span></span>
+          <div className="flex flex-col items-start gap-1.5">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain select-none"
+            />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-blue-50 text-blue-600 border border-blue-200 ml-0.5">
+              User
+            </span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:bg-white rounded">
             <X size={20} />
@@ -561,7 +567,11 @@ export default function UserDashboard() {
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-slate-500">
               <Menu size={24} />
             </button>
-            <span className="font-bold text-gray-900 text-sm">Wellwigen</span>
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-8 sm:h-9 w-auto object-contain select-none"
+            />
           </div>
           <div className="flex items-center gap-3">
             <img 

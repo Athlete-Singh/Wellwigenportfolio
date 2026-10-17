@@ -84,21 +84,15 @@ export default function TrainerIntro() {
       {/* Top Navigation */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b-2 border-teal-500/30 shadow-xs shadow-teal-500/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-sky-500 shadow-md shadow-teal-500/20 flex items-center justify-center text-white font-black text-base shrink-0 group-hover:scale-105 transition-transform">
-              W
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-slate-900 tracking-tight text-lg">WELLWIGEN</span>
-                <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded uppercase tracking-wider border border-teal-200/50">
-                  Coach
-                </span>
-              </div>
-              <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-widest leading-none">
-                Trainer Portal
-              </p>
-            </div>
+          <Link to="/" className="flex items-center gap-2 group">
+            <img
+              src="/images/wellwigen-logo.webp"
+              alt="Wellwigen"
+              className="h-12 sm:h-14 md:h-16 w-auto object-contain select-none group-hover:scale-105 transition-transform duration-200"
+            />
+            <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-teal-200/60 shadow-2xs">
+              Coach
+            </span>
           </Link>
 
           <div className="flex items-center gap-3 sm:gap-4">
