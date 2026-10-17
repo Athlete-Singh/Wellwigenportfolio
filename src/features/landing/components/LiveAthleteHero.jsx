@@ -1,35 +1,69 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 import { useLiveAthlete } from '../context/LiveAthleteContext';
 
 /**
  * LiveAthleteHero - 3D Athlete placed directly in the Hero Section.
  * - Scrolls naturally up with the home page (NOT pinned in the background of lower sections).
- * - Sits on top of the hero text and rotating words (z-55 > z-10).
- * - Sits on top of the navbar (z-55 > z-50) so his head seamlessly reaches into the header gap.
- * - 3D mouse tilt and natural idle breathing animation.
+ * - Sits on top of the hero text and rotating words.
+ * - Sits on top of the navbar so his head seamlessly reaches into the header gap.
+ * - Interactive 3D mouse parallax tilt & translation matching Personal Training and Group Classes.
+ * - Natural idle breathing animation.
  * - Overflow-hidden and strictly clamped so it never wobbles or causes horizontal scroll on any screen.
  */
 export default function LiveAthleteHero() {
+  const containerRef = useRef(null);
   const athlete = useLiveAthlete();
+  const prefersReducedMotion = useReducedMotion();
 
-  const {
-    prefersReducedMotion,
-    baseRotateX,
-    baseRotateY,
-  } = athlete || {};
+  // Mouse coordinate values (-0.5 to 0.5 normalized across container)
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Smooth springs for natural 60fps inertia (identical to LivePersonalTrainerHero & LiveGroupClassesHero)
+  const springConfig = { damping: 24, stiffness: 150, mass: 0.4 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  // 3D Tilt Rotations
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], [6, -6]);
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-7, 7]);
+
+  // Differential parallax depth offsets
+  const wallTranslateX = useTransform(smoothX, [-0.5, 0.5], [6, -6]);
+  const wallTranslateY = useTransform(smoothY, [-0.5, 0.5], [6, -6]);
+
+  const athleteTranslateX = useTransform(smoothX, [-0.5, 0.5], [-14, 14]);
+  const athleteTranslateY = useTransform(smoothY, [-0.5, 0.5], [-14, 14]);
+
+  const handleMouseMove = (e) => {
+    if (prefersReducedMotion || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX.set(x);
+    mouseY.set(y);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   return (
     <div
       className="hidden lg:block absolute inset-0 pointer-events-none select-none overflow-hidden w-full max-w-full"
       style={{
-        perspective: '1000px',
+        perspective: '1400px',
         zIndex: 25,
       }}
       aria-hidden="true"
     >
       {/* Positioned Hero Visual Container (Arch + Athlete in Lockstep) */}
       <motion.div
+        ref={containerRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         initial={{ opacity: 0, y: 15, filter: 'blur(8px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
@@ -41,109 +75,122 @@ export default function LiveAthleteHero() {
           height: 'var(--athlete-height)',
           maskImage: 'linear-gradient(to bottom, black 84%, transparent 99%)',
           WebkitMaskImage: 'linear-gradient(to bottom, black 84%, transparent 99%)',
+          pointerEvents: 'auto',
+          transformStyle: 'preserve-3d',
+          rotateX: prefersReducedMotion ? 0 : rotateX,
+          rotateY: prefersReducedMotion ? 0 : rotateY,
         }}
       >
         {/* Layer 1: Flat Solid Background Shapes (Shifted left per user request) */}
-        <div
-          className="absolute inset-0 pointer-events-none select-none z-0"
+        <motion.div
           style={{
-            transform: 'translateX(-36px)',
+            x: prefersReducedMotion ? 0 : wallTranslateX,
+            y: prefersReducedMotion ? 0 : wallTranslateY,
+            transformStyle: 'preserve-3d',
           }}
+          className="absolute inset-0 pointer-events-none select-none z-0"
         >
-          {/* Shape 2: Dark Teal Accent Panel peeking behind main arch */}
           <div
-            className="absolute shadow-[0_16px_36px_rgba(15,23,42,0.10)]"
+            className="absolute inset-0 pointer-events-none select-none z-0"
             style={{
-              width: 'var(--hero-arch-width)',
-              height: 'var(--hero-arch-height)',
-              backgroundColor: 'var(--solid-teal-dark, #0F766E)',
-              borderRadius: 'var(--hero-arch-radius) var(--hero-arch-radius) 44px 44px',
-              transform: 'rotate(-9deg) translate(-28px, 16px)',
-              right: 'calc(var(--athlete-width) * 0.225)',
-              top: 'calc(var(--athlete-height) * 0.14)',
+              transform: 'translateX(-36px)',
             }}
-          />
+          >
+            {/* Shape 2: Dark Teal Accent Panel peeking behind main arch */}
+            <div
+              className="absolute shadow-[0_16px_36px_rgba(15,23,42,0.10)]"
+              style={{
+                width: 'var(--hero-arch-width)',
+                height: 'var(--hero-arch-height)',
+                backgroundColor: 'var(--solid-teal-dark, #0F766E)',
+                borderRadius: 'var(--hero-arch-radius) var(--hero-arch-radius) 44px 44px',
+                transform: 'rotate(-9deg) translate(-28px, 16px)',
+                right: 'calc(var(--athlete-width) * 0.225)',
+                top: 'calc(var(--athlete-height) * 0.14)',
+              }}
+            />
 
-          {/* Shape 3: Light Teal Circle peeking on left of arch */}
-          <div
-            className="absolute rounded-full shadow-[0_12px_30px_rgba(15,23,42,0.08)]"
-            style={{
-              width: 'var(--hero-circle-size)',
-              height: 'var(--hero-circle-size)',
-              backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
-              right: 'calc(var(--athlete-width) * 0.415)',
-              top: 'calc(var(--athlete-height) * 0.31)',
-            }}
-          />
+            {/* Shape 3: Light Teal Circle peeking on left of arch */}
+            <div
+              className="absolute rounded-full shadow-[0_12px_30px_rgba(15,23,42,0.08)]"
+              style={{
+                width: 'var(--hero-circle-size)',
+                height: 'var(--hero-circle-size)',
+                backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
+                right: 'calc(var(--athlete-width) * 0.415)',
+                top: 'calc(var(--athlete-height) * 0.31)',
+              }}
+            />
 
-          {/* Shape 1: Main Solid Teal Rounded-Arch Panel (tilted -5deg) */}
-          <div
-            className="absolute shadow-[0_24px_48px_rgba(15,23,42,0.14)]"
-            style={{
-              width: 'var(--hero-arch-width)',
-              height: 'var(--hero-arch-height)',
-              backgroundColor: 'var(--solid-teal, #1FB5A3)',
-              borderRadius: 'var(--hero-arch-radius) var(--hero-arch-radius) 44px 44px',
-              transform: 'rotate(var(--hero-arch-tilt, -5deg))',
-              right: 'calc(var(--athlete-width) * 0.20)',
-              top: 'calc(var(--athlete-height) * 0.155)',
-            }}
-          />
+            {/* Shape 1: Main Solid Teal Rounded-Arch Panel (tilted -5deg) */}
+            <div
+              className="absolute shadow-[0_24px_48px_rgba(15,23,42,0.14)]"
+              style={{
+                width: 'var(--hero-arch-width)',
+                height: 'var(--hero-arch-height)',
+                backgroundColor: 'var(--solid-teal, #1FB5A3)',
+                borderRadius: 'var(--hero-arch-radius) var(--hero-arch-radius) 44px 44px',
+                transform: 'rotate(var(--hero-arch-tilt, -5deg))',
+                right: 'calc(var(--athlete-width) * 0.20)',
+                top: 'calc(var(--athlete-height) * 0.155)',
+              }}
+            />
 
-          {/* Floating Accent Shapes */}
-          <div
-            className="bg-drift-1 absolute rounded-full shadow-md"
-            style={{
-              width: '26px',
-              height: '26px',
-              backgroundColor: 'var(--solid-teal, #1FB5A3)',
-              right: 'calc(var(--athlete-width) * 0.58)',
-              top: 'calc(var(--athlete-height) * 0.24)',
-            }}
-          />
-          <div
-            className="bg-drift-2 absolute rounded-full shadow-sm"
-            style={{
-              width: '18px',
-              height: '18px',
-              backgroundColor: 'var(--solid-teal-dark, #0F766E)',
-              right: 'calc(var(--athlete-width) * 0.28)',
-              top: 'calc(var(--athlete-height) * 0.12)',
-            }}
-          />
-          <div
-            className="bg-drift-1 absolute rounded-full shadow-md"
-            style={{
-              width: '38px',
-              height: '38px',
-              backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
-              right: 'calc(var(--athlete-width) * 0.53)',
-              top: 'calc(var(--athlete-height) * 0.80)',
-            }}
-          />
-          <div
-            className="bg-drift-2 absolute rounded-full shadow-sm"
-            style={{
-              width: '46px',
-              height: '46px',
-              border: '3.5px solid var(--solid-teal, #1FB5A3)',
-              backgroundColor: 'transparent',
-              right: 'calc(var(--athlete-width) * 0.62)',
-              top: 'calc(var(--athlete-height) * 0.50)',
-            }}
-          />
-          <div
-            className="bg-drift-1 absolute rounded-full shadow-sm"
-            style={{
-              width: '28px',
-              height: '28px',
-              border: '2.5px solid var(--solid-teal-dark, #0F766E)',
-              backgroundColor: 'transparent',
-              right: 'calc(var(--athlete-width) * 0.20)',
-              top: 'calc(var(--athlete-height) * 0.84)',
-            }}
-          />
-        </div>
+            {/* Floating Accent Shapes */}
+            <div
+              className="bg-drift-1 absolute rounded-full shadow-md"
+              style={{
+                width: '26px',
+                height: '26px',
+                backgroundColor: 'var(--solid-teal, #1FB5A3)',
+                right: 'calc(var(--athlete-width) * 0.58)',
+                top: 'calc(var(--athlete-height) * 0.24)',
+              }}
+            />
+            <div
+              className="bg-drift-2 absolute rounded-full shadow-sm"
+              style={{
+                width: '18px',
+                height: '18px',
+                backgroundColor: 'var(--solid-teal-dark, #0F766E)',
+                right: 'calc(var(--athlete-width) * 0.28)',
+                top: 'calc(var(--athlete-height) * 0.12)',
+              }}
+            />
+            <div
+              className="bg-drift-1 absolute rounded-full shadow-md"
+              style={{
+                width: '38px',
+                height: '38px',
+                backgroundColor: 'var(--solid-teal-light, #5EEAD4)',
+                right: 'calc(var(--athlete-width) * 0.53)',
+                top: 'calc(var(--athlete-height) * 0.80)',
+              }}
+            />
+            <div
+              className="bg-drift-2 absolute rounded-full shadow-sm"
+              style={{
+                width: '46px',
+                height: '46px',
+                border: '3.5px solid var(--solid-teal, #1FB5A3)',
+                backgroundColor: 'transparent',
+                right: 'calc(var(--athlete-width) * 0.62)',
+                top: 'calc(var(--athlete-height) * 0.50)',
+              }}
+            />
+            <div
+              className="bg-drift-1 absolute rounded-full shadow-sm"
+              style={{
+                width: '28px',
+                height: '28px',
+                border: '2.5px solid var(--solid-teal-dark, #0F766E)',
+                backgroundColor: 'transparent',
+                right: 'calc(var(--athlete-width) * 0.20)',
+                top: 'calc(var(--athlete-height) * 0.84)',
+              }}
+            />
+          </div>
+        </motion.div>
 
         {/* Layer 2: 3D Tilt Card Canvas with Athlete (Minor downward nudge per user request) */}
         <div
@@ -153,31 +200,42 @@ export default function LiveAthleteHero() {
             transformOrigin: '50% 80%',
           }}
         >
+          {/* Parallax translation wrapper moving according to mouse */}
           <motion.div
             style={{
               position: 'relative',
-            width: '100%',
-            height: '100%',
-            transformOrigin: '50% 15%',
-            transformStyle: 'preserve-3d',
-            rotateX: prefersReducedMotion ? 0 : baseRotateX,
-            rotateY: prefersReducedMotion ? 0 : baseRotateY,
-          }}
-          animate={
-            prefersReducedMotion
-              ? {}
-              : {
-                  scale: [1, 1.014, 1],
-                  y: [0, -2.5, 0],
-                }
-          }
-          transition={{
-            duration: 3.6,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          className="relative z-10 w-full h-full flex items-start justify-center"
-        >
+              width: '100%',
+              height: '100%',
+              transformOrigin: '50% 15%',
+              transformStyle: 'preserve-3d',
+              x: prefersReducedMotion ? 0 : athleteTranslateX,
+              y: prefersReducedMotion ? 0 : athleteTranslateY,
+            }}
+            className="relative z-10 w-full h-full flex items-start justify-center"
+          >
+            {/* Autonomous breathing float animation */}
+            <motion.div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                transformStyle: 'preserve-3d',
+              }}
+              animate={
+                prefersReducedMotion
+                  ? {}
+                  : {
+                      scale: [1, 1.014, 1],
+                      y: [0, -2.5, 0],
+                    }
+              }
+              transition={{
+                duration: 3.6,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+              className="relative w-full h-full flex items-start justify-center"
+            >
           {/* OLD CODE (commented by AI) - neon colored glow without studio wall shadows
           <picture className="w-full h-full block">
             <source srcSet="/images/athlete-live.webp" type="image/webp" />
@@ -259,6 +317,7 @@ export default function LiveAthleteHero() {
               decoding="async"
             />
           </picture>
+        </motion.div>
         </motion.div>
         </div>
       </motion.div>

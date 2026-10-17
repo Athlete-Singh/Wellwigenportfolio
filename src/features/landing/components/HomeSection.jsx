@@ -325,7 +325,7 @@ export default function HomeSection({ onOpenLeadModal, onNavigateSection }) {
             <MobileAthleteHero />
 
             {/* Content Container: shifted higher UP on mobile to overlay onto the 3D athlete visual */}
-            <div className="-mt-20 xs:-mt-24 sm:-mt-28 lg:mt-0 relative z-20 space-y-4 sm:space-y-6 lg:space-y-7">
+            <div className="-mt-20 xs:-mt-24 sm:-mt-28 lg:mt-0 relative z-30 space-y-4 sm:space-y-6 lg:space-y-7">
 
               {/* Display Headline with Animated Rotating Words */}
               <motion.div
